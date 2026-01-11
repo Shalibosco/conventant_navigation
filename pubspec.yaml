@@ -1,0 +1,51 @@
+name: conventant_navigation
+description: Covenant University Navigation App
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.8
+  hive_generator: ^2.0.1
+
+  # 🗺️ MAPS & LOCATION
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.0
+  geolocator: ^14.0.2  # Added this
+
+  # 🎤 VOICE ASSISTANT
+  speech_to_text: ^7.3.0
+  flutter_tts: ^4.2.5
+
+  # 🏗️ STATE MANAGEMENT
+  provider: ^6.1.2
+
+  # 📁 OFFLINE STORAGE
+  hive: ^2.2.3        # Added this
+  hive_flutter: ^1.1.0  # Added this
+
+  # 🌐 NETWORKING
+  url_launcher: ^6.2.3
+
+  # 🌍 MULTI-LANGUAGE
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/translations/
+    - assets/map_tiles/
+    - assets/lang/
