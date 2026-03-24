@@ -1,12 +1,21 @@
+// lib/features/navigation/screens/map_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import '../../../core/app_constants.dart';
-import '../../../features/multilingual/language_provider.dart';
+import '../providers/navigation_provider.dart';
 import '../widgets/map_widget.dart';
-import '../../voice_assistant/voice_pro.dart';  // Changed from voice_ui.dart
-import '../../information/info_screen.dart';
+import '../widgets/search_bar_widget.dart';
+import '../widgets/destination_card.dart';
+import '../../voice_assistant/widgets/voice_ui.dart';
+import '../../voice_assistant/providers/voice_provider.dart';
+import '../../voice_assistant/services/voice_command_handler.dart';
+import '../../multilingual/providers/language_provider.dart';
+import '../../../core/routes/app_router.dart';
+import '../../../core/utils/helpers.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_constants.dart';
+import 'package:latlong2/latlong.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -15,174 +24,277 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   final MapController _mapController = MapController();
-  LatLng? _currentLocation;
-  String? _selectedLocation;
+  late AnimationController _fabAnimController;
+
+  @override
+  void initState() {
+    super.initState();
+    _fabAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initProviders();
+    });
+  }
+
+  Future<void> _initProviders() async {
+    final navProvider = context.read<NavigationProvider>();
+    final langProvider = context.read<LanguageProvider>();
+    final voiceProvider = context.read<VoiceProvider>();
+
+    await navProvider.initialize();
+    await voiceProvider.initialize(langProvider.langCode);
+
+    // Connect voice commands to navigation
+    voiceProvider.onCommandResolved = (VoiceCommand command) {
+      _handleVoiceCommand(command);
+    };
+
+    navProvider.startLocationTracking();
+  }
+
+  void _handleVoiceCommand(VoiceCommand command) {
+    final navProvider = context.read<NavigationProvider>();
+    final isOnline = true; // Could check NetworkService
+
+    switch (command.type) {
+      case VoiceCommandType.navigate:
+        if (command.resolvedLocation != null) {
+          navProvider.navigateTo(command.resolvedLocation!, isOnline: isOnline);
+          _flyTo(LatLng(
+            command.resolvedLocation!.latitude,
+            command.resolvedLocation!.longitude,
+          ));
+        }
+        break;
+
+      case VoiceCommandType.whereAmI:
+        if (navProvider.userLocation != null) {
+          _flyTo(navProvider.userLocation!);
+        }
+        break;
+
+      case VoiceCommandType.listCategory:
+        if (command.category != null) {
+          navProvider.filterByCategory(command.category!);
+        }
+        break;
+
+      case VoiceCommandType.search:
+        if (command.query != null) {
+          navProvider.search(command.query!);
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  void _flyTo(LatLng target, {double zoom = AppConstants.defaultZoom}) {
+    _mapController.move(target, zoom);
+  }
+
+  void _recenterOnUser() {
+    final userLoc = context.read<NavigationProvider>().userLocation;
+    if (userLoc != null) {
+      _flyTo(userLoc);
+    } else {
+      Helpers.showSnackBar(context, 'Location not available yet');
+    }
+  }
+
+  @override
+  void dispose() {
+    _fabAnimController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final navProvider = context.watch<NavigationProvider>();
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Covenant University Navigator',
-          style: TextStyle(fontSize: 18),
-        ),
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.language),
-            onSelected: (language) {
-              final provider = Provider.of<LanguageProvider>(context, listen: false);
-              provider.changeLanguage(language);
-            },
-            itemBuilder: (BuildContext context) => [
-              const PopupMenuItem<String>(
-                value: 'en',
+      body: Stack(
+        children: [
+          // ── MAP (full screen) ───────────────────────────
+          Positioned.fill(
+            child: MapWidget(mapController: _mapController),
+          ),
+
+          // ── TOP AREA ────────────────────────────────────
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.flag, color: Colors.blue),
-                    SizedBox(width: 8),
-                    Text('English'),
+                    // Search Bar
+                    Expanded(
+                      child: const MapSearchBar(),
+                    ),
+                    const SizedBox(width: 10),
+
+                    // Info Button (top right)
+                    _TopIconButton(
+                      icon: Icons.info_outline_rounded,
+                      tooltip: 'Campus Info',
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoutes.info),
+                    ),
                   ],
                 ),
               ),
-              const PopupMenuItem<String>(
-                value: 'yo',
-                child: Row(
-                  children: [
-                    Icon(Icons.flag, color: Colors.green),
-                    SizedBox(width: 8),
-                    Text('Yoruba'),
-                  ],
+            ),
+          ),
+
+          // ── RIGHT SIDE FABs ──────────────────────────────
+          Positioned(
+            right: 16,
+            bottom: navProvider.isNavigating ? 240 : 140,
+            child: Column(
+              children: [
+                // Recenter
+                _MapFab(
+                  icon: Icons.gps_fixed_rounded,
+                  onTap: _recenterOnUser,
+                  tooltip: 'My Location',
+                ),
+                const SizedBox(height: 10),
+                // Settings
+                _MapFab(
+                  icon: Icons.settings_rounded,
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.settings),
+                  tooltip: 'Settings',
+                ),
+              ],
+            ),
+          ),
+
+          // ── BOTTOM: Destination Card or Voice UI ─────────
+          Positioned(
+            bottom: 24,
+            left: 0,
+            right: 0,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (navProvider.isNavigating) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: const DestinationCard(),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                // Voice Assistant Button
+                const VoiceUI(),
+              ],
+            ),
+          ),
+
+          // ── Loading Overlay ───────────────────────────────
+          if (navProvider.state == NavigationState.loading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
                 ),
               ),
-              const PopupMenuItem<String>(
-                value: 'ig',
-                child: Row(
-                  children: [
-                    Icon(Icons.flag, color: Colors.orange),
-                    SizedBox(width: 8),
-                    Text('Igbo'),
-                  ],
-                ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Reusable top icon button ───────────────────────────────
+class _TopIconButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _TopIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.12),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (context) => const InformationScreen(),
-                ),
-              );
-            },
-          ),
-        ],
+          child: Icon(icon, color: theme.colorScheme.primary, size: 24),
+        ),
       ),
-      body: Stack(
-        children: [
-          MapWidget(
-            mapController: _mapController,
-            currentLocation: _currentLocation,
-            onLocationSelected: (String location) {
-              setState(() {
-                _selectedLocation = location;
-              });
-            },
-          ),
+    );
+  }
+}
 
-          Positioned(
-            top: 16,
-            left: 16,
-            right: 16,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),  // Reverted to withOpacity
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+// ── Map FAB ────────────────────────────────────────────────
+class _MapFab extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final String tooltip;
+
+  const _MapFab({
+    required this.icon,
+    required this.onTap,
+    required this.tooltip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 46,
+          height: 46,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.14),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
               ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search locations...',
-                  prefixIcon: Icon(Icons.search),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-              ),
-            ),
+            ],
           ),
-
-          Positioned(
-            top: 80,
-            left: 16,
-            right: 16,
-            child: SizedBox(
-              height: 50,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: AppConstants.campusLocations.entries.map((entry) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(entry.value['name'] as String),
-                      selected: _selectedLocation == entry.key,
-                      onSelected: (selected) {
-                        setState(() {
-                          _selectedLocation = selected ? entry.key : null;
-                          _mapController.move(
-                            LatLng(
-                              entry.value['lat'] as double,
-                              entry.value['lng'] as double,
-                            ),
-                            18,
-                          );
-                        });
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 100,
-            right: 16,
-            child: FloatingActionButton(
-              heroTag: 'location',
-              onPressed: () {
-                // Get current location
-              },
-              backgroundColor: Colors.white,
-              child: const Icon(Icons.my_location, color: Colors.blue),
-            ),
-          ),
-
-          // Simple voice button instead of VoiceAssistantButton widget
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: FloatingActionButton(
-              heroTag: 'voice',
-              onPressed: () {
-                final voiceProvider = Provider.of<VoiceProvider>(context, listen: false);
-                voiceProvider.startListening();
-              },
-              child: const Icon(Icons.mic),
-            ),
-          ),
-        ],
+          child: Icon(icon, color: theme.colorScheme.primary, size: 22),
+        ),
       ),
     );
   }

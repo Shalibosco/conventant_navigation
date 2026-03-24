@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../features/multilingual/language_provider.dart';
-import '../../features/voice_assistant/voice_pro.dart';
+import '../../features/voice_assistant/providers/voice_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

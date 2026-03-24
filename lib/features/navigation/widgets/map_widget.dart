@@ -1,151 +1,299 @@
-// lib/features/navigation/widgets/map_widget.dart - UPDATED
+// lib/features/navigation/widgets/map_widget.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import '../../../core/app_constants.dart';
+import 'package:provider/provider.dart';
+import '../providers/navigation_provider.dart';
+import '../../../data/models/location_model.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/utils/helpers.dart';
+import '../../../core/theme/app_theme.dart';
 
 class MapWidget extends StatelessWidget {
   final MapController mapController;
-  final LatLng? currentLocation;
-  final void Function(String)? onLocationSelected;
 
-  const MapWidget({
-    super.key,
-    required this.mapController,
-    this.currentLocation,
-    this.onLocationSelected,
-  });
+  const MapWidget({super.key, required this.mapController});
 
   @override
   Widget build(BuildContext context) {
+    final navProvider = context.watch<NavigationProvider>();
+
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
-        initialCenter: LatLng(  // Changed from 'center' to 'initialCenter'
-          AppConstants.campusLatitude,
-          AppConstants.campusLongitude,
-        ),
-        initialZoom: 16.0,  // Changed from 'zoom'
-        maxZoom: 19.0,
-        minZoom: 14.0,
-        interactionOptions: const InteractionOptions(
-          flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-        ),
+        initialCenter: navProvider.userLocation ?? Helpers.campusCenter,
+        initialZoom: AppConstants.defaultZoom,
+        minZoom: AppConstants.minZoom,
+        maxZoom: AppConstants.maxZoom,
+        onTap: (_, __) {},
       ),
       children: [
-        // Base map layer
+        // ── Tile Layer ──────────────────────────────────────
         TileLayer(
-          urlTemplate: AppConstants.mapTileUrl,
-          userAgentPackageName: 'com.covenant.navigator',
+          urlTemplate: AppConstants.tileUrlTemplate,
+          userAgentPackageName: AppConstants.tileUserAgent,
+          maxZoom: AppConstants.maxZoom,
         ),
 
-        // Campus boundary - FIXED PolygonLayer
-        PolygonLayer(
-          polygons: [
-            Polygon(
-              points: AppConstants.campusBoundary
-                  .map((coord) => LatLng(coord[0], coord[1]))
-                  .toList(),
-              color: Colors.blue.withOpacity(0.2),
-              borderColor: Colors.blue,
-              borderStrokeWidth: 2,
-              // 'isFilled' parameter removed - polygons are always filled
-            ),
-          ],
-        ),
-
-        // Campus locations markers - FIXED MarkerLayer
-        MarkerLayer(
-          markers: [
-            for (final entry in AppConstants.campusLocations.entries)
-              Marker(
-                point: LatLng(
-                  entry.value['lat'] as double,
-                  entry.value['lng'] as double,
-                ),
-                width: 40,
-                height: 40,
-                child: GestureDetector(
-                  onTap: () {
-                    onLocationSelected?.call(entry.key);
-                  },
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color.fromRGBO(0, 0, 0, 0.2),
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          _getLocationIcon(entry.key),
-                          color: Colors.blue,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        entry.value['name'] as String,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          backgroundColor: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
-
-        // Current location marker
-        if (currentLocation != null)
-          MarkerLayer(
-            markers: [
-              Marker(
-                point: currentLocation!,
-                width: 30,
-                height: 30,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.3),
-                    border: Border.all(color: Colors.blue, width: 2),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.location_pin,
-                      color: Colors.blue,
-                      size: 20,
-                    ),
-                  ),
-                ),
+        // ── Route Polyline ──────────────────────────────────
+        if (navProvider.hasRoute)
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: navProvider.routePoints,
+                strokeWidth: 5.0,
+                color: AppTheme.accentColor,
+                borderStrokeWidth: 2.0,
+                borderColor: Colors.white.withValues(alpha: 0.6),
               ),
             ],
           ),
+
+        // ── Location Markers ────────────────────────────────
+        MarkerLayer(
+          markers: [
+            // All campus location markers
+            ...navProvider.filteredLocations.map(
+                  (loc) => _buildLocationMarker(context, loc, navProvider),
+            ),
+
+            // User location marker
+            if (navProvider.userLocation != null)
+              _buildUserMarker(navProvider.userLocation!),
+
+            // Destination marker
+            if (navProvider.selectedDestination != null)
+              _buildDestinationMarker(navProvider.selectedDestination!),
+          ],
+        ),
       ],
     );
   }
 
-  IconData _getLocationIcon(String locationKey) {
-    switch (locationKey) {
-      case 'chapel':
-        return Icons.church;
-      case 'library':
-        return Icons.library_books;
-      case 'cafeteria':
-        return Icons.restaurant;
-      default:
-        return Icons.location_on;
-    }
+  Marker _buildLocationMarker(
+      BuildContext context,
+      LocationModel location,
+      NavigationProvider navProvider,
+      ) {
+    final isSelected = navProvider.selectedDestination?.id == location.id;
+    final color = Helpers.getCategoryColor(location.category);
+
+    return Marker(
+      point: LatLng(location.latitude, location.longitude),
+      width: isSelected ? 48 : 36,
+      height: isSelected ? 48 : 36,
+      child: GestureDetector(
+        onTap: () => _onMarkerTap(context, location),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          decoration: BoxDecoration(
+            color: isSelected ? color : color.withValues(alpha: 0.85),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white,
+              width: isSelected ? 3 : 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.5),
+                blurRadius: isSelected ? 12 : 6,
+                spreadRadius: isSelected ? 3 : 1,
+              ),
+            ],
+          ),
+          child: Icon(
+            Helpers.getCategoryIcon(location.category),
+            color: Colors.white,
+            size: isSelected ? 24 : 18,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Marker _buildUserMarker(LatLng position) {
+    return Marker(
+      point: position,
+      width: 44,
+      height: 44,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+          ),
+          Container(
+            width: 22,
+            height: 22,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.5),
+                  blurRadius: 8,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Marker _buildDestinationMarker(LocationModel destination) {
+    return Marker(
+      point: LatLng(destination.latitude, destination.longitude),
+      width: 52,
+      height: 64,
+      child: Column(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppTheme.accentColor,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.accentColor.withValues(alpha: 0.6),
+                  blurRadius: 14,
+                  spreadRadius: 4,
+                ),
+              ],
+            ),
+            child: const Icon(Icons.flag_rounded, color: Colors.white, size: 26),
+          ),
+          Container(width: 3, height: 12, color: AppTheme.accentColor),
+        ],
+      ),
+    );
+  }
+
+  void _onMarkerTap(BuildContext context, LocationModel location) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _MarkerBottomSheet(location: location),
+    );
+  }
+}
+
+// ── Marker tap bottom sheet ────────────────────────────────
+class _MarkerBottomSheet extends StatelessWidget {
+  final LocationModel location;
+  const _MarkerBottomSheet({required this.location});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final navProvider = context.read<NavigationProvider>();
+    final color = Helpers.getCategoryColor(location.category);
+
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle bar
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: theme.dividerColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(
+                        Helpers.getCategoryIcon(location.category),
+                        color: color,
+                        size: 26,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(location.name,
+                              style: theme.textTheme.titleLarge),
+                          const SizedBox(height: 2),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              Helpers.capitalize(location.category),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                  color: color, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(location.description, style: theme.textTheme.bodyMedium),
+                if (location.openingHours != null) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.access_time, size: 16),
+                      const SizedBox(width: 6),
+                      Text(location.openingHours!,
+                          style: theme.textTheme.bodySmall),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      navProvider.navigateTo(location);
+                    },
+                    icon: const Icon(Icons.directions_walk_rounded),
+                    label: const Text('Navigate Here'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

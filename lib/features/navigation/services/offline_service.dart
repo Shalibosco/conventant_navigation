@@ -1,27 +1,39 @@
+// lib/features/navigation/services/offline_map_service.dart
+
 import 'package:latlong2/latlong.dart';
-import '../../../core/utils/helpers.dart';  // Fixed: Two dots not three
-import '../../../core/app_constants.dart';
+import '../../../core/utils/helpers.dart';
+import '../../../core/constants/app_constants.dart'; // Corrected path to include /constants/
 
 class OfflineMapService {
-  // Calculate distance method for this class
+
+  // 1. Fix: Extract latitude and longitude from the LatLng objects to pass 4 doubles
   double _calculateDistance(LatLng point1, LatLng point2) {
-    return Helpers.calculateDistance(point1, point2);
+    return Helpers.calculateDistance(
+      point1.latitude,
+      point1.longitude,
+      point2.latitude,
+      point2.longitude,
+    );
   }
 
   Future<void> cacheMapTiles() async {
-    // Download tiles for campus radius (2373m)
+    // Download tiles for campus radius
     // Store in local database
   }
 
   Future<bool> isLocationWithinCampus(LatLng location) async {
-    // Check if location is within 2373m radius
+    // 2. Fix: Match variables to your actual app_constants.dart
     final distance = _calculateDistance(
       location,
-      LatLng(
-        AppConstants.campusLatitude,
-        AppConstants.campusLongitude,
+      const LatLng(
+        AppConstants.campusLat, // Fixed name
+        AppConstants.campusLng, // Fixed name
       ),
     );
-    return distance <= AppConstants.campusRadius;
+
+    // Let's assume a 2500-meter threshold for bounding Hebron (approx 2.5km)
+    const double campusRadiusThreshold = 2500.0;
+
+    return distance <= campusRadiusThreshold;
   }
 }

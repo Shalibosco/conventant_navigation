@@ -1,0 +1,212 @@
+[
+  {
+    "id": "loc_001",
+    "name": "Chapel of Light",
+    "description": "The main chapel at Covenant University. Mandatory chapel service holds every Monday, Wednesday, and Friday at 6:45 AM.",
+    "latitude": 6.6731,
+    "longitude": 3.1588,
+    "category": "worship",
+    "tags": ["chapel", "church", "worship", "prayer", "service"],
+    "openingHours": "Mon, Wed, Fri – 6:45 AM | Sunday – 8:00 AM",
+    "localizedNames": {
+      "yo": "Ṣọ́ọ̀sì Imọlẹ",
+      "ig": "Ụlọ Ọzọ Ocha",
+      "pidgin": "Chapel of Light"
+    },
+    "localizedDescriptions": {
+      "yo": "Ṣọ́ọ̀sì àkọ́kọ́ ní Covenant University. Iṣẹ́ ṣọ́ọ̀sì wà ní Ọjọ́ Ajé, Ọjọ́rú, àti Ọjọ́ Ẹtì ní 6:45 owurọ̀.",
+      "ig": "Ụlọ Ụkwu nke Mahadum. Ọzọzọ ọ bụ n'Mọnde, Wenezdee na Fraịde n'oge 6:45 AM.",
+      "pidgin": "Di main chapel for Covenant University. Chapel dey hold every Monday, Wednesday and Friday by 6:45 AM."
+    }
+  },
+  {
+    "id": "loc_002",
+    "name": "Engineering & Science Building (ENG)",
+    "description": "Houses the College of Engineering and the College of Science and Technology. Contains lecture halls, labs, and staff offices.",
+    "latitude": 6.6718,
+    "longitude": 3.1605,
+    "category": "academic",
+    "tags": ["engineering", "science", "technology", "CST", "lecture", "lab"],
+    "openingHours": "Mon–Fri: 7:00 AM – 8:00 PM",
+    "localizedNames": {
+      "yo": "Ile Engineering & Science",
+      "ig": "Ụlọ Nkà ihe rụrụ ọrụ",
+      "pidgin": "Engineering & Science Building"
+    }
+  },
+  {
+    "id": "loc_003",
+    "name": "University Library",
+    "description": "The main library with extensive print and digital resources. Wi-Fi available. Student ID required for entry.",
+    "latitude": 6.6720,
+    "longitude": 3.1600,
+    "category": "academic",
+    "tags": ["library", "books", "study", "research", "reading"],
+    "openingHours": "Mon–Fri: 7:00 AM – 10:00 PM | Sat: 8:00 AM – 6:00 PM",
+    "localizedNames": {
+      "yo": "Ilé-Ìwé Ìpamọ Ìwé",
+      "ig": "Ụlọ Akwụkwọ Mahadum",
+      "pidgin": "University Library"
+    }
+  },
+  {
+    "id": "loc_004",
+    "name": "Male Hostel (David's Court)",
+    "description": "Main male student accommodation complex. Contains rooms, common areas, and laundry facilities.",
+    "latitude": 6.6710,
+    "longitude": 3.1612,
+    "category": "hostel",
+    "tags": ["hostel", "male", "accommodation", "dormitory", "hall", "room"],
+    "openingHours": "24 hours",
+    "localizedNames": {
+      "yo": "Ile Isinmi Akọ (David's Court)",
+      "ig": "Ọnọdụ Ụmụ Nwoke (David's Court)",
+      "pidgin": "Male Hostel (David's Court)"
+    }
+  },
+  {
+    "id": "loc_005",
+    "name": "Female Hostel (Esther Hall)",
+    "description": "Main female student accommodation complex. Secure access with 24-hour security personnel.",
+    "latitude": 6.6708,
+    "longitude": 3.1595,
+    "category": "hostel",
+    "tags": ["hostel", "female", "accommodation", "dormitory", "hall", "room"],
+    "openingHours": "24 hours",
+    "localizedNames": {
+      "yo": "Ile Isinmi Obinrin (Esther Hall)",
+      "ig": "Ọnọdụ Ụmụ Nwanyị (Esther Hall)",
+      "pidgin": "Female Hostel (Esther Hall)"
+    }
+  },
+  {
+    "id": "loc_006",
+    "name": "University Cafeteria",
+    "description": "The main dining hall serving breakfast, lunch, and dinner. Accepts CU ID cards for cashless payments.",
+    "latitude": 6.6725,
+    "longitude": 3.1595,
+    "category": "food",
+    "tags": ["food", "eat", "cafeteria", "dining", "restaurant", "canteen", "breakfast", "lunch", "dinner"],
+    "openingHours": "6:30 AM – 9:00 PM daily",
+    "localizedNames": {
+      "yo": "Cafeteria Yunifásítì",
+      "ig": "Ebe Oriri Mahadum",
+      "pidgin": "University Cafeteria"
+    }
+  },
+  {
+    "id": "loc_007",
+    "name": "Student Health Centre",
+    "description": "Provides medical consultation, emergency care, and pharmacy services for students and staff.",
+    "latitude": 6.6714,
+    "longitude": 3.1620,
+    "category": "medical",
+    "tags": ["hospital", "clinic", "medical", "health", "doctor", "sick", "pharmacy", "emergency"],
+    "openingHours": "Mon–Fri: 8:00 AM – 5:00 PM | Emergency: 24/7",
+    "phoneNumber": "+234-xxx-xxxx",
+    "localizedNames": {
+      "yo": "Ile Iwosan Awon Akẹkọọ",
+      "ig": "Ụlọ Ọgwụ Ụmụ Akwụkwọ",
+      "pidgin": "Student Health Centre"
+    }
+  },
+  {
+    "id": "loc_008",
+    "name": "Sports Complex",
+    "description": "Multi-purpose sports facility with football field, basketball courts, tennis courts, and gym.",
+    "latitude": 6.6740,
+    "longitude": 3.1585,
+    "category": "sports",
+    "tags": ["sports", "gym", "football", "basketball", "tennis", "field", "court", "exercise"],
+    "openingHours": "Mon–Fri: 6:00 AM – 8:00 PM | Weekends: 7:00 AM – 6:00 PM",
+    "localizedNames": {
+      "yo": "Ile Ere Idaraya",
+      "ig": "Ebe Egwuregwu",
+      "pidgin": "Sports Complex"
+    }
+  },
+  {
+    "id": "loc_009",
+    "name": "Administrative Block",
+    "description": "Central administrative hub. Houses the Vice-Chancellor's office, Registry, Bursary, and other admin units.",
+    "latitude": 6.6728,
+    "longitude": 3.1610,
+    "category": "admin",
+    "tags": ["admin", "office", "registry", "bursary", "VC", "management", "senate"],
+    "openingHours": "Mon–Fri: 8:00 AM – 4:00 PM",
+    "localizedNames": {
+      "yo": "Ile Ijoba Yunifásítì",
+      "ig": "Ụlọ Ọchịchị Mahadum",
+      "pidgin": "Administrative Block"
+    }
+  },
+  {
+    "id": "loc_010",
+    "name": "Peter Odili Academic City (POAC)",
+    "description": "State-of-the-art lecture complex housing large lecture halls, seminar rooms, and ICT centers.",
+    "latitude": 6.6715,
+    "longitude": 3.1590,
+    "category": "academic",
+    "tags": ["lecture", "class", "academic", "POAC", "seminar", "ICT"],
+    "openingHours": "Mon–Fri: 7:00 AM – 9:00 PM",
+    "localizedNames": {
+      "yo": "POAC – Ile Ikẹkọọ Nla",
+      "ig": "POAC – Ụlọ Akwụkwọ Ukwu",
+      "pidgin": "POAC – Peter Odili Academic City"
+    }
+  },
+  {
+    "id": "loc_011",
+    "name": "Senate Building",
+    "description": "Houses the Senate Chamber, Council room, and key administrative offices for the university governance.",
+    "latitude": 6.6730,
+    "longitude": 3.1598,
+    "category": "admin",
+    "tags": ["senate", "council", "governance", "admin", "official"],
+    "openingHours": "Mon–Fri: 8:00 AM – 4:00 PM"
+  },
+  {
+    "id": "loc_012",
+    "name": "Student Centre",
+    "description": "Central hub for student activities, clubs, and organizations. Contains meeting rooms and recreation areas.",
+    "latitude": 6.6722,
+    "longitude": 3.1606,
+    "category": "recreation",
+    "tags": ["recreation", "student", "centre", "club", "activity", "lounge", "relax"],
+    "openingHours": "Mon–Sat: 8:00 AM – 9:00 PM",
+    "localizedNames": {
+      "yo": "Ile Awon Akẹkọọ",
+      "ig": "Ebe Ụmụ Akwụkwọ",
+      "pidgin": "Student Centre"
+    }
+  },
+  {
+    "id": "loc_013",
+    "name": "School of Law",
+    "description": "Dedicated faculty for law students with moot courts, law clinics, and legal research centers.",
+    "latitude": 6.6712,
+    "longitude": 3.1602,
+    "category": "academic",
+    "tags": ["law", "faculty", "lecture", "moot court", "legal"],
+    "openingHours": "Mon–Fri: 7:00 AM – 8:00 PM"
+  },
+  {
+    "id": "loc_014",
+    "name": "Business School",
+    "description": "Faculty of Business Administration and Management Sciences. Houses the Bloomberg terminal lab.",
+    "latitude": 6.6716,
+    "longitude": 3.1615,
+    "category": "academic",
+    "tags": ["business", "MBA", "management", "economics", "accounting", "finance"],
+    "openingHours": "Mon–Fri: 7:00 AM – 8:00 PM"
+  },
+  {
+    "id": "loc_015",
+    "name": "CU Staff Quarters Gate",
+    "description": "Main entrance gate to staff residential quarters. Access restricted to authorized personnel.",
+    "latitude": 6.6745,
+    "longitude": 3.1608,
+    "category": "admin",
+    "tags": ["gate", "staff", "entrance", "quarters", "security"]
+  }
+]

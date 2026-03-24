@@ -8,7 +8,7 @@ part of 'location_model.dart';
 
 class LocationModelAdapter extends TypeAdapter<LocationModel> {
   @override
-  final int typeId = 1;
+  final int typeId = 0;
 
   @override
   LocationModel read(BinaryReader reader) {
@@ -19,38 +19,47 @@ class LocationModelAdapter extends TypeAdapter<LocationModel> {
     return LocationModel(
       id: fields[0] as String,
       name: fields[1] as String,
-      latitude: fields[2] as double,
-      longitude: fields[3] as double,
-      description: fields[4] as String,
-      type: fields[5] as String,
-      buildingCode: fields[6] as String?,
-      floor: fields[7] as String?,
-      tags: (fields[8] as List?)?.cast<String>(),
+      description: fields[2] as String,
+      latitude: fields[3] as double,
+      longitude: fields[4] as double,
+      category: fields[5] as String,
+      imageAssetPath: fields[6] as String?,
+      localizedNames: (fields[7] as Map?)?.cast<String, String>(),
+      localizedDescriptions: (fields[8] as Map?)?.cast<String, String>(),
+      tags: (fields[9] as List?)?.cast<String>(),
+      openingHours: fields[10] as String?,
+      phoneNumber: fields[11] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, LocationModel obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.latitude)
-      ..writeByte(3)
-      ..write(obj.longitude)
-      ..writeByte(4)
       ..write(obj.description)
+      ..writeByte(3)
+      ..write(obj.latitude)
+      ..writeByte(4)
+      ..write(obj.longitude)
       ..writeByte(5)
-      ..write(obj.type)
+      ..write(obj.category)
       ..writeByte(6)
-      ..write(obj.buildingCode)
+      ..write(obj.imageAssetPath)
       ..writeByte(7)
-      ..write(obj.floor)
+      ..write(obj.localizedNames)
       ..writeByte(8)
-      ..write(obj.tags);
+      ..write(obj.localizedDescriptions)
+      ..writeByte(9)
+      ..write(obj.tags)
+      ..writeByte(10)
+      ..write(obj.openingHours)
+      ..writeByte(11)
+      ..write(obj.phoneNumber);
   }
 
   @override

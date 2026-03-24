@@ -1,66 +1,89 @@
+// lib/features/information/widgets/info_card.dart
+
 import 'package:flutter/material.dart';
+import '../../../data/models/info_model.dart';
+import '../../../core/utils/helpers.dart';
+import '../../../core/theme/app_theme.dart';
 
 class InfoCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final String content;
-  final Color? color;
+  final InfoModel item;
+  final String langCode;
 
-  const InfoCard({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.content,
-    this.color,
-  });
+  const InfoCard({super.key, required this.item, required this.langCode});
+
+  IconData _getIcon() {
+    switch (item.iconName) {
+      case 'church':   return Icons.church_rounded;
+      case 'medical':  return Icons.local_hospital_rounded;
+      case 'admin':    return Icons.business_rounded;
+      case 'academic': return Icons.school_rounded;
+      case 'rule':     return Icons.gavel_rounded;
+      default:         return Icons.info_outline_rounded;
+    }
+  }
+
+  Color _getCategoryColor() {
+    switch (item.category) {
+      case 'rule':     return const Color(0xFFE74C3C);
+      case 'facility': return AppTheme.primaryColor;
+      case 'contact':  return const Color(0xFF27AE60);
+      case 'event':    return AppTheme.secondaryColor;
+      default:         return AppTheme.primaryColor;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = _getCategoryColor();
+    final title = item.getLocalizedTitle(langCode);
+    final content = item.getLocalizedContent(langCode);
+
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color ?? Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: color ?? Colors.blue,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Theme(
+        data: theme.copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          leading: Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 12),
-            Text(
-              content,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[700],
-                height: 1.5,
+            child: Icon(_getIcon(), color: color, size: 22),
+          ),
+          title: Text(title, style: theme.textTheme.titleMedium),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                Helpers.capitalize(item.category),
+                style: theme.textTheme.labelSmall
+                    ?.copyWith(color: color, fontWeight: FontWeight.w600),
               ),
             ),
+          ),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Divider(),
+            const SizedBox(height: 8),
+            Text(content, style: theme.textTheme.bodyMedium),
+            if (item.lastUpdated != null) ...[
+              const SizedBox(height: 10),
+              Text(
+                'Last updated: ${item.lastUpdated}',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                ),
+              ),
+            ],
           ],
         ),
       ),
