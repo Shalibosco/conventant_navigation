@@ -15,11 +15,10 @@ class StorageService {
       _prefs.setString(AppConstants.prefLanguage, code);
 
   // ── Theme ─────────────────────────────────────────────────
-  bool isDarkMode() => _prefs.getBool(AppConstants.prefThemeMode) ?? false;
+  bool isDarkMode() => _prefs.getBool(AppConstants.prefTheme) ?? false;
 
   Future<void> setDarkMode(bool value) =>
-      _prefs.setBool(AppConstants.prefThemeMode, value);
-
+      _prefs.setBool(AppConstants.prefTheme, value);
   // ── First Launch ──────────────────────────────────────────
   bool isFirstLaunch() => _prefs.getBool(AppConstants.prefFirstLaunch) ?? true;
 

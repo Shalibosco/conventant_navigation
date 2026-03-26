@@ -28,7 +28,7 @@ class DestinationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.14),
+            color: Colors.black.withValues(alpha: 0.14), // ✅ Fixed withValues
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
@@ -46,7 +46,7 @@ class DestinationCard extends StatelessWidget {
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
+                    color: color.withValues(alpha: 0.12), // ✅ Fixed withValues
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(
@@ -69,7 +69,7 @@ class DestinationCard extends StatelessWidget {
                       Text(
                         Helpers.capitalize(destination.category),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.55),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.55), // ✅ Fixed withValues
                         ),
                       ),
                     ],
@@ -81,7 +81,7 @@ class DestinationCard extends StatelessWidget {
                     width: 34,
                     height: 34,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withOpacity(0.08),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.08), // ✅ Fixed withValues
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.close_rounded, size: 18),
@@ -102,21 +102,21 @@ class DestinationCard extends StatelessWidget {
                   icon: Icons.straighten_rounded,
                   label: 'Distance',
                   value: distance,
-                  color: AppTheme.primaryColor,
+                  color: AppTheme.cuNavy, // ✅ Fixed: Pointing to cuNavy
                 ),
                 Container(width: 1, height: 36, color: theme.dividerColor),
                 _StatItem(
                   icon: Icons.directions_walk_rounded,
                   label: 'Walk Time',
                   value: navProvider.estimatedTime,
-                  color: AppTheme.accentColor,
+                  color: AppTheme.navGreen, // ✅ Fixed: Pointing to navGreen
                 ),
                 Container(width: 1, height: 36, color: theme.dividerColor),
                 _StatItem(
                   icon: Icons.route_rounded,
                   label: 'Route',
                   value: navProvider.hasRoute ? 'Ready' : 'Loading...',
-                  color: AppTheme.secondaryColor,
+                  color: AppTheme.cuGold, // ✅ Fixed: Pointing to cuGold
                 ),
               ],
             ),
@@ -130,8 +130,8 @@ class DestinationCard extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppTheme.accentColor,
-                    AppTheme.accentColor.withOpacity(0.75),
+                    AppTheme.cuNavy, // ✅ Swapped to Navy gradient for aesthetics
+                    AppTheme.cuNavy.withValues(alpha: 0.75),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(14),

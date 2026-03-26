@@ -24,11 +24,11 @@ class InfoCard extends StatelessWidget {
 
   Color _getCategoryColor() {
     switch (item.category) {
-      case 'rule':     return const Color(0xFFE74C3C);
-      case 'facility': return AppTheme.primaryColor;
-      case 'contact':  return const Color(0xFF27AE60);
-      case 'event':    return AppTheme.secondaryColor;
-      default:         return AppTheme.primaryColor;
+      case 'rule':     return const Color(0xFFE53935); // Matches your AppTheme.errorRed
+      case 'facility': return AppTheme.cuNavy; // ✅ Fixed: Using cuNavy
+      case 'contact':  return AppTheme.navGreen; // ✅ Reused your AppTheme.navGreen
+      case 'event':    return AppTheme.cuGold; // ✅ Fixed: Using cuGold
+      default:         return AppTheme.cuNavy; // ✅ Fixed
     }
   }
 
@@ -48,7 +48,8 @@ class InfoCard extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              // ✅ Fixed: withValues instead of withOpacity
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(_getIcon(), color: color, size: 22),
@@ -56,17 +57,23 @@ class InfoCard extends StatelessWidget {
           title: Text(title, style: theme.textTheme.titleMedium),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 2),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                Helpers.capitalize(item.category),
-                style: theme.textTheme.labelSmall
-                    ?.copyWith(color: color, fontWeight: FontWeight.w600),
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    // ✅ Fixed: withValues instead of withOpacity
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    Helpers.capitalize(item.category),
+                    style: theme.textTheme.labelSmall
+                        ?.copyWith(color: color, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
             ),
           ),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -80,7 +87,8 @@ class InfoCard extends StatelessWidget {
               Text(
                 'Last updated: ${item.lastUpdated}',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                  // ✅ Fixed: withValues instead of withOpacity
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
               ),
             ],

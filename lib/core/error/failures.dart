@@ -7,9 +7,10 @@ abstract class Failure extends Equatable {
   const Failure(this.message);
 
   @override
-  List<Object> get props => [message];
+  List<Object?> get props => [message]; // ✅ Nullable props for safety
 }
 
+// ── Feature-Specific Failures ──────────────────────────────
 class LocationFailure extends Failure {
   const LocationFailure(super.message);
 }
@@ -32,6 +33,10 @@ class VoiceFailure extends Failure {
 
 class CacheFailure extends Failure {
   const CacheFailure(super.message);
+}
+
+class ServerFailure extends Failure {
+  const ServerFailure(super.message);
 }
 
 class UnknownFailure extends Failure {

@@ -31,7 +31,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
 
   void _clear(NavigationProvider provider) {
     _controller.clear();
-    provider.clearSearch();
+    provider.search('');
     _focusNode.unfocus();
     setState(() => _isExpanded = false);
   }
@@ -51,7 +51,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.12),
+                color: Colors.black.withValues(alpha: 0.12),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -72,7 +72,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
                   decoration: InputDecoration(
                     hintText: 'Search buildings, hostels, offices...',
                     hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.45),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
                     ),
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
@@ -88,7 +88,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Icon(Icons.close_rounded,
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         size: 20),
                   ),
                 ),
@@ -107,7 +107,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.10),
+                  color: Colors.black.withValues(alpha: 0.10),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -128,7 +128,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
                     height: 38,
                     decoration: BoxDecoration(
                       color: Helpers.getCategoryColor(loc.category)
-                          .withOpacity(0.15),
+                          .withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -202,7 +202,7 @@ class _CategoryFilterRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Colors.black.withValues(alpha: 0.08),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -215,7 +215,7 @@ class _CategoryFilterRow extends StatelessWidget {
                     size: 14,
                     color: isActive
                         ? Colors.white
-                        : theme.colorScheme.onSurface.withOpacity(0.7),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   const SizedBox(width: 5),
                   Text(

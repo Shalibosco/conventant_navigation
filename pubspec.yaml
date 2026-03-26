@@ -1,21 +1,25 @@
 name: covenant_navigation
-description: Covenant University Campus Navigation App with Voice Assistant and Multilingual Support
+description: Covenant University Campus Navigation App
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
+
+  # 🟢 ADD THIS LINE HERE:
   flutter_localizations:
     sdk: flutter
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
+  flutter_polyline_points: ^2.1.0
 
-  # --- Map & Navigation ---
-  flutter_map: ^6.1.0
-  latlong2: ^0.9.0
-  flutter_map_cache: ^1.1.0
+  # --- Map & Navigation (Combined & De-duplicated) ---
+  google_maps_flutter: ^2.12.1
+
 
   # --- Location ---
   geolocator: ^11.0.0
@@ -27,9 +31,10 @@ dependencies:
   shared_preferences: ^2.2.2
   path_provider: ^2.1.2
 
-  # --- Voice Assistant ---
-  speech_to_text: ^7.3.0
-  flutter_tts: ^3.8.5
+  # --- Voice (native) ---
+  speech_to_text: ^7.0.0
+  flutter_tts: ^4.0.2
+  permission_handler: ^11.3.1
 
   # --- State Management ---
   provider: ^6.1.2
@@ -38,21 +43,20 @@ dependencies:
   get_it: ^7.6.7
 
   # --- Networking ---
-  connectivity_plus: ^5.0.2
+  connectivity_plus: ^6.0.0
   http: ^1.2.0
 
   # --- UI & UX ---
   flutter_animate: ^4.5.0
-  lottie: ^3.1.0
   google_fonts: ^6.2.1
-  cached_network_image: ^3.3.1
   flutter_svg: ^2.0.10+1
   intl: ^0.20.2
+  sliding_up_panel: ^2.0.0+1
+  lottie: ^3.1.0
 
   # --- Utils ---
-  uuid: ^4.3.3
-  logger: ^2.2.0
   equatable: ^2.0.5
+  logger: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -61,30 +65,11 @@ dev_dependencies:
   build_runner: ^2.4.9
   flutter_lints: ^3.0.0
 
-  # ✅ Fixed: Added required CLI tool dependencies
-  flutter_launcher_icons: ^0.14.4
-  flutter_native_splash: ^2.4.4
-
-# ── Asset Configurations ──────────────────────────────────────
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icons/cnicon.png" # ✅ Changed to match your file tree
-
-flutter_native_splash:
-  color: "#1A3C6E" # CU Deep Blue
-  image: "assets/icons/cnicon.png" # ✅ Changed
-
-  android_12:
-    image: "assets/icons/cnicon.png" # ✅ Changed
-    color: "#1A3C6E"
-
 flutter:
   uses-material-design: true
   generate: true
 
-  # ✅ Fixed: Directories clean up your yaml file so you don't list 100 files
+  # ✅ Pro-Tip: Specify the directory to include all files inside automatically!
   assets:
     - assets/images/
     - assets/icons/

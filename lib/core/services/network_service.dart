@@ -6,15 +6,22 @@ class NetworkService {
   final Connectivity _connectivity = Connectivity();
 
   Future<bool> isConnected() async {
-    final result = await _connectivity.checkConnectivity();
+    final List<ConnectivityResult> result = await _connectivity.checkConnectivity();
     return _hasConnection(result);
   }
 
   Stream<bool> get connectivityStream =>
       _connectivity.onConnectivityChanged.map(_hasConnection);
 
-  // Fixed: Accepting a single ConnectivityResult enum instead of a List 👇
-  bool _hasConnection(ConnectivityResult result) {
-    return result != ConnectivityResult.none;
+  // ✅ Fixed: Accepts a List of results instead of a single result
+  bool _hasConnection(List<ConnectivityResult> results) {
+    if (results.isEmpty) return false;
+
+    // If the list ONLY contains .none, we are offline
+    if (results.length == 1 && results.first == ConnectivityResult.none) {
+      return false;
+    }
+
+    return true;
   }
 }

@@ -41,3 +41,8 @@ class LocalizationException implements Exception {
   @override
   String toString() => 'LocalizationException: $message';
 }
+
+class CacheException implements Exception {
+  final String message;
+  CacheException(this.message);
+}

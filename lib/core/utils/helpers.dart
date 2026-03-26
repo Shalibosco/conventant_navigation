@@ -2,7 +2,7 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart'; // ✅ Swapped to Google Maps
 import '../constants/app_constants.dart';
 
 class Helpers {
@@ -103,7 +103,7 @@ class Helpers {
 
   // ── LatLng helpers ────────────────────────────────────────
   static LatLng get campusCenter =>
-      LatLng(AppConstants.campusLat, AppConstants.campusLng);
+      const LatLng(AppConstants.campusLat, AppConstants.campusLng); // ✅ Added const
 
   // ── Snackbar helper ───────────────────────────────────────
   static void showSnackBar(

@@ -13,10 +13,13 @@ import 'core/theme/app_theme.dart';
 import 'core/services/network_service.dart';
 
 import 'data/models/location_model.dart';
+import 'data/repositories/location_repository.dart';
 
 import 'features/multilingual/localization/app_localization.dart';
 import 'features/multilingual/providers/language_provider.dart';
 import 'features/navigation/providers/navigation_provider.dart';
+import 'features/navigation/services/location_service.dart';
+import 'features/navigation/services/route_service.dart';
 import 'features/voice_assistant/providers/voice_provider.dart';
 import 'presentation/providers/app_state_provider.dart';
 
@@ -64,7 +67,11 @@ class _CUNavigateAppState extends State<CUNavigateApp> {
     super.initState();
     _appStateProvider = AppStateProvider();
     _languageProvider = LanguageProvider();
-    _navigationProvider = NavigationProvider();
+    _navigationProvider = NavigationProvider(
+      sl<LocationRepository>(),
+      sl<LocationService>(),
+      sl<RouteService>(),
+    );
     _voiceProvider = VoiceProvider();
     _initApp();
   }
@@ -95,9 +102,21 @@ class _CUNavigateAppState extends State<CUNavigateApp> {
             title: AppConstants.appName,
             debugShowCheckedModeBanner: false,
 
-            // ── Theme ─────────────────────────────────────
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
+            // ── Theme (Fixed with modern Seed generation) ──
+            theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: AppTheme.cuNavy, // ✅ Uses your custom campus Navy
+                brightness: Brightness.light,
+              ),
+            ),
+            darkTheme: ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: AppTheme.cuNavy, // ✅ Dark mode variant
+                brightness: Brightness.dark,
+              ),
+            ),
             themeMode: appState.themeMode,
 
             // ── Routing ───────────────────────────────────
@@ -127,21 +146,17 @@ class _CUNavigateAppState extends State<CUNavigateApp> {
 
             // ── Builder: connectivity banner ──────────────
             builder: (context, child) {
-              return Consumer<AppStateProvider>(
-                builder: (context, appState, _) {
-                  return Stack(
-                    children: [
-                      child!,
-                      if (!appState.isOnline)
-                        Positioned(
-                          top: MediaQuery.of(context).padding.top,
-                          left: 0,
-                          right: 0,
-                          child: _OfflineBanner(),
-                        ),
-                    ],
-                  );
-                },
+              return Stack(
+                children: [
+                  child!,
+                  if (!appState.isOnline)
+                    Positioned(
+                      top: MediaQuery.of(context).padding.top,
+                      left: 0,
+                      right: 0,
+                      child: _OfflineBanner(),
+                    ),
+                ],
               );
             },
           );

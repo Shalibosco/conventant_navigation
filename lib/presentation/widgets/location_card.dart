@@ -1,8 +1,7 @@
 // lib/presentation/widgets/location_card.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import '../../data/models/location_model.dart';
+import '../../data/models/location_model.dart'; // ✅ Removed unused flutter_animate import
 import '../../core/utils/helpers.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -38,7 +37,7 @@ class LocationCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? color.withOpacity(0.08)
+              ? color.withValues(alpha: 0.08) // ✅ Swapped withValues
               : theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
@@ -47,7 +46,7 @@ class LocationCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.07),
+              color: Colors.black.withValues(alpha: 0.07), // ✅ Swapped withValues
               blurRadius: 12,
               offset: const Offset(0, 3),
             ),
@@ -62,7 +61,7 @@ class LocationCard extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12), // ✅ Swapped withValues
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
@@ -88,7 +87,7 @@ class LocationCard extends StatelessWidget {
                     Text(
                       description,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.55),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.55), // ✅ Swapped withValues
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -97,17 +96,17 @@ class LocationCard extends StatelessWidget {
                       const SizedBox(height: 5),
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.directions_walk_rounded,
                             size: 13,
-                            color: AppTheme.accentColor,
+                            color: AppTheme.navGreen, // ✅ Mapped to navGreen
                           ),
                           const SizedBox(width: 3),
                           Text(
                             '${Helpers.formatDistance(distanceMeters!)} · '
                                 '${Helpers.estimateWalkTime(distanceMeters!)}',
                             style: theme.textTheme.labelSmall?.copyWith(
-                              color: AppTheme.accentColor,
+                              color: AppTheme.navGreen, // ✅ Mapped to navGreen
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -126,7 +125,7 @@ class LocationCard extends StatelessWidget {
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryColor,
+                      color: AppTheme.cuNavy, // ✅ Mapped to cuNavy
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(

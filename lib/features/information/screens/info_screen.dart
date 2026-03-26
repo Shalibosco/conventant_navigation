@@ -42,10 +42,12 @@ class _InfoScreenState extends State<InfoScreen>
 
   Future<void> _loadInfo() async {
     final (items, _) = await _repo.getAllInfo();
-    setState(() {
-      _allItems = items ?? _fallbackItems;
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _allItems = items ?? _fallbackItems;
+        _isLoading = false;
+      });
+    }
   }
 
   List<InfoModel> _getFilteredItems(String category) {
@@ -71,10 +73,11 @@ class _InfoScreenState extends State<InfoScreen>
           controller: _tabController,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          indicatorColor: AppTheme.secondaryColor,
-          labelColor: AppTheme.primaryColor,
-          unselectedLabelColor:
-          theme.colorScheme.onSurface.withOpacity(0.5),
+          // ✅ Fixed: Mapped to your actual AppTheme brand colors
+          indicatorColor: AppTheme.cuGold,
+          labelColor: AppTheme.cuNavy,
+          // ✅ Fixed: Swapped withOpacity to withValues to avoid precision loss
+          unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
           tabs: _tabs.map((tab) {
             return Tab(
               child: Row(

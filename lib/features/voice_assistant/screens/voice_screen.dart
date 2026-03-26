@@ -18,6 +18,9 @@ class VoiceScreen extends StatelessWidget {
     final voiceProvider = context.watch<VoiceProvider>();
     final langProvider = context.watch<LanguageProvider>();
 
+    // ✅ Re-evaluated fallback language name logic safely
+    final languageName = AppConstants.languageNames[langProvider.langCode] ?? 'English';
+
     return Scaffold(
       appBar: AppBar(title: const Text('Voice Assistant')),
       body: SafeArea(
@@ -33,12 +36,12 @@ class VoiceScreen extends StatelessWidget {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryColor.withOpacity(0.1),
+                  color: AppTheme.cuNavy.withValues(alpha: 0.1), // ✅ Fixed withValues & cuNavy
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.assistant_rounded,
-                  color: AppTheme.primaryColor,
+                  color: AppTheme.cuNavy, // ✅ Fixed cuNavy
                   size: 40,
                 ),
               ).animate().fadeIn(duration: 400.ms).scale(),
@@ -53,9 +56,9 @@ class VoiceScreen extends StatelessWidget {
               const SizedBox(height: 8),
 
               Text(
-                'Speak in ${AppConstants.languageNames[langProvider.langCode]}',
+                'Speak in $languageName',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.55),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.55), // ✅ Fixed withValues
                 ),
               ).animate().fadeIn(delay: 300.ms),
 
@@ -71,7 +74,7 @@ class VoiceScreen extends StatelessWidget {
                 _TextBubble(
                   label: 'You said',
                   text: voiceProvider.recognizedText,
-                  color: AppTheme.primaryColor,
+                  color: AppTheme.cuNavy, // ✅ Fixed cuNavy
                 ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2),
 
               if (voiceProvider.responseText.isNotEmpty) ...[
@@ -79,7 +82,7 @@ class VoiceScreen extends StatelessWidget {
                 _TextBubble(
                   label: 'Assistant',
                   text: voiceProvider.responseText,
-                  color: AppTheme.accentColor,
+                  color: AppTheme.navGreen, // ✅ Fixed navGreen
                 ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2),
               ],
 
@@ -114,9 +117,9 @@ class _TextBubble extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08), // ✅ Fixed withValues
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)), // ✅ Fixed withValues
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,7 +182,7 @@ class _ExampleCommands extends StatelessWidget {
         Text(
           'Try saying:',
           style: theme.textTheme.labelMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.55),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.55), // ✅ Fixed withValues
           ),
         ),
         const SizedBox(height: 10),

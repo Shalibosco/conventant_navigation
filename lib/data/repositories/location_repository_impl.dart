@@ -1,18 +1,20 @@
-// lib/data/repositories/location_repository.dart
+// lib/data/repositories/location_repository_impl.dart
 
 import '../datasources/local_location_data_source.dart';
 import '../models/location_model.dart';
-import '../../core/error/exceptions.dart';
-import '../../core/error/failures.dart'; // ✅ Using concrete LocationFailure & StorageFailure
+import 'location_repository.dart';
+import '../../../core/error/exceptions.dart';
+import '../../../core/error/failures.dart';
 
-class LocationRepository {
-  final LocalLocationDataSource _dataSource;
+class LocationRepositoryImpl implements LocationRepository {
+  final LocalLocationDataSource localDataSource;
 
-  LocationRepository(this._dataSource);
+  LocationRepositoryImpl(this.localDataSource);
 
+  @override
   Future<(List<LocationModel>?, Failure?)> getAllLocations() async {
     try {
-      final locations = await _dataSource.getLocations();
+      final locations = await localDataSource.getLocations();
       return (locations, null);
     } on StorageException catch (e) {
       return (null, StorageFailure(e.message));
@@ -21,9 +23,10 @@ class LocationRepository {
     }
   }
 
+  @override
   Future<(LocationModel?, Failure?)> getLocationById(String id) async {
     try {
-      final location = await _dataSource.getLocationById(id);
+      final location = await localDataSource.getLocationById(id);
       if (location == null) {
         return (null, const StorageFailure('Location not found'));
       }
@@ -35,9 +38,10 @@ class LocationRepository {
     }
   }
 
+  @override
   Future<(List<LocationModel>?, Failure?)> searchLocations(String query) async {
     try {
-      final locations = await _dataSource.searchLocations(query);
+      final locations = await localDataSource.searchLocations(query);
       return (locations, null);
     } on StorageException catch (e) {
       return (null, StorageFailure(e.message));
@@ -46,9 +50,10 @@ class LocationRepository {
     }
   }
 
+  @override
   Future<(List<LocationModel>?, Failure?)> getByCategory(String category) async {
     try {
-      final locations = await _dataSource.getLocationsByCategory(category);
+      final locations = await localDataSource.getLocationsByCategory(category);
       return (locations, null);
     } on StorageException catch (e) {
       return (null, StorageFailure(e.message));

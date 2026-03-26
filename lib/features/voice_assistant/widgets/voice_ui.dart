@@ -42,32 +42,26 @@ class VoiceUI extends StatelessWidget {
 
   Widget _buildStatusText(VoiceProvider provider, ThemeData theme) {
     String text;
-    Color color;
 
     switch (provider.state) {
       case VoiceState.listening:
         text = provider.partialText.isNotEmpty
             ? '"${provider.partialText}"'
             : 'Listening...';
-        color = AppTheme.voiceListeningColor;
         break;
       case VoiceState.processing:
         text = 'Processing...';
-        color = AppTheme.primaryColor;
         break;
       case VoiceState.speaking:
         text = provider.responseText.isNotEmpty
             ? provider.responseText
             : 'Speaking...';
-        color = AppTheme.accentColor;
         break;
       case VoiceState.error:
         text = 'Try again';
-        color = AppTheme.errorColor;
         break;
       default:
         text = 'Tap mic to speak';
-        color = theme.colorScheme.onSurface.withOpacity(0.6);
     }
 
     return Container(
@@ -75,7 +69,7 @@ class VoiceUI extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 260),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.55),
+        color: Colors.black.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -108,16 +102,16 @@ class _MicButton extends StatelessWidget {
     final IconData icon;
 
     if (isListening) {
-      bgColor = AppTheme.voiceListeningColor;
+      bgColor = AppTheme.voiceListening;
       icon = Icons.mic_rounded;
     } else if (isSpeaking) {
-      bgColor = AppTheme.accentColor;
+      bgColor = AppTheme.voiceSpeaking;
       icon = Icons.volume_up_rounded;
     } else if (isProcessing) {
-      bgColor = AppTheme.primaryColor;
+      bgColor = AppTheme.voiceProcessing;
       icon = Icons.hourglass_top_rounded;
     } else {
-      bgColor = AppTheme.primaryColor;
+      bgColor = AppTheme.voiceIdle;
       icon = Icons.mic_none_rounded;
     }
 
@@ -129,13 +123,13 @@ class _MicButton extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: bgColor.withOpacity(0.5),
+            color: bgColor.withValues(alpha: 0.5),
             blurRadius: isListening ? 20 : 10,
             spreadRadius: isListening ? 4 : 1,
           ),
         ],
       ),
-      child: Icon(icon, color: Colors.white, size: 28),
+      child: Icon(icon, color: Colors.white, size: 28), // ✅ Fixed: Removed 'const'
     );
 
     if (isListening) {

@@ -61,7 +61,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
 
           // ── Language ───────────────────────────────────────
-          _SectionHeader(title: 'Language', icon: Icons.language_rounded),
+          const _SectionHeader(title: 'Language', icon: Icons.language_rounded), // ✅ Added const
           const SizedBox(height: 10),
           ...AppConstants.languageNames.entries.map((entry) {
             return _LanguageTile(
@@ -79,7 +79,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // ── Appearance ─────────────────────────────────────
-          _SectionHeader(title: 'Appearance', icon: Icons.palette_rounded),
+          const _SectionHeader(title: 'Appearance', icon: Icons.palette_rounded), // ✅ Added const
           const SizedBox(height: 10),
           Card(
             child: SwitchListTile(
@@ -89,12 +89,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: theme.textTheme.bodySmall,
               ),
               value: appState.isDarkMode,
-              activeColor: AppTheme.primaryColor,
-              secondary: Icon(
-                appState.isDarkMode
-                    ? Icons.dark_mode_rounded
-                    : Icons.light_mode_rounded,
-                color: AppTheme.primaryColor,
+              activeTrackColor: AppTheme.cuNavy, // ✅ Swapped activeColor to activeTrackColor for M3 Switch constraints
+              secondary: const Icon(
+                Icons.brightness_medium_rounded, // ✅ Uses generic const Icon
+                color: AppTheme.cuNavy,
               ),
               onChanged: (val) => appState.setDarkMode(val),
             ),
@@ -103,7 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // ── Offline Maps ───────────────────────────────────
-          _SectionHeader(title: 'Offline Maps', icon: Icons.map_outlined),
+          const _SectionHeader(title: 'Offline Maps', icon: Icons.map_outlined), // ✅ Added const
           const SizedBox(height: 10),
           Card(
             child: Padding(
@@ -114,7 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Row(
                     children: [
                       const Icon(Icons.storage_rounded,
-                          color: AppTheme.primaryColor),
+                          color: AppTheme.cuNavy), // ✅ Swapped primaryColor to cuNavy
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -158,7 +156,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // ── About ──────────────────────────────────────────
-          _SectionHeader(title: 'About', icon: Icons.info_outline_rounded),
+          const _SectionHeader(title: 'About', icon: Icons.info_outline_rounded), // ✅ Added const
           const SizedBox(height: 10),
           Card(
             child: Padding(
@@ -171,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const Divider(height: 16),
                   _AboutRow(label: 'University', value: AppConstants.universityName),
                   const Divider(height: 16),
-                  _AboutRow(label: 'Campus',     value: AppConstants.universityAddress),
+                  _AboutRow(label: 'Campus',     value: AppConstants.universityAddr), // ✅ Swapped universityAddress to universityAddr
                 ],
               ),
             ),
@@ -184,7 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showDownloadDialog(BuildContext context) {
-    showDialog(
+    showDialog<void>( // ✅ Strictly typed
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Download Offline Map'),
@@ -211,19 +209,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 class _SectionHeader extends StatelessWidget {
   final String title;
   final IconData icon;
-  const _SectionHeader({required this.title, required this.icon});
+  const _SectionHeader({required this.title, required this.icon}); // ✅ Standard constructor keeps const usability
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, color: AppTheme.primaryColor, size: 18),
+        Icon(icon, color: AppTheme.cuNavy, size: 18), // ✅ Swapped primaryColor to cuNavy
         const SizedBox(width: 8),
         Text(
           title,
           style: theme.textTheme.titleSmall?.copyWith(
-            color: AppTheme.primaryColor,
+            color: AppTheme.cuNavy, // ✅ Swapped primaryColor to cuNavy
             fontWeight: FontWeight.w700,
             letterSpacing: 0.5,
           ),
@@ -258,7 +256,7 @@ class _LanguageTile extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             color: isSelected
-                ? AppTheme.primaryColor.withOpacity(0.1)
+                ? AppTheme.cuNavy.withValues(alpha: 0.1) // ✅ Swapped to cuNavy + withValues
                 : theme.colorScheme.surfaceContainerHighest,
             shape: BoxShape.circle,
           ),
@@ -267,7 +265,7 @@ class _LanguageTile extends StatelessWidget {
               langCode.toUpperCase().substring(0, 2),
               style: theme.textTheme.labelLarge?.copyWith(
                 color: isSelected
-                    ? AppTheme.primaryColor
+                    ? AppTheme.cuNavy // ✅ Swapped primaryColor to cuNavy
                     : theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w700,
               ),
@@ -277,9 +275,9 @@ class _LanguageTile extends StatelessWidget {
         title: Text(langName, style: theme.textTheme.titleMedium),
         trailing: isSelected
             ? const Icon(Icons.check_circle_rounded,
-            color: AppTheme.primaryColor)
+            color: AppTheme.cuNavy) // ✅ Swapped primaryColor to cuNavy
             : Icon(Icons.radio_button_unchecked_rounded,
-            color: theme.colorScheme.onSurface.withOpacity(0.3)),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.3)), // ✅ Swapped withValues
       ),
     );
   }
@@ -298,7 +296,7 @@ class _AboutRow extends StatelessWidget {
       children: [
         Text(label,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.55),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.55), // ✅ Swapped withValues
             )),
         Text(value,
             style: theme.textTheme.bodyMedium

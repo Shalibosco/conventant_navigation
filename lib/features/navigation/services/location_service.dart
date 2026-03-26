@@ -13,7 +13,8 @@ class LocationService {
   Future<LatLng?> getCurrentLocation() async {
     try {
       await _permissionsService.requestLocationPermission();
-      final position = await Geolocator.getCurrentPosition(
+
+      final Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
         timeLimit: const Duration(seconds: 10),
       );
@@ -26,12 +27,13 @@ class LocationService {
   }
 
   Stream<LatLng> trackLocation() {
-    return Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 3, // update every 3 meters
-      ),
-    ).map((pos) => LatLng(pos.latitude, pos.longitude));
+    const LocationSettings settings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 3, // update every 3 meters
+    );
+
+    return Geolocator.getPositionStream(locationSettings: settings)
+        .map((Position pos) => LatLng(pos.latitude, pos.longitude));
   }
 
   Future<double> getBearing(LatLng from, LatLng to) async {

@@ -31,36 +31,38 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    Widget child = isLoading
+    // ✅ Marked as 'final' to satisfy linter warnings
+    final Widget child = isLoading
         ? SizedBox(
       width: 20,
       height: 20,
       child: CircularProgressIndicator(
         strokeWidth: 2,
-        color: _getForegroundColor(theme),
+        color: _getForegroundColor(),
       ),
     )
         : Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         if (icon != null) ...[
-          Icon(icon, size: 18, color: _getForegroundColor(theme)),
+          Icon(icon, size: 18, color: _getForegroundColor()),
           const SizedBox(width: 8),
         ],
         Text(
           label,
           style: theme.textTheme.labelLarge?.copyWith(
-            color: _getForegroundColor(theme),
+            color: _getForegroundColor(),
           ),
         ),
       ],
     );
 
-    Widget button = switch (variant) {
+    // ✅ Marked as 'final' to satisfy linter warnings
+    final Widget button = switch (variant) {
       ButtonVariant.primary => ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primaryColor,
+          backgroundColor: AppTheme.cuNavy, // ✅ Mapped to cuNavy
           foregroundColor: Colors.white,
           minimumSize: Size(width ?? (isFullWidth ? double.infinity : 0), height),
           shape: RoundedRectangleBorder(
@@ -72,7 +74,7 @@ class CustomButton extends StatelessWidget {
       ButtonVariant.secondary => ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.secondaryColor,
+          backgroundColor: AppTheme.cuGold, // ✅ Mapped to cuGold
           foregroundColor: Colors.white,
           minimumSize: Size(width ?? (isFullWidth ? double.infinity : 0), height),
           shape: RoundedRectangleBorder(
@@ -84,8 +86,8 @@ class CustomButton extends StatelessWidget {
       ButtonVariant.outline => OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppTheme.primaryColor,
-          side: const BorderSide(color: AppTheme.primaryColor, width: 1.5),
+          foregroundColor: AppTheme.cuNavy, // ✅ Mapped to cuNavy
+          side: const BorderSide(color: AppTheme.cuNavy, width: 1.5), // ✅ Swapped Const Issue
           minimumSize: Size(width ?? (isFullWidth ? double.infinity : 0), height),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
@@ -96,7 +98,7 @@ class CustomButton extends StatelessWidget {
       ButtonVariant.ghost => TextButton(
         onPressed: isLoading ? null : onPressed,
         style: TextButton.styleFrom(
-          foregroundColor: AppTheme.primaryColor,
+          foregroundColor: AppTheme.cuNavy, // ✅ Mapped to cuNavy
           minimumSize: Size(width ?? (isFullWidth ? double.infinity : 0), height),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
@@ -107,7 +109,7 @@ class CustomButton extends StatelessWidget {
       ButtonVariant.danger => ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.errorColor,
+          backgroundColor: AppTheme.errorRed, // ✅ Mapped to errorRed or standard Colors.red
           foregroundColor: Colors.white,
           minimumSize: Size(width ?? (isFullWidth ? double.infinity : 0), height),
           shape: RoundedRectangleBorder(
@@ -124,11 +126,11 @@ class CustomButton extends StatelessWidget {
     return button;
   }
 
-  Color _getForegroundColor(ThemeData theme) {
+  Color _getForegroundColor() {
     return switch (variant) {
       ButtonVariant.primary || ButtonVariant.secondary ||
       ButtonVariant.danger => Colors.white,
-      ButtonVariant.outline || ButtonVariant.ghost => AppTheme.primaryColor,
+      ButtonVariant.outline || ButtonVariant.ghost => AppTheme.cuNavy, // ✅ Mapped to cuNavy
     };
   }
 }

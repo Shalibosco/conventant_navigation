@@ -1,186 +1,171 @@
 // lib/features/navigation/providers/navigation_provider.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../../../data/models/location_model.dart';
 import '../services/location_service.dart';
 import '../services/route_service.dart';
-import '../../../data/models/location_model.dart';
 import '../../../data/repositories/location_repository.dart';
-import '../../../core/di/service_locator.dart';
-import '../../../core/utils/helpers.dart';
-import '../../../core/constants/app_constants.dart';
-
-enum NavigationState { idle, loading, navigating, searching, error }
 
 class NavigationProvider extends ChangeNotifier {
-  final LocationService _locationService = sl<LocationService>();
-  final RouteService _routeService = sl<RouteService>();
-  final LocationRepository _locationRepo = sl<LocationRepository>();
+  final LocationRepository _repository;
+  final LocationService _locationService;
+  final RouteService _routeService;
 
-  NavigationState _state = NavigationState.idle;
+  NavigationProvider(this._repository, this._locationService, this._routeService);
+
+  // 🛰️ State Variables
   LatLng? _userLocation;
   LocationModel? _selectedDestination;
-  List<LatLng> _routePoints = [];
+  bool _isNavigating = false;
+  String _activeFilter = 'all';
+
   List<LocationModel> _allLocations = [];
   List<LocationModel> _filteredLocations = [];
-  List<LocationModel> _searchResults = [];
-  String? _errorMessage;
-  String _activeFilter = 'all';
-  bool _isTrackingLocation = false;
-  double _distanceToDestination = 0;
-  String _estimatedTime = '';
+  List<LatLng> _routePoints = [];
 
-  // ── Getters ───────────────────────────────────────────────
-  NavigationState get state => _state;
+  // 🧲 Getters
   LatLng? get userLocation => _userLocation;
   LocationModel? get selectedDestination => _selectedDestination;
-  List<LatLng> get routePoints => _routePoints;
-  List<LocationModel> get allLocations => _allLocations;
-  List<LocationModel> get filteredLocations => _filteredLocations;
-  List<LocationModel> get searchResults => _searchResults;
-  String? get errorMessage => _errorMessage;
+  bool get isNavigating => _isNavigating;
   String get activeFilter => _activeFilter;
-  bool get isNavigating => _state == NavigationState.navigating;
+  List<LocationModel> get searchResults => _filteredLocations;
   bool get hasRoute => _routePoints.isNotEmpty;
-  double get distanceToDestination => _distanceToDestination;
-  String get estimatedTime => _estimatedTime;
 
-  // ── Initialize ────────────────────────────────────────────
-  Future<void> initialize() async {
-    _setState(NavigationState.loading);
-    await Future.wait([
-      loadLocations(),
-      fetchUserLocation(),
-    ]);
-    _setState(NavigationState.idle);
+  // 📍 Getter for OpenStreetMap UI Markers
+  List<Marker> get osmMarkers {
+    final List<Marker> markers = [];
+
+    if (_userLocation != null) {
+      markers.add(
+        Marker(
+          point: _userLocation!,
+          width: 40,
+          height: 40,
+          child: const Icon(Icons.person_pin_circle_rounded, color: Colors.blue, size: 40),
+        ),
+      );
+    }
+
+    if (_selectedDestination != null) {
+      markers.add(
+        Marker(
+          point: LatLng(_selectedDestination!.latitude, _selectedDestination!.longitude),
+          width: 45,
+          height: 45,
+          child: const Icon(Icons.location_on_rounded, color: Colors.red, size: 45),
+        ),
+      );
+    }
+
+    return markers;
   }
 
-  // ── Load all campus locations ─────────────────────────────
-  Future<void> loadLocations() async {
-    final (locations, failure) = await _locationRepo.getAllLocations();
-    if (failure != null) {
-      _setError(failure.message);
-      return;
+  // 🛣️ Getter for OpenStreetMap UI Route Lines
+  List<Polyline> get osmPolylines {
+    if (_routePoints.isEmpty) return [];
+
+    return [
+      Polyline(
+        points: _routePoints,
+        color: const Color(0xFF800000), // ✅ Maroon Hex code for Covenant University
+        strokeWidth: 5.0,
+      ),
+    ];
+  }
+
+  // 🏃‍♂️ Distance Calculation (Haversine formula context)
+  double get distanceToDestination {
+    if (_userLocation == null || _selectedDestination == null) return 0.0;
+
+    // ✅ Using the direct Distance algorithm from latlong2
+    const Distance distance = Distance();
+    return distance.as(
+      LengthUnit.Meter,
+      _userLocation!,
+      LatLng(_selectedDestination!.latitude, _selectedDestination!.longitude),
+    );
+  }
+
+  String get estimatedTime {
+    final meters = distanceToDestination;
+    if (meters == 0) return '0 mins';
+    final minutes = (meters / 80).ceil();
+    return '$minutes mins';
+  }
+
+  // 🚀 Logic Methods
+  Future<void> initialize() async {
+    final (locations, _) = await _repository.getAllLocations();
+    if (locations != null) {
+      _allLocations = locations;
+      _filteredLocations = locations;
     }
-    _allLocations = locations ?? [];
-    _filteredLocations = _allLocations;
     notifyListeners();
   }
 
-  // ── Fetch user GPS position ───────────────────────────────
   Future<void> fetchUserLocation() async {
-    try {
-      final location = await _locationService.getCurrentLocation();
-      _userLocation = location;
+    final position = await _locationService.getCurrentLocation();
+    if (position != null) {
+      _userLocation = position;
       notifyListeners();
-    } catch (e) {
-      // Non-fatal — map still works without user location
-      debugPrint('Location fetch error: $e');
     }
   }
 
-  // ── Start live GPS tracking ───────────────────────────────
   void startLocationTracking() {
-    if (_isTrackingLocation) return;
-    _isTrackingLocation = true;
-    _locationService.trackLocation().listen((location) {
-      _userLocation = location;
-      if (_selectedDestination != null) _updateDistanceInfo();
+    _locationService.trackLocation().listen((position) {
+      _userLocation = position;
+      if (_isNavigating) {
+        _updateRoute();
+      }
       notifyListeners();
     });
   }
 
-  // ── Navigate to a destination ─────────────────────────────
-  Future<void> navigateTo(LocationModel destination,
-      {bool isOnline = true}) async {
-    _selectedDestination = destination;
-    _setState(NavigationState.navigating);
-    _routePoints = [];
-
-    final from = _userLocation ?? Helpers.campusCenter;
-    final to = LatLng(destination.latitude, destination.longitude);
-
-    try {
-      if (isOnline) {
-        _routePoints = await _routeService.getWalkingRoute(from, to);
-      } else {
-        _routePoints = _routeService.getStraightLineRoute(from, to);
-      }
-    } catch (_) {
-      // Fallback to straight line if OSRM fails
-      _routePoints = _routeService.getStraightLineRoute(from, to);
+  void search(String query) {
+    if (query.isEmpty) {
+      _filteredLocations = _allLocations;
+    } else {
+      _filteredLocations = _allLocations.where((loc) {
+        return loc.name.toLowerCase().contains(query.toLowerCase()) ||
+            loc.category.toLowerCase().contains(query.toLowerCase());
+      }).toList();
     }
-
-    _updateDistanceInfo();
     notifyListeners();
   }
 
-  void _updateDistanceInfo() {
-    if (_userLocation == null || _selectedDestination == null) return;
-    _distanceToDestination = Helpers.calculateDistance(
-      _userLocation!.latitude,
-      _userLocation!.longitude,
-      _selectedDestination!.latitude,
-      _selectedDestination!.longitude,
-    );
-    _estimatedTime = Helpers.estimateWalkTime(_distanceToDestination);
-  }
-
-  // ── Cancel active navigation ──────────────────────────────
-  void cancelNavigation() {
-    _selectedDestination = null;
-    _routePoints = [];
-    _distanceToDestination = 0;
-    _estimatedTime = '';
-    _setState(NavigationState.idle);
-  }
-
-  // ── Filter markers by category ────────────────────────────
   void filterByCategory(String category) {
     _activeFilter = category;
     if (category == 'all') {
       _filteredLocations = _allLocations;
     } else {
-      _filteredLocations =
-          _allLocations.where((l) => l.category == category).toList();
+      _filteredLocations = _allLocations.where((loc) => loc.category == category).toList();
     }
     notifyListeners();
   }
 
-  // ── Text search ───────────────────────────────────────────
-  Future<void> search(String query) async {
-    if (query.trim().isEmpty) {
-      _searchResults = [];
-      notifyListeners();
-      return;
-    }
-    _setState(NavigationState.searching);
-    final (results, _) = await _locationRepo.searchLocations(query);
-    _searchResults = results ?? [];
-    _setState(NavigationState.idle);
-  }
-
-  void clearSearch() {
-    _searchResults = [];
+  void navigateTo(LocationModel destination) {
+    _selectedDestination = destination;
+    _isNavigating = true;
+    _updateRoute();
     notifyListeners();
   }
 
-  // ── Navigate by location ID (used by voice commands) ──────
-  Future<void> navigateToLocationById(String id,
-      {bool isOnline = true}) async {
-    final (location, failure) = await _locationRepo.getLocationById(id);
-    if (failure != null || location == null) return;
-    await navigateTo(location, isOnline: isOnline);
-  }
-
-  void _setState(NavigationState newState) {
-    _state = newState;
+  void cancelNavigation() {
+    _isNavigating = false;
+    _selectedDestination = null;
+    _routePoints = [];
     notifyListeners();
   }
 
-  void _setError(String message) {
-    _errorMessage = message;
-    _state = NavigationState.error;
+  Future<void> _updateRoute() async {
+    if (_userLocation == null || _selectedDestination == null) return;
+
+    final destLatLng = LatLng(_selectedDestination!.latitude, _selectedDestination!.longitude);
+    final points = await _routeService.getRoutePoints(_userLocation!, destLatLng);
+
+    _routePoints = points;
     notifyListeners();
   }
 }
