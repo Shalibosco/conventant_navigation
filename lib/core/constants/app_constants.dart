@@ -9,18 +9,21 @@ class AppConstants {
   static const String universityName = 'Covenant University';
   static const String universityAddress = 'Ota, Ogun State, Nigeria';
 
-  // ── Campus Coordinates (Center of Covenant University) ───
-  static const double campusLat = 6.6722;
-  static const double campusLng = 3.1600;
+  // ── Campus Centre (calculated from all 33 landmarks) ─────
+  static const double campusLat = 6.672639;
+  static const double campusLng = 3.157639;
   static const double defaultZoom = 16.5;
   static const double minZoom = 14.0;
   static const double maxZoom = 19.0;
 
-  // ── Campus Boundary (rough bounding box) ─────────────────
-  static const double campusBoundNorth = 6.6780;
-  static const double campusBoundSouth = 6.6660;
-  static const double campusBoundEast = 3.1680;
-  static const double campusBoundWest = 3.1520;
+  // ── Campus Boundary (real bounding box + 0.001 padding) ──
+  static const double campusBoundNorth = 6.679611;
+  static const double campusBoundSouth = 6.665667;
+  static const double campusBoundEast  = 3.163500;
+  static const double campusBoundWest  = 3.151778;
+
+  // ── Tile cache folder ─────────────────────────────────────
+  static const String tileCacheDir = 'cu_map_tiles';
 
   // ── Supported Languages ───────────────────────────────────
   static const List<String> supportedLocales = ['en', 'yo', 'ig', 'pidgin'];
@@ -49,43 +52,43 @@ class AppConstants {
 
   // ── Hive Box Names ────────────────────────────────────────
   static const String locationsBox = 'locations_box';
-  static const String infoBox = 'info_box';
-  static const String settingsBox = 'settings_box';
+  static const String infoBox      = 'info_box';
+  static const String settingsBox  = 'settings_box';
 
   // ── Asset Paths ───────────────────────────────────────────
   static const String locationsJsonPath = 'assets/map/covenant_locations.json';
-  static const String langBasePath = 'assets/lang/';
+  static const String langBasePath      = 'assets/lang/';
 
   // ── Shared Preferences Keys ───────────────────────────────
-  static const String prefLanguage = 'pref_language';
-  static const String prefThemeMode = 'pref_theme_mode';
+  static const String prefLanguage   = 'pref_language';
+  static const String prefThemeMode  = 'pref_theme_mode';
   static const String prefFirstLaunch = 'pref_first_launch';
 
   // ── Location Categories ───────────────────────────────────
-  static const String catAcademic = 'academic';
-  static const String catHostel = 'hostel';
-  static const String catWorship = 'worship';
-  static const String catFood = 'food';
-  static const String catSports = 'sports';
-  static const String catAdmin = 'admin';
-  static const String catMedical = 'medical';
+  static const String catAcademic   = 'academic';
+  static const String catHostel     = 'hostel';
+  static const String catWorship    = 'worship';
+  static const String catFood       = 'food';
+  static const String catSports     = 'sports';
+  static const String catAdmin      = 'admin';
+  static const String catMedical    = 'medical';
   static const String catRecreation = 'recreation';
 
   // ── Map Tile URL ──────────────────────────────────────────
   static const String tileUrlTemplate =
       'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
   static const String tileUserAgent = 'covenant_navigation/1.0.0';
-  static const int tileCacheDays = 30;
+  static const int    tileCacheDays = 30;
 
   // ── Voice Assistant ───────────────────────────────────────
-  static const int voiceListenDurationSeconds = 5;
-  static const double voiceConfidenceThreshold = 0.7;
+  static const int    voiceListenDurationSeconds = 5;
+  static const double voiceConfidenceThreshold   = 0.7;
 
   // ── UI ────────────────────────────────────────────────────
-  static const double borderRadiusSmall = 8.0;
+  static const double borderRadiusSmall  = 8.0;
   static const double borderRadiusMedium = 16.0;
-  static const double borderRadiusLarge = 24.0;
-  static const double paddingSmall = 8.0;
-  static const double paddingMedium = 16.0;
-  static const double paddingLarge = 24.0;
+  static const double borderRadiusLarge  = 24.0;
+  static const double paddingSmall       = 8.0;
+  static const double paddingMedium      = 16.0;
+  static const double paddingLarge       = 24.0;
 }

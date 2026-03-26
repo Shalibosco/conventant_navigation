@@ -1,212 +1,700 @@
 [
   {
     "id": "loc_001",
-    "name": "Chapel of Light",
-    "description": "The main chapel at Covenant University. Mandatory chapel service holds every Monday, Wednesday, and Friday at 6:45 AM.",
-    "latitude": 6.6731,
-    "longitude": 3.1588,
-    "category": "worship",
-    "tags": ["chapel", "church", "worship", "prayer", "service"],
-    "openingHours": "Mon, Wed, Fri – 6:45 AM | Sunday – 8:00 AM",
+    "name": "CU Gate",
+    "description": "Main entrance and security checkpoint of Covenant University.",
+    "latitude": 6.677778,
+    "longitude": 3.1625,
+    "category": "admin",
+    "tags": [
+      "cu",
+      "office",
+      "security",
+      "gate",
+      "admin"
+    ],
     "localizedNames": {
-      "yo": "Ṣọ́ọ̀sì Imọlẹ",
-      "ig": "Ụlọ Ọzọ Ocha",
-      "pidgin": "Chapel of Light"
-    },
-    "localizedDescriptions": {
-      "yo": "Ṣọ́ọ̀sì àkọ́kọ́ ní Covenant University. Iṣẹ́ ṣọ́ọ̀sì wà ní Ọjọ́ Ajé, Ọjọ́rú, àti Ọjọ́ Ẹtì ní 6:45 owurọ̀.",
-      "ig": "Ụlọ Ụkwu nke Mahadum. Ọzọzọ ọ bụ n'Mọnde, Wenezdee na Fraịde n'oge 6:45 AM.",
-      "pidgin": "Di main chapel for Covenant University. Chapel dey hold every Monday, Wednesday and Friday by 6:45 AM."
+      "yo": "Ẹnu-bode CU",
+      "ig": "Ọnụ Ụzọ CU",
+      "pidgin": "CU Gate"
     }
   },
   {
     "id": "loc_002",
-    "name": "Engineering & Science Building (ENG)",
-    "description": "Houses the College of Engineering and the College of Science and Technology. Contains lecture halls, labs, and staff offices.",
-    "latitude": 6.6718,
-    "longitude": 3.1605,
-    "category": "academic",
-    "tags": ["engineering", "science", "technology", "CST", "lecture", "lab"],
-    "openingHours": "Mon–Fri: 7:00 AM – 8:00 PM",
+    "name": "CU Stadium",
+    "description": "University sports stadium used for athletic events and ceremonies.",
+    "latitude": 6.675556,
+    "longitude": 3.161944,
+    "category": "sports",
+    "tags": [
+      "cu",
+      "athletics",
+      "stadium",
+      "sports",
+      "field"
+    ],
     "localizedNames": {
-      "yo": "Ile Engineering & Science",
-      "ig": "Ụlọ Nkà ihe rụrụ ọrụ",
-      "pidgin": "Engineering & Science Building"
+      "yo": "Ibi Idaraya CU",
+      "ig": "Ebe Egwuregwu CU",
+      "pidgin": "CU Stadium"
     }
   },
   {
     "id": "loc_003",
-    "name": "University Library",
-    "description": "The main library with extensive print and digital resources. Wi-Fi available. Student ID required for entry.",
-    "latitude": 6.6720,
-    "longitude": 3.1600,
+    "name": "EIE Building",
+    "description": "Electrical and Information Engineering faculty building.",
+    "latitude": 6.675556,
+    "longitude": 3.162222,
     "category": "academic",
-    "tags": ["library", "books", "study", "research", "reading"],
-    "openingHours": "Mon–Fri: 7:00 AM – 10:00 PM | Sat: 8:00 AM – 6:00 PM",
+    "tags": [
+      "faculty",
+      "department",
+      "lecture",
+      "class",
+      "building",
+      "lab",
+      "eie"
+    ],
     "localizedNames": {
-      "yo": "Ilé-Ìwé Ìpamọ Ìwé",
-      "ig": "Ụlọ Akwụkwọ Mahadum",
-      "pidgin": "University Library"
+      "yo": "Ile EIE",
+      "ig": "Ụlọ EIE",
+      "pidgin": "EIE Building"
     }
   },
   {
     "id": "loc_004",
-    "name": "Male Hostel (David's Court)",
-    "description": "Main male student accommodation complex. Contains rooms, common areas, and laundry facilities.",
-    "latitude": 6.6710,
-    "longitude": 3.1612,
-    "category": "hostel",
-    "tags": ["hostel", "male", "accommodation", "dormitory", "hall", "room"],
-    "openingHours": "24 hours",
+    "name": "Civil Engineering Building",
+    "description": "Faculty of Civil Engineering. Houses labs and lecture rooms.",
+    "latitude": 6.674444,
+    "longitude": 3.162222,
+    "category": "academic",
+    "tags": [
+      "faculty",
+      "department",
+      "civil",
+      "lecture",
+      "class",
+      "building",
+      "lab"
+    ],
     "localizedNames": {
-      "yo": "Ile Isinmi Akọ (David's Court)",
-      "ig": "Ọnọdụ Ụmụ Nwoke (David's Court)",
-      "pidgin": "Male Hostel (David's Court)"
+      "yo": "Ile Injinia Civil",
+      "ig": "Ụlọ Injinia Civil",
+      "pidgin": "Civil Building"
     }
   },
   {
     "id": "loc_005",
-    "name": "Female Hostel (Esther Hall)",
-    "description": "Main female student accommodation complex. Secure access with 24-hour security personnel.",
-    "latitude": 6.6708,
-    "longitude": 3.1595,
-    "category": "hostel",
-    "tags": ["hostel", "female", "accommodation", "dormitory", "hall", "room"],
-    "openingHours": "24 hours",
+    "name": "Mechanical Engineering Building",
+    "description": "Faculty of Mechanical Engineering with workshops and labs.",
+    "latitude": 6.673333,
+    "longitude": 3.1625,
+    "category": "academic",
+    "tags": [
+      "faculty",
+      "department",
+      "lecture",
+      "class",
+      "mechanical",
+      "building",
+      "lab"
+    ],
     "localizedNames": {
-      "yo": "Ile Isinmi Obinrin (Esther Hall)",
-      "ig": "Ọnọdụ Ụmụ Nwanyị (Esther Hall)",
-      "pidgin": "Female Hostel (Esther Hall)"
+      "yo": "Ile Injinia Mechanical",
+      "ig": "Ụlọ Injinia Mechanical",
+      "pidgin": "Mechanical Building"
     }
   },
   {
     "id": "loc_006",
-    "name": "University Cafeteria",
-    "description": "The main dining hall serving breakfast, lunch, and dinner. Accepts CU ID cards for cashless payments.",
-    "latitude": 6.6725,
-    "longitude": 3.1595,
-    "category": "food",
-    "tags": ["food", "eat", "cafeteria", "dining", "restaurant", "canteen", "breakfast", "lunch", "dinner"],
-    "openingHours": "6:30 AM – 9:00 PM daily",
+    "name": "ALDC Building",
+    "description": "Agricultural and Life Science Development Centre.",
+    "latitude": 6.671944,
+    "longitude": 3.1625,
+    "category": "academic",
+    "tags": [
+      "faculty",
+      "department",
+      "aldc",
+      "lecture",
+      "class",
+      "building",
+      "lab"
+    ],
     "localizedNames": {
-      "yo": "Cafeteria Yunifásítì",
-      "ig": "Ebe Oriri Mahadum",
-      "pidgin": "University Cafeteria"
+      "yo": "Ile ALDC",
+      "ig": "Ụlọ ALDC",
+      "pidgin": "ALDC Building"
     }
   },
   {
     "id": "loc_007",
-    "name": "Student Health Centre",
-    "description": "Provides medical consultation, emergency care, and pharmacy services for students and staff.",
-    "latitude": 6.6714,
-    "longitude": 3.1620,
-    "category": "medical",
-    "tags": ["hospital", "clinic", "medical", "health", "doctor", "sick", "pharmacy", "emergency"],
-    "openingHours": "Mon–Fri: 8:00 AM – 5:00 PM | Emergency: 24/7",
-    "phoneNumber": "+234-xxx-xxxx",
+    "name": "CU Guest House",
+    "description": "Official university guest accommodation.",
+    "latitude": 6.671667,
+    "longitude": 3.1625,
+    "category": "admin",
+    "tags": [
+      "cu",
+      "office",
+      "security",
+      "gate",
+      "admin"
+    ],
     "localizedNames": {
-      "yo": "Ile Iwosan Awon Akẹkọọ",
-      "ig": "Ụlọ Ọgwụ Ụmụ Akwụkwọ",
-      "pidgin": "Student Health Centre"
+      "yo": "Ile Alejo CU",
+      "ig": "Ụlọ Ọbịa CU",
+      "pidgin": "CU Guest House"
     }
   },
   {
     "id": "loc_008",
-    "name": "Sports Complex",
-    "description": "Multi-purpose sports facility with football field, basketball courts, tennis courts, and gym.",
-    "latitude": 6.6740,
-    "longitude": 3.1585,
-    "category": "sports",
-    "tags": ["sports", "gym", "football", "basketball", "tennis", "field", "court", "exercise"],
-    "openingHours": "Mon–Fri: 6:00 AM – 8:00 PM | Weekends: 7:00 AM – 6:00 PM",
+    "name": "Cafeteria 2",
+    "description": "Secondary student dining hall serving meals daily.",
+    "latitude": 6.672222,
+    "longitude": 3.161944,
+    "category": "food",
+    "tags": [
+      "restaurant",
+      "dining",
+      "cafeteria",
+      "food",
+      "canteen",
+      "eat"
+    ],
     "localizedNames": {
-      "yo": "Ile Ere Idaraya",
-      "ig": "Ebe Egwuregwu",
-      "pidgin": "Sports Complex"
+      "yo": "Ile Ounjẹ 2",
+      "ig": "Ụlọ Ọrịa 2",
+      "pidgin": "Cafeteria 2"
     }
   },
   {
     "id": "loc_009",
-    "name": "Administrative Block",
-    "description": "Central administrative hub. Houses the Vice-Chancellor's office, Registry, Bursary, and other admin units.",
-    "latitude": 6.6728,
-    "longitude": 3.1610,
-    "category": "admin",
-    "tags": ["admin", "office", "registry", "bursary", "VC", "management", "senate"],
-    "openingHours": "Mon–Fri: 8:00 AM – 4:00 PM",
+    "name": "CURCID Building",
+    "description": "Covenant University Research, Innovation and Development centre.",
+    "latitude": 6.672778,
+    "longitude": 3.160833,
+    "category": "academic",
+    "tags": [
+      "faculty",
+      "department",
+      "lecture",
+      "class",
+      "curcid",
+      "building",
+      "lab"
+    ],
     "localizedNames": {
-      "yo": "Ile Ijoba Yunifásítì",
-      "ig": "Ụlọ Ọchịchị Mahadum",
-      "pidgin": "Administrative Block"
+      "yo": "Ile CURCID",
+      "ig": "Ụlọ CURCID",
+      "pidgin": "CURCID Building"
     }
   },
   {
     "id": "loc_010",
-    "name": "Peter Odili Academic City (POAC)",
-    "description": "State-of-the-art lecture complex housing large lecture halls, seminar rooms, and ICT centers.",
-    "latitude": 6.6715,
-    "longitude": 3.1590,
-    "category": "academic",
-    "tags": ["lecture", "class", "academic", "POAC", "seminar", "ICT"],
-    "openingHours": "Mon–Fri: 7:00 AM – 9:00 PM",
+    "name": "Senate Building",
+    "description": "University administrative and governance building.",
+    "latitude": 6.678611,
+    "longitude": 3.160278,
+    "category": "admin",
+    "tags": [
+      "office",
+      "senate",
+      "security",
+      "gate",
+      "admin"
+    ],
     "localizedNames": {
-      "yo": "POAC – Ile Ikẹkọọ Nla",
-      "ig": "POAC – Ụlọ Akwụkwọ Ukwu",
-      "pidgin": "POAC – Peter Odili Academic City"
+      "yo": "Ile Igbimọ",
+      "ig": "Ụlọ Senate",
+      "pidgin": "Senate Building"
     }
   },
   {
     "id": "loc_011",
-    "name": "Senate Building",
-    "description": "Houses the Senate Chamber, Council room, and key administrative offices for the university governance.",
-    "latitude": 6.6730,
-    "longitude": 3.1598,
-    "category": "admin",
-    "tags": ["senate", "council", "governance", "admin", "official"],
-    "openingHours": "Mon–Fri: 8:00 AM – 4:00 PM"
+    "name": "Lecture Theatre",
+    "description": "Large-capacity lecture hall used for faculty-wide classes.",
+    "latitude": 6.674167,
+    "longitude": 3.158889,
+    "category": "academic",
+    "tags": [
+      "faculty",
+      "department",
+      "lecture",
+      "class",
+      "building",
+      "lab"
+    ],
+    "localizedNames": {
+      "yo": "Ile Ikẹkọ Nla",
+      "ig": "Ụlọ Ọmụmụ Nnukwu",
+      "pidgin": "Lecture Theatre"
+    }
   },
   {
     "id": "loc_012",
-    "name": "Student Centre",
-    "description": "Central hub for student activities, clubs, and organizations. Contains meeting rooms and recreation areas.",
-    "latitude": 6.6722,
-    "longitude": 3.1606,
-    "category": "recreation",
-    "tags": ["recreation", "student", "centre", "club", "activity", "lounge", "relax"],
-    "openingHours": "Mon–Sat: 8:00 AM – 9:00 PM",
+    "name": "Diamond Bank",
+    "description": "On-campus Diamond Bank branch and ATM services.",
+    "latitude": 6.673889,
+    "longitude": 3.157778,
+    "category": "admin",
+    "tags": [
+      "office",
+      "security",
+      "gate",
+      "admin",
+      "diamond"
+    ],
     "localizedNames": {
-      "yo": "Ile Awon Akẹkọọ",
-      "ig": "Ebe Ụmụ Akwụkwọ",
-      "pidgin": "Student Centre"
+      "yo": "Ile Ifowopamọ Diamond",
+      "ig": "Ụlọ Ego Diamond",
+      "pidgin": "Diamond Bank"
     }
   },
   {
     "id": "loc_013",
-    "name": "School of Law",
-    "description": "Dedicated faculty for law students with moot courts, law clinics, and legal research centers.",
-    "latitude": 6.6712,
-    "longitude": 3.1602,
+    "name": "Petroleum and Chemical Building",
+    "description": "Faculty of Petroleum and Chemical Engineering.",
+    "latitude": 6.674167,
+    "longitude": 3.157222,
     "category": "academic",
-    "tags": ["law", "faculty", "lecture", "moot court", "legal"],
-    "openingHours": "Mon–Fri: 7:00 AM – 8:00 PM"
+    "tags": [
+      "petroleum",
+      "faculty",
+      "department",
+      "lecture",
+      "class",
+      "building",
+      "lab"
+    ],
+    "localizedNames": {
+      "yo": "Ile Epo ati Kemika",
+      "ig": "Ụlọ Mmanụ na Kemịkal",
+      "pidgin": "Petroleum Building"
+    }
   },
   {
     "id": "loc_014",
-    "name": "Business School",
-    "description": "Faculty of Business Administration and Management Sciences. Houses the Bloomberg terminal lab.",
-    "latitude": 6.6716,
-    "longitude": 3.1615,
-    "category": "academic",
-    "tags": ["business", "MBA", "management", "economics", "accounting", "finance"],
-    "openingHours": "Mon–Fri: 7:00 AM – 8:00 PM"
+    "name": "Zenith Bank / ICT Centre",
+    "description": "On-campus Zenith Bank branch and university ICT support centre.",
+    "latitude": 6.674167,
+    "longitude": 3.156944,
+    "category": "admin",
+    "tags": [
+      "office",
+      "security",
+      "gate",
+      "zenith",
+      "admin"
+    ],
+    "localizedNames": {
+      "yo": "Ile Zenith/ICT",
+      "ig": "Ụlọ Zenith/ICT",
+      "pidgin": "Zenith Bank/ICT"
+    }
   },
   {
     "id": "loc_015",
-    "name": "CU Staff Quarters Gate",
-    "description": "Main entrance gate to staff residential quarters. Access restricted to authorized personnel.",
-    "latitude": 6.6745,
-    "longitude": 3.1608,
-    "category": "admin",
-    "tags": ["gate", "staff", "entrance", "quarters", "security"]
+    "name": "CST Building",
+    "description": "College of Science and Technology. Engineering and science departments.",
+    "latitude": 6.673333,
+    "longitude": 3.159167,
+    "category": "academic",
+    "tags": [
+      "cst",
+      "faculty",
+      "department",
+      "lecture",
+      "class",
+      "building",
+      "lab"
+    ],
+    "localizedNames": {
+      "yo": "Ile CST",
+      "ig": "Ụlọ CST",
+      "pidgin": "CST Building"
+    }
+  },
+  {
+    "id": "loc_016",
+    "name": "CMSS Building",
+    "description": "College of Management and Social Sciences. Business and economics.",
+    "latitude": 6.671389,
+    "longitude": 3.16,
+    "category": "academic",
+    "tags": [
+      "faculty",
+      "department",
+      "lecture",
+      "class",
+      "building",
+      "cmss",
+      "lab"
+    ],
+    "localizedNames": {
+      "yo": "Ile CMSS",
+      "ig": "Ụlọ CMSS",
+      "pidgin": "CMSS Building"
+    }
+  },
+  {
+    "id": "loc_017",
+    "name": "CEDS Building",
+    "description": "College of Engineering and Development Studies.",
+    "latitude": 6.671389,
+    "longitude": 3.161111,
+    "category": "academic",
+    "tags": [
+      "faculty",
+      "department",
+      "lecture",
+      "class",
+      "building",
+      "lab",
+      "ceds"
+    ],
+    "localizedNames": {
+      "yo": "Ile CEDS",
+      "ig": "Ụlọ CEDS",
+      "pidgin": "CEDS Building"
+    }
+  },
+  {
+    "id": "loc_018",
+    "name": "Dorcas Hall",
+    "description": "Female student residential hall.",
+    "latitude": 6.671944,
+    "longitude": 3.156389,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "accommodation",
+      "dorcas",
+      "hall",
+      "hostel",
+      "residence"
+    ],
+    "localizedNames": {
+      "yo": "Ile Dorcas",
+      "ig": "Ụlọ Dorcas",
+      "pidgin": "Dorcas Hall"
+    }
+  },
+  {
+    "id": "loc_019",
+    "name": "CU Chapel",
+    "description": "Chapel of Light — main worship centre. Mandatory services Mon, Wed, Fri.",
+    "latitude": 6.67,
+    "longitude": 3.157778,
+    "category": "worship",
+    "tags": [
+      "prayer",
+      "cu",
+      "worship",
+      "service",
+      "chapel",
+      "church"
+    ],
+    "localizedNames": {
+      "yo": "Ṣọọ̀sì CU",
+      "ig": "Ụlọ Ọzọ CU",
+      "pidgin": "CU Chapel"
+    }
+  },
+  {
+    "id": "loc_020",
+    "name": "CU Library",
+    "description": "University library with academic resources. Mon–Fri 7 AM–10 PM.",
+    "latitude": 6.67,
+    "longitude": 3.157222,
+    "category": "academic",
+    "tags": [
+      "faculty",
+      "cu",
+      "department",
+      "lecture",
+      "class",
+      "building",
+      "lab"
+    ],
+    "localizedNames": {
+      "yo": "Ile-ikawe CU",
+      "ig": "Ụlọ Akwụkwọ CU",
+      "pidgin": "CU Library"
+    }
+  },
+  {
+    "id": "loc_021",
+    "name": "Eagle Square",
+    "description": "Open recreational square and social gathering space.",
+    "latitude": 6.671111,
+    "longitude": 3.154722,
+    "category": "recreation",
+    "tags": [
+      "square",
+      "park",
+      "eagle",
+      "social",
+      "recreation",
+      "relax"
+    ],
+    "localizedNames": {
+      "yo": "Pápá Eagle",
+      "ig": "Ogige Eagle",
+      "pidgin": "Eagle Square"
+    }
+  },
+  {
+    "id": "loc_022",
+    "name": "Deborah Hall",
+    "description": "Female student residential hall.",
+    "latitude": 6.671111,
+    "longitude": 3.155278,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "accommodation",
+      "hall",
+      "hostel",
+      "residence",
+      "deborah"
+    ],
+    "localizedNames": {
+      "yo": "Ile Deborah",
+      "ig": "Ụlọ Deborah",
+      "pidgin": "Deborah Hall"
+    }
+  },
+  {
+    "id": "loc_023",
+    "name": "Lydia Hall",
+    "description": "Female student residential hall.",
+    "latitude": 6.671667,
+    "longitude": 3.155278,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "accommodation",
+      "hall",
+      "hostel",
+      "lydia",
+      "residence"
+    ],
+    "localizedNames": {
+      "yo": "Ile Lydia",
+      "ig": "Ụlọ Lydia",
+      "pidgin": "Lydia Hall"
+    }
+  },
+  {
+    "id": "loc_024",
+    "name": "Mary Hall",
+    "description": "Female student residential hall.",
+    "latitude": 6.671667,
+    "longitude": 3.154722,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "accommodation",
+      "hall",
+      "hostel",
+      "residence",
+      "mary"
+    ],
+    "localizedNames": {
+      "yo": "Ile Mary",
+      "ig": "Ụlọ Mary",
+      "pidgin": "Mary Hall"
+    }
+  },
+  {
+    "id": "loc_025",
+    "name": "Joshua Hall",
+    "description": "Male student residential hall.",
+    "latitude": 6.669444,
+    "longitude": 3.155556,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "joshua",
+      "accommodation",
+      "hall",
+      "hostel",
+      "residence"
+    ],
+    "localizedNames": {
+      "yo": "Ile Joshua",
+      "ig": "Ụlọ Joshua",
+      "pidgin": "Joshua Hall"
+    }
+  },
+  {
+    "id": "loc_026",
+    "name": "Peter Hall",
+    "description": "Male student residential hall.",
+    "latitude": 6.668333,
+    "longitude": 3.154722,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "accommodation",
+      "hall",
+      "peter",
+      "hostel",
+      "residence"
+    ],
+    "localizedNames": {
+      "yo": "Ile Peter",
+      "ig": "Ụlọ Peter",
+      "pidgin": "Peter Hall"
+    }
+  },
+  {
+    "id": "loc_027",
+    "name": "CU Medical Centre",
+    "description": "University health centre. Free medical care for students. Emergency: 24/7.",
+    "latitude": 6.668333,
+    "longitude": 3.155278,
+    "category": "medical",
+    "tags": [
+      "clinic",
+      "cu",
+      "doctor",
+      "hospital",
+      "medical",
+      "pharmacy",
+      "health"
+    ],
+    "localizedNames": {
+      "yo": "Ile-iwosan CU",
+      "ig": "Ụlọ Ọgwụgwọ CU",
+      "pidgin": "CU Medical Centre"
+    }
+  },
+  {
+    "id": "loc_028",
+    "name": "Cafeteria 1",
+    "description": "Main student dining hall serving breakfast, lunch and dinner daily.",
+    "latitude": 6.669444,
+    "longitude": 3.154167,
+    "category": "food",
+    "tags": [
+      "restaurant",
+      "dining",
+      "cafeteria",
+      "food",
+      "canteen",
+      "eat"
+    ],
+    "localizedNames": {
+      "yo": "Ile Ounjẹ 1",
+      "ig": "Ụlọ Ọrịa 1",
+      "pidgin": "Cafeteria 1"
+    }
+  },
+  {
+    "id": "loc_029",
+    "name": "John Hall",
+    "description": "Male student residential hall.",
+    "latitude": 6.669167,
+    "longitude": 3.153333,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "accommodation",
+      "john",
+      "hall",
+      "hostel",
+      "residence"
+    ],
+    "localizedNames": {
+      "yo": "Ile John",
+      "ig": "Ụlọ John",
+      "pidgin": "John Hall"
+    }
+  },
+  {
+    "id": "loc_030",
+    "name": "Paul Hall",
+    "description": "Male student residential hall.",
+    "latitude": 6.670278,
+    "longitude": 3.153611,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "accommodation",
+      "hall",
+      "hostel",
+      "residence",
+      "paul"
+    ],
+    "localizedNames": {
+      "yo": "Ile Paul",
+      "ig": "Ụlọ Paul",
+      "pidgin": "Paul Hall"
+    }
+  },
+  {
+    "id": "loc_031",
+    "name": "Joseph Hall",
+    "description": "Male student residential hall.",
+    "latitude": 6.670556,
+    "longitude": 3.153056,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "accommodation",
+      "hall",
+      "joseph",
+      "hostel",
+      "residence"
+    ],
+    "localizedNames": {
+      "yo": "Ile Joseph",
+      "ig": "Ụlọ Joseph",
+      "pidgin": "Joseph Hall"
+    }
+  },
+  {
+    "id": "loc_032",
+    "name": "Daniel Hall",
+    "description": "Male student residential hall.",
+    "latitude": 6.671667,
+    "longitude": 3.152778,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "accommodation",
+      "daniel",
+      "hall",
+      "hostel",
+      "residence"
+    ],
+    "localizedNames": {
+      "yo": "Ile Daniel",
+      "ig": "Ụlọ Daniel",
+      "pidgin": "Daniel Hall"
+    }
+  },
+  {
+    "id": "loc_033",
+    "name": "Postgraduate Residence",
+    "description": "Residential accommodation for postgraduate students.",
+    "latitude": 6.666667,
+    "longitude": 3.156389,
+    "category": "hostel",
+    "tags": [
+      "dormitory",
+      "accommodation",
+      "hall",
+      "hostel",
+      "residence",
+      "postgraduate"
+    ],
+    "localizedNames": {
+      "yo": "Ibugbe Postgraduate",
+      "ig": "Ụlọ Obibi Postgraduate",
+      "pidgin": "PG Residence"
+    }
   }
 ]

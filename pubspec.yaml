@@ -61,15 +61,32 @@ dev_dependencies:
   build_runner: ^2.4.9
   flutter_lints: ^3.0.0
 
+  # ✅ Fixed: Added required CLI tool dependencies
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.4
+
+# ── Asset Configurations ──────────────────────────────────────
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/cnicon.png" # ✅ Changed to match your file tree
+
+flutter_native_splash:
+  color: "#1A3C6E" # CU Deep Blue
+  image: "assets/icons/cnicon.png" # ✅ Changed
+
+  android_12:
+    image: "assets/icons/cnicon.png" # ✅ Changed
+    color: "#1A3C6E"
+
 flutter:
   uses-material-design: true
   generate: true
 
+  # ✅ Fixed: Directories clean up your yaml file so you don't list 100 files
   assets:
-    - assets/images/convenant.png
-    - assets/map/covenant_locations.json
-    - assets/map/campus_info.json
-    - assets/lang/en.json
-    - assets/lang/ig.json
-    - assets/lang/yo.json
-    - assets/lang/pidgin.json
+    - assets/images/
+    - assets/icons/
+    - assets/map/
+    - assets/lang/

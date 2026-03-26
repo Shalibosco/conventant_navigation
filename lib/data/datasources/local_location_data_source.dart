@@ -8,32 +8,38 @@ import '../../core/constants/app_constants.dart';
 import '../../core/error/exceptions.dart';
 
 class LocalLocationDataSource {
-  // ── Load from JSON asset then cache in Hive ───────────────
+  // Version bump forces re-seed when location data changes
+  static const int _dataVersion = 2;
+  static const String _versionKey = 'locations_data_version';
+
   Future<List<LocationModel>> getLocations() async {
     try {
       final box = await Hive.openBox<LocationModel>(AppConstants.locationsBox);
+      final versionBox = await Hive.openBox(_versionKey);
+      final storedVersion = versionBox.get('version', defaultValue: 0) as int;
 
-      // Return cached data if available
-      if (box.isNotEmpty) {
-        return box.values.toList();
+      // Re-seed if version changed or box is empty
+      if (box.isEmpty || storedVersion < _dataVersion) {
+        await box.clear();
+        await _seedFromJson(box);
+        await versionBox.put('version', _dataVersion);
       }
 
-      // Load from bundled JSON asset
-      final jsonString =
-      await rootBundle.loadString(AppConstants.locationsJsonPath);
-      final List<dynamic> jsonList = json.decode(jsonString) as List<dynamic>;
-      final locations = jsonList
-          .map((e) => LocationModel.fromJson(e as Map<String, dynamic>))
-          .toList();
-
-      // Cache in Hive
-      for (final loc in locations) {
-        await box.put(loc.id, loc);
-      }
-
-      return locations;
+      return box.values.toList();
     } catch (e) {
       throw StorageException('Failed to load locations: $e');
+    }
+  }
+
+  Future<void> _seedFromJson(Box<LocationModel> box) async {
+    final jsonString =
+    await rootBundle.loadString(AppConstants.locationsJsonPath);
+    final List<dynamic> jsonList = json.decode(jsonString) as List<dynamic>;
+    final locations = jsonList
+        .map((e) => LocationModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+    for (final loc in locations) {
+      await box.put(loc.id, loc);
     }
   }
 
