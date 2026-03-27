@@ -9,6 +9,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../providers/navigation_provider.dart';
+import '../widgets/map_widget.dart';
 import '../../voice_assistant/providers/voice_provider.dart';
 import '../../voice_assistant/services/voice_command_handler.dart';
 import '../../multilingual/providers/language_provider.dart';
@@ -35,9 +36,6 @@ class _MapScreenState extends State<MapScreen> {
 
   bool _searchExpanded = false;
 
-  // 📍 Covenant University Default Center
-  static const LatLng _initialCamera = LatLng(6.6726, 3.1616);
-
   @override
   void initState() {
     super.initState();
@@ -51,6 +49,9 @@ class _MapScreenState extends State<MapScreen> {
 
     await nav.initialize();
     await voice.initialize(lang.langCode);
+    
+    // Link voice provider to navigation for directions
+    nav.updateVoiceProvider(voice);
 
     voice.onCommandResolved = _handleVoiceCommand;
     nav.startLocationTracking();
@@ -110,7 +111,6 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     final nav = context.watch<NavigationProvider>();
-    final isDark = context.watch<AppStateProvider>().isDarkMode;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -137,33 +137,8 @@ class _MapScreenState extends State<MapScreen> {
             : const SizedBox.shrink(),
         body: Stack(
           children: [
-            FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                initialCenter: _initialCamera,
-                initialZoom: 16.5,
-                maxZoom: 18.0,
-                minZoom: 14.0,
-                onTap: (_, __) {
-                  _searchFocus.unfocus();
-                  setState(() => _searchExpanded = false);
-                },
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: isDark
-                      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                      : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.covenant.campus_navigation',
-                ),
-                PolylineLayer(
-                  polylines: nav.osmPolylines,
-                ),
-                MarkerLayer(
-                  markers: nav.osmMarkers,
-                ),
-              ],
-            ),
+            // ── The Central Map Widget ──────────────────────────
+            MapWidget(mapController: _mapController),
 
             Positioned(
               top: 0,

@@ -7,6 +7,9 @@ import '../../../data/models/location_model.dart';
 import '../services/location_service.dart';
 import '../services/route_service.dart';
 import '../../../data/repositories/location_repository.dart';
+import '../../voice_assistant/providers/voice_provider.dart';
+
+enum MapEngineType { google, osm }
 
 class NavigationProvider extends ChangeNotifier {
   final LocationRepository _repository;
@@ -20,10 +23,14 @@ class NavigationProvider extends ChangeNotifier {
   LocationModel? _selectedDestination;
   bool _isNavigating = false;
   String _activeFilter = 'all';
+  MapEngineType _activeEngine = MapEngineType.osm;
 
   List<LocationModel> _allLocations = [];
   List<LocationModel> _filteredLocations = [];
   List<LatLng> _routePoints = [];
+  
+  // Voice direction control
+  VoiceProvider? _voiceProvider;
 
   // 🧲 Getters
   LatLng? get userLocation => _userLocation;
@@ -32,6 +39,16 @@ class NavigationProvider extends ChangeNotifier {
   String get activeFilter => _activeFilter;
   List<LocationModel> get searchResults => _filteredLocations;
   bool get hasRoute => _routePoints.isNotEmpty;
+  MapEngineType get activeEngine => _activeEngine;
+
+  void updateVoiceProvider(VoiceProvider voice) {
+    _voiceProvider = voice;
+  }
+  
+  void setMapEngine(MapEngineType engine) {
+    _activeEngine = engine;
+    notifyListeners();
+  }
 
   // 📍 Getter for OpenStreetMap UI Markers
   List<Marker> get osmMarkers {
@@ -75,11 +92,10 @@ class NavigationProvider extends ChangeNotifier {
     ];
   }
 
-  // 🏃‍♂️ Distance Calculation (Haversine formula context)
+  // 🏃‍♂️ Distance Calculation
   double get distanceToDestination {
     if (_userLocation == null || _selectedDestination == null) return 0.0;
 
-    // ✅ Using the direct Distance algorithm from latlong2
     const Distance distance = Distance();
     return distance.as(
       LengthUnit.Meter,
@@ -115,12 +131,28 @@ class NavigationProvider extends ChangeNotifier {
 
   void startLocationTracking() {
     _locationService.trackLocation().listen((position) {
+      final oldLocation = _userLocation;
       _userLocation = position;
+      
       if (_isNavigating) {
         _updateRoute();
+        _checkProximityAndSpeak(oldLocation, position);
       }
       notifyListeners();
     });
+  }
+
+  void _checkProximityAndSpeak(LatLng? oldPos, LatLng newPos) {
+    if (_selectedDestination == null || _voiceProvider == null) return;
+    
+    final dist = distanceToDestination;
+    
+    // Arrival check
+    if (dist < 15) {
+      _voiceProvider!.speak("You have arrived at ${_selectedDestination!.name}.");
+      cancelNavigation();
+      return;
+    }
   }
 
   void search(String query) {
@@ -149,6 +181,11 @@ class NavigationProvider extends ChangeNotifier {
     _selectedDestination = destination;
     _isNavigating = true;
     _updateRoute();
+    
+    if (_voiceProvider != null) {
+       _voiceProvider!.speak("Navigating to ${destination.name}. Follow the route on the map.");
+    }
+
     notifyListeners();
   }
 
