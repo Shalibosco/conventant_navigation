@@ -50,4 +50,8 @@ class LocationService {
       to.latitude, to.longitude,
     );
   }
+
+  void dispose() {
+    // Cleanup location tracking resources if needed
+  }
 }

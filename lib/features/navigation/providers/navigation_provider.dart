@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../data/models/location_model.dart';
 import '../services/location_service.dart';
 import '../services/route_service.dart';
+import '../services/map_trail_service.dart';
 import '../../../data/repositories/location_repository.dart';
 import '../../voice_assistant/providers/voice_provider.dart';
 
@@ -15,6 +16,7 @@ class NavigationProvider extends ChangeNotifier {
   final LocationRepository _repository;
   final LocationService _locationService;
   final RouteService _routeService;
+  final MapTrailService _trailService = MapTrailService();
 
   NavigationProvider(this._repository, this._locationService, this._routeService);
 
@@ -40,6 +42,7 @@ class NavigationProvider extends ChangeNotifier {
   List<LocationModel> get searchResults => _filteredLocations;
   bool get hasRoute => _routePoints.isNotEmpty;
   MapEngineType get activeEngine => _activeEngine;
+  MapTrailService get trailService => _trailService;
 
   void updateVoiceProvider(VoiceProvider voice) {
     _voiceProvider = voice;
@@ -81,15 +84,32 @@ class NavigationProvider extends ChangeNotifier {
 
   // 🛣️ Getter for OpenStreetMap UI Route Lines
   List<Polyline> get osmPolylines {
-    if (_routePoints.isEmpty) return [];
-
-    return [
-      Polyline(
-        points: _routePoints,
-        color: const Color(0xFF800000), // ✅ Maroon Hex code for Covenant University
-        strokeWidth: 5.0,
-      ),
-    ];
+    final List<Polyline> polylines = [];
+    
+    // Add user trail (breadcrumb trail) when navigating
+    if (_isNavigating && _trailService.hasTrail && _trailService.trailPoints.length > 1) {
+      polylines.add(
+        Polyline(
+          points: _trailService.trailPoints,
+          color: const Color(0xFF4A90E2).withValues(alpha: 0.6), // Light blue trail
+          strokeWidth: 3.0,
+          // isDotted: false,
+        ),
+      );
+    }
+    
+    // Add navigation route
+    if (_routePoints.isNotEmpty) {
+      polylines.add(
+        Polyline(
+          points: _routePoints,
+          color: const Color(0xFF800000), // ✅ Maroon Hex code for Covenant University
+          strokeWidth: 5.0,
+        ),
+      );
+    }
+    
+    return polylines;
   }
 
   // 🏃‍♂️ Distance Calculation
@@ -134,7 +154,9 @@ class NavigationProvider extends ChangeNotifier {
       final oldLocation = _userLocation;
       _userLocation = position;
       
+      // Add to trail when navigating
       if (_isNavigating) {
+        _trailService.addTrailPoint(position);
         _updateRoute();
         _checkProximityAndSpeak(oldLocation, position);
       }
@@ -177,24 +199,33 @@ class NavigationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void navigateTo(LocationModel destination) {
-    _selectedDestination = destination;
-    _isNavigating = true;
-    _updateRoute();
-    
-    if (_voiceProvider != null) {
-       _voiceProvider!.speak("Navigating to ${destination.name}. Follow the route on the map.");
-    }
+   void navigateTo(LocationModel destination) {
+     _selectedDestination = destination;
+     _isNavigating = true;
+     
+     // Reset trail for new navigation
+     if (_userLocation != null) {
+       _trailService.resetTrail(_userLocation!);
+     } else {
+       _trailService.clearTrail();
+     }
+     
+     _updateRoute();
+     
+     if (_voiceProvider != null) {
+        _voiceProvider!.speak("Navigating to ${destination.name}. Follow the route on the map.");
+     }
 
-    notifyListeners();
-  }
+     notifyListeners();
+   }
 
-  void cancelNavigation() {
-    _isNavigating = false;
-    _selectedDestination = null;
-    _routePoints = [];
-    notifyListeners();
-  }
+   void cancelNavigation() {
+     _isNavigating = false;
+     _selectedDestination = null;
+     _routePoints = [];
+     _trailService.clearTrail(); // Clear trail when navigation ends
+     notifyListeners();
+   }
 
   Future<void> _updateRoute() async {
     if (_userLocation == null || _selectedDestination == null) return;
@@ -204,5 +235,14 @@ class NavigationProvider extends ChangeNotifier {
 
     _routePoints = points;
     notifyListeners();
+  }
+
+  // 🛣️ Get trail distance in kilometers
+  double get trailDistance => _trailService.getTotalTrailDistance();
+
+  void dispose() {
+    _locationService.dispose();
+    _routeService.dispose();
+    _trailService.dispose();
   }
 }

@@ -47,5 +47,16 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<!-- Microphone permissions for speech recognition -->
+		<key>NSMicrophoneUsageDescription</key>
+		<string>This app needs microphone access to recognize your voice commands for campus navigation.</string>
+		<!-- Speech recognition permissions -->
+		<key>NSSpeechRecognitionUsageDescription</key>
+		<string>This app uses speech recognition to understand your navigation commands.</string>
+		<!-- Location permissions -->
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>We need your location to show your position on the campus map and provide navigation.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>We need your location to show your position on the campus map and provide navigation, even when the app is in the background.</string>
 	</dict>
 </plist>

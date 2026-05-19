@@ -9,17 +9,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # 🟢 ADD THIS LINE HERE:
   flutter_localizations:
     sdk: flutter
+
+  # --- Map & Navigation ---
   flutter_map: ^8.2.2
   latlong2: ^0.9.1
   flutter_polyline_points: ^2.1.0
-
-  # --- Map & Navigation (Combined & De-duplicated) ---
   google_maps_flutter: ^2.12.1
-
 
   # --- Location ---
   geolocator: ^11.0.0
@@ -61,15 +58,21 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.3   # ✅ ADDED — generates the missing launcher_icon
   hive_generator: ^2.0.1
   build_runner: ^2.4.9
   flutter_lints: ^3.0.0
+
+# ✅ Launcher icon config — generates mipmap/launcher_icon referenced in AndroidManifest.xml
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: false
+  image_path: "assets/images/app_icon.png"
 
 flutter:
   uses-material-design: true
   generate: true
 
-  # ✅ Pro-Tip: Specify the directory to include all files inside automatically!
   assets:
     - assets/images/
     - assets/icons/

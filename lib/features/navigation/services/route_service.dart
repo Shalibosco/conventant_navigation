@@ -29,4 +29,8 @@ class RouteService {
       end,   // The target campus building destination
     ];
   }
+  
+  void dispose() {
+    // Cleanup routing resources if needed
+  }
 }
