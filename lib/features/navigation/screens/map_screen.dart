@@ -15,6 +15,7 @@ import '../../voice_assistant/services/voice_command_handler.dart';
 import '../../multilingual/providers/language_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/helpers.dart';
+import '../../../core/routes/app_router.dart';
 import '../../../data/models/location_model.dart';
 import '../../information/screens/info_screen.dart';
 import '../../settings/screens/settings_screen.dart';
@@ -369,6 +370,27 @@ class _CategoryChips extends StatelessWidget {
     {'label': 'Medical', 'value': 'medical', 'icon': Icons.local_hospital_rounded},
   ];
 
+  void _onCategoryTap(BuildContext context, String category, String label) {
+    final nav = context.read<NavigationProvider>();
+    
+    // If "All" is selected, just filter on map
+    if (category == 'all') {
+      nav.filterByCategory('all');
+      return;
+    }
+    
+    // Filter and navigate to category list
+    nav.filterByCategory(category);
+    Navigator.pushNamed(
+      context,
+      AppRoutes.categoryList,
+      arguments: {
+        'category': category,
+        'categoryLabel': label,
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final nav = context.watch<NavigationProvider>();
@@ -383,7 +405,11 @@ class _CategoryChips extends StatelessWidget {
           final f = _filters[i];
           final active = nav.activeFilter == f['value'];
           return GestureDetector(
-            onTap: () => nav.filterByCategory(f['value'] as String),
+            onTap: () => _onCategoryTap(
+              context,
+              f['value'] as String,
+              f['label'] as String,
+            ),
             child: AnimatedContainer(
               duration: 200.ms,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),

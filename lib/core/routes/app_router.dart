@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../../features/navigation/screens/map_screen.dart';
+import '../../features/navigation/screens/category_list_screen.dart';
 import '../../features/information/screens/info_screen.dart';
 import '../../features/voice_assistant/screens/voice_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
@@ -10,6 +11,7 @@ class AppRoutes {
   AppRoutes._();
 
   static const String map = '/';
+  static const String categoryList = '/category_list';
   static const String info = '/info';
   static const String voice = '/voice';
   static const String settings = '/settings';
@@ -20,6 +22,23 @@ class AppRouter {
     switch (settings.name) {
       case AppRoutes.map:
         return _fadeRoute(const MapScreen(), settings);
+
+      case AppRoutes.categoryList:
+        final args = settings.arguments as Map<String, dynamic>?;
+        if (args == null) {
+          return MaterialPageRoute(
+            builder: (_) => const Scaffold(
+              body: Center(child: Text('Invalid category')),
+            ),
+          );
+        }
+        return _slideRoute(
+          CategoryListScreen(
+            category: args['category'] as String,
+            categoryLabel: args['categoryLabel'] as String,
+          ),
+          settings,
+        );
 
       case AppRoutes.info:
         return _slideRoute(const InfoScreen(), settings);
@@ -41,8 +60,8 @@ class AppRouter {
     }
   }
 
-  static PageRouteBuilder _fadeRoute(Widget page, RouteSettings settings) {
-    return PageRouteBuilder(
+  static PageRouteBuilder<dynamic> _fadeRoute(Widget page, RouteSettings settings) {
+    return PageRouteBuilder<dynamic>(
       settings: settings,
       pageBuilder: (_, __, ___) => page,
       transitionsBuilder: (_, animation, __, child) {
@@ -52,8 +71,8 @@ class AppRouter {
     );
   }
 
-  static PageRouteBuilder _slideRoute(Widget page, RouteSettings settings) {
-    return PageRouteBuilder(
+  static PageRouteBuilder<dynamic> _slideRoute(Widget page, RouteSettings settings) {
+    return PageRouteBuilder<dynamic>(
       settings: settings,
       pageBuilder: (_, __, ___) => page,
       transitionsBuilder: (_, animation, __, child) {
