@@ -1,5 +1,6 @@
 // lib/features/navigation/providers/navigation_provider.dart
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -9,8 +10,6 @@ import '../services/route_service.dart';
 import '../services/map_trail_service.dart';
 import '../../../data/repositories/location_repository.dart';
 import '../../voice_assistant/providers/voice_provider.dart';
-
-enum MapEngineType { google, osm }
 
 class NavigationProvider extends ChangeNotifier {
   final LocationRepository _repository;
@@ -25,12 +24,15 @@ class NavigationProvider extends ChangeNotifier {
   LocationModel? _selectedDestination;
   bool _isNavigating = false;
   String _activeFilter = 'all';
-  MapEngineType _activeEngine = MapEngineType.osm;
+  String _searchQuery = '';
 
   List<LocationModel> _allLocations = [];
   List<LocationModel> _filteredLocations = [];
   List<LatLng> _routePoints = [];
-  
+
+  StreamSubscription<LatLng>? _locationSubscription;
+  LatLng? _lastRouteFrom; // throttle: only recalculate route after >30m movement
+
   // Voice direction control
   VoiceProvider? _voiceProvider;
 
@@ -41,16 +43,10 @@ class NavigationProvider extends ChangeNotifier {
   String get activeFilter => _activeFilter;
   List<LocationModel> get searchResults => _filteredLocations;
   bool get hasRoute => _routePoints.isNotEmpty;
-  MapEngineType get activeEngine => _activeEngine;
   MapTrailService get trailService => _trailService;
 
   void updateVoiceProvider(VoiceProvider voice) {
     _voiceProvider = voice;
-  }
-  
-  void setMapEngine(MapEngineType engine) {
-    _activeEngine = engine;
-    notifyListeners();
   }
 
   // 📍 Getter for OpenStreetMap UI Markers
@@ -150,66 +146,86 @@ class NavigationProvider extends ChangeNotifier {
   }
 
   void startLocationTracking() {
-    _locationService.trackLocation().listen((position) {
-      final oldLocation = _userLocation;
-      _userLocation = position;
-      
-      // Add to trail when navigating
-      if (_isNavigating) {
-        _trailService.addTrailPoint(position);
-        _updateRoute();
-        _checkProximityAndSpeak(oldLocation, position);
-      }
-      notifyListeners();
-    });
+    _locationSubscription?.cancel();
+    _locationSubscription = _locationService.trackLocation().listen(
+      (position) {
+        _userLocation = position;
+
+        if (_isNavigating) {
+          _trailService.addTrailPoint(position);
+          _maybeUpdateRoute(position);
+          _checkProximityAndSpeak(position);
+        }
+        notifyListeners();
+      },
+      onError: (Object error) {
+        debugPrint('NavigationProvider: location stream error — $error');
+      },
+    );
   }
 
-  void _checkProximityAndSpeak(LatLng? oldPos, LatLng newPos) {
+  void _maybeUpdateRoute(LatLng position) {
+    if (_lastRouteFrom == null) {
+      _updateRoute();
+      return;
+    }
+    const distCalc = Distance();
+    final moved = distCalc.as(LengthUnit.Meter, _lastRouteFrom!, position);
+    if (moved > 30) _updateRoute();
+  }
+
+  void _checkProximityAndSpeak(LatLng newPos) {
     if (_selectedDestination == null || _voiceProvider == null) return;
-    
+
     final dist = distanceToDestination;
-    
-    // Arrival check
+
     if (dist < 15) {
       _voiceProvider!.speak("You have arrived at ${_selectedDestination!.name}.");
       cancelNavigation();
-      return;
     }
   }
 
   void search(String query) {
-    if (query.isEmpty) {
-      _filteredLocations = _allLocations;
-    } else {
-      _filteredLocations = _allLocations.where((loc) {
-        return loc.name.toLowerCase().contains(query.toLowerCase()) ||
-            loc.category.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-    }
-    notifyListeners();
+    _searchQuery = query;
+    _applyFilters();
   }
 
   void filterByCategory(String category) {
     _activeFilter = category;
-    if (category == 'all') {
-      _filteredLocations = _allLocations;
-    } else {
-      _filteredLocations = _allLocations.where((loc) => loc.category == category).toList();
+    _applyFilters();
+  }
+
+  void _applyFilters() {
+    var results = _allLocations;
+
+    if (_activeFilter != 'all') {
+      results = results.where((loc) => loc.category == _activeFilter).toList();
     }
+
+    if (_searchQuery.isNotEmpty) {
+      final q = _searchQuery.toLowerCase();
+      results = results.where((loc) {
+        return loc.name.toLowerCase().contains(q) ||
+            loc.category.toLowerCase().contains(q);
+      }).toList();
+    }
+
+    _filteredLocations = results;
     notifyListeners();
   }
 
    void navigateTo(LocationModel destination) {
      _selectedDestination = destination;
      _isNavigating = true;
-     
+     _lastRouteFrom = null;
+
      // Reset trail for new navigation
      if (_userLocation != null) {
        _trailService.resetTrail(_userLocation!);
      } else {
        _trailService.clearTrail();
      }
-     
+
      _updateRoute();
      
      if (_voiceProvider != null) {
@@ -230,6 +246,7 @@ class NavigationProvider extends ChangeNotifier {
   Future<void> _updateRoute() async {
     if (_userLocation == null || _selectedDestination == null) return;
 
+    _lastRouteFrom = _userLocation;
     final destLatLng = LatLng(_selectedDestination!.latitude, _selectedDestination!.longitude);
     final points = await _routeService.getRoutePoints(_userLocation!, destLatLng);
 
@@ -240,9 +257,12 @@ class NavigationProvider extends ChangeNotifier {
   // 🛣️ Get trail distance in kilometers
   double get trailDistance => _trailService.getTotalTrailDistance();
 
+  @override
   void dispose() {
+    _locationSubscription?.cancel();
     _locationService.dispose();
     _routeService.dispose();
     _trailService.dispose();
+    super.dispose();
   }
 }

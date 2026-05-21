@@ -13,13 +13,13 @@ import '../widgets/map_widget.dart';
 import '../../voice_assistant/providers/voice_provider.dart';
 import '../../voice_assistant/services/voice_command_handler.dart';
 import '../../multilingual/providers/language_provider.dart';
-import '../../../presentation/providers/app_state_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../data/models/location_model.dart';
 import '../../information/screens/info_screen.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../../voice_assistant/widgets/voice_fab.dart';
+import '../../../presentation/widgets/app_drawer.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -115,6 +115,7 @@ class _MapScreenState extends State<MapScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      drawer: const AppDrawer(),
       body: SlidingUpPanel(
         controller: _panelController,
         minHeight: nav.isNavigating ? 160 : 0,
@@ -228,13 +229,6 @@ class _MapScreenState extends State<MapScreen> {
               child: const Center(child: VoiceFab()),
             ),
 
-            if (!context.watch<AppStateProvider>().isOnline)
-              Positioned(
-                top: MediaQuery.of(context).padding.top,
-                left: 0,
-                right: 0,
-                child: const _OfflineBanner(),
-              ),
           ],
         ),
       ),
@@ -619,27 +613,3 @@ class _MapFab extends StatelessWidget {
   }
 }
 
-class _OfflineBanner extends StatelessWidget {
-  const _OfflineBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-      color: AppTheme.warningAmber,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.wifi_off_rounded, color: Colors.white, size: 16),
-          const SizedBox(width: 8),
-          Text('Offline mode',
-              style: Theme.of(context)
-                  .textTheme
-                  .labelMedium
-                  ?.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
-        ],
-      ),
-    );
-  }
-}

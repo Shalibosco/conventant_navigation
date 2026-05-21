@@ -23,6 +23,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSizeMB = 0;
   bool _loadingCacheSize = true;
   bool _clearingCache = false;
+  bool _isDownloading = false;
+  double _downloadProgress = 0.0;
 
   @override
   void initState() {
@@ -140,14 +142,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () => _showDownloadDialog(context),
-                      icon: const Icon(Icons.download_rounded),
-                      label: const Text('Download Campus Tiles'),
+                  if (_isDownloading) ...[
+                    LinearProgressIndicator(
+                      value: _downloadProgress,
+                      backgroundColor: AppTheme.lightBorder,
+                      color: AppTheme.cuNavy,
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${(_downloadProgress * 100).toStringAsFixed(0)}% downloaded',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 8),
+                  ] else
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => _showDownloadDialog(context),
+                        icon: const Icon(Icons.download_rounded),
+                        label: const Text('Download Campus Tiles'),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -181,8 +196,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<void> _startDownload() async {
+    setState(() {
+      _isDownloading = true;
+      _downloadProgress = 0.0;
+    });
+    try {
+      await _offlineService.preCacheCampusTiles(
+        onProgress: (p) {
+          if (mounted) setState(() => _downloadProgress = p);
+        },
+      );
+      if (mounted) Helpers.showSnackBar(context, 'Campus tiles downloaded');
+    } catch (e) {
+      if (mounted) {
+        Helpers.showSnackBar(context, 'Download failed — check connection',
+            isError: true);
+      }
+    } finally {
+      if (mounted) setState(() => _isDownloading = false);
+      await _loadCacheSize();
+    }
+  }
+
   void _showDownloadDialog(BuildContext context) {
-    showDialog<void>( // ✅ Strictly typed
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Download Offline Map'),
@@ -196,7 +234,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              Helpers.showSnackBar(context, 'Downloading map tiles...');
+              _startDownload();
             },
             child: const Text('Download'),
           ),

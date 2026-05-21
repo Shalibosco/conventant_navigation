@@ -28,14 +28,25 @@ class MapWidget extends StatelessWidget {
         initialZoom: AppConstants.defaultZoom,
         maxZoom: AppConstants.maxZoom,
         minZoom: AppConstants.minZoom,
+        cameraConstraint: CameraConstraint.containCenter(
+          bounds: LatLngBounds(
+            const LatLng(AppConstants.campusBoundSouth, AppConstants.campusBoundWest),
+            const LatLng(AppConstants.campusBoundNorth, AppConstants.campusBoundEast),
+          ),
+        ),
       ),
       children: [
-        TileLayer(
-          urlTemplate: isDark
-              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-              : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.covenant.campus_navigation',
-        ),
+        if (isDark)
+          TileLayer(
+            urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+            subdomains: const ['a', 'b', 'c', 'd'],
+            userAgentPackageName: 'com.covenant.campus_navigation',
+          )
+        else
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.covenant.campus_navigation',
+          ),
         PolylineLayer(
           polylines: navProvider.osmPolylines,
         ),

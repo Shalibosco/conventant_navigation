@@ -1,5 +1,6 @@
 // lib/core/di/service_locator.dart
 
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,7 +39,16 @@ Future<void> initServiceLocator() async {
   sl.registerSingleton<SharedPreferences>(prefs);
 
   // ── Hive Boxes ────────────────────────────────────────────
-  final locationBox = await Hive.openBox<LocationModel>('locations_box');
+  // Auto-recover from corrupted box (can happen if the previous process was
+  // killed mid-write, e.g. during a debug session crash).
+  Box<LocationModel> locationBox;
+  try {
+    locationBox = await Hive.openBox<LocationModel>('locations_box');
+  } catch (e) {
+    debugPrint('Hive box corrupted, clearing and reopening: $e');
+    await Hive.deleteBoxFromDisk('locations_box');
+    locationBox = await Hive.openBox<LocationModel>('locations_box');
+  }
 
   // ── Core Services ─────────────────────────────────────────
   sl.registerLazySingleton<StorageService>(

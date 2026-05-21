@@ -88,5 +88,5 @@ class _AppLocalizationDelegate
   }
 
   @override
-  bool shouldReload(_AppLocalizationDelegate old) => true;
+  bool shouldReload(_AppLocalizationDelegate old) => false;
 }

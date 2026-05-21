@@ -1,6 +1,8 @@
 // lib/features/navigation/services/offline_map_service.dart
 
 import 'dart:io';
+import 'dart:math' as math;
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import '../../../core/constants/app_constants.dart';
 
@@ -43,11 +45,11 @@ class OfflineMapService {
     } catch (_) {}
   }
 
-  // Pre-cache tiles for the campus bounding box at zoom levels 14–18
+  /// Pre-caches OSM tiles for the campus bounding box at zoom levels 14–18.
   Future<void> preCacheCampusTiles({
     void Function(double progress)? onProgress,
   }) async {
-    final tilesToCache = _getTileCoordinates(
+    final tiles = _getTileCoordinates(
       north: AppConstants.campusBoundNorth,
       south: AppConstants.campusBoundSouth,
       east: AppConstants.campusBoundEast,
@@ -57,10 +59,10 @@ class OfflineMapService {
     );
 
     int completed = 0;
-    for (final tile in tilesToCache) {
+    for (final tile in tiles) {
       await _downloadTile(tile[0], tile[1], tile[2]);
       completed++;
-      onProgress?.call(completed / tilesToCache.length);
+      onProgress?.call(completed / tiles.length);
     }
   }
 
@@ -92,54 +94,33 @@ class OfflineMapService {
   }
 
   int _latToTile(double lat, int zoom) {
-    final latRad = lat * 3.141592653589793 / 180;
+    final latRad = lat * math.pi / 180;
     return ((1 -
-        (log(tan(latRad) + 1 / cos(latRad)) /
-            3.141592653589793)) /
-        2 *
-        (1 << zoom))
+                math.log(math.tan(latRad) + 1 / math.cos(latRad)) /
+                    math.pi) /
+            2 *
+            (1 << zoom))
         .floor();
   }
 
-  double log(double x) => x <= 0 ? 0 : (x == 1 ? 0 : _ln(x));
-  double _ln(double x) {
-    // Simple natural log approximation
-    return (x - 1) -
-        (x - 1) * (x - 1) / 2 +
-        (x - 1) * (x - 1) * (x - 1) / 3;
-  }
-
-  double tan(double x) => sin(x) / cos(x);
-  double sin(double x) {
-    double result = x;
-    double term = x;
-    for (int i = 1; i <= 10; i++) {
-      term *= -x * x / ((2 * i) * (2 * i + 1));
-      result += term;
-    }
-    return result;
-  }
-
-  double cos(double x) {
-    double result = 1;
-    double term = 1;
-    for (int i = 1; i <= 10; i++) {
-      term *= -x * x / ((2 * i - 1) * (2 * i));
-      result += term;
-    }
-    return result;
-  }
-
   Future<void> _downloadTile(int z, int x, int y) async {
-    // Tile download would use http in production;
-    // this is a stub that represents the download flow
     try {
       final dir = await getTileCacheDirectory();
       final file = File('${dir.path}/$z/$x/$y.png');
       if (file.existsSync()) return;
       file.parent.createSync(recursive: true);
-      // In production: final bytes = await http.get(Uri.parse(url));
-      // file.writeAsBytesSync(bytes.bodyBytes);
+
+      final url = 'https://tile.openstreetmap.org/$z/$x/$y.png';
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'User-Agent': 'CUNavigate/1.0 (Covenant University campus navigation)',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        await file.writeAsBytes(response.bodyBytes);
+      }
     } catch (_) {}
   }
 }

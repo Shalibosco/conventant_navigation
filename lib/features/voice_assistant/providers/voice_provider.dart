@@ -111,7 +111,11 @@ class VoiceProvider extends ChangeNotifier {
   }
 
   // ── Speak directly (for nav instructions) ────────────────
+  // Skips if user is actively speaking or processing a command.
   Future<void> speak(String text) async {
+    if (_state == VoiceState.listening || _state == VoiceState.processing) {
+      return;
+    }
     _setState(VoiceState.speaking);
     await _ttsService.speak(text);
     _setState(VoiceState.idle);

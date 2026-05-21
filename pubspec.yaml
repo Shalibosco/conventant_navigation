@@ -16,7 +16,6 @@ dependencies:
   flutter_map: ^8.2.2
   latlong2: ^0.9.1
   flutter_polyline_points: ^2.1.0
-  google_maps_flutter: ^2.12.1
 
   # --- Location ---
   geolocator: ^11.0.0
@@ -65,9 +64,9 @@ dev_dependencies:
 
 # ✅ Launcher icon config — generates mipmap/launcher_icon referenced in AndroidManifest.xml
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: "ic_launcher"
   ios: false
-  image_path: "assets/images/app_icon.png"
+  image_path: "assets/images/convenant.png"
 
 flutter:
   uses-material-design: true

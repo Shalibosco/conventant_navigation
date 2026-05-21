@@ -266,7 +266,7 @@ class _DrawerItem extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      leading: const Icon(Icons.map_rounded, color: AppTheme.cuNavy, size: 22), // ✅ Swapped icon parameter if you want it hardcoded, or remove const
+      leading: Icon(icon, color: AppTheme.cuNavy, size: 22),
       title: Text(label, style: theme.textTheme.titleMedium),
       trailing: const Icon(Icons.chevron_right_rounded, size: 18),
     );

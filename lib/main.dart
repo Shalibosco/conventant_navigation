@@ -43,7 +43,15 @@ Future<void> main() async {
   Hive.registerAdapter(LocationModelAdapter());
 
   // ── Dependency Injection ─────────────────────────────────
-  await initServiceLocator();
+  // Wrapped in try-catch so a DI/Hive failure never silently kills the process
+  // before the Dart VM service announces its port (which causes "Stuck at Launching").
+  try {
+    await initServiceLocator();
+  } catch (e, stack) {
+    debugPrint('⚠️  initServiceLocator failed: $e\n$stack');
+    // Fall through — runApp still executes so the VM service can connect
+    // and the error appears in Flutter DevTools rather than as a silent hang.
+  }
 
   // ── Run App ──────────────────────────────────────────────
   runApp(const CUNavigateApp());
