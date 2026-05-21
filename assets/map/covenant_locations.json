@@ -211,16 +211,16 @@
   },
   {
     "id": "loc_016",
-    "name": "CBSS / CLDS Building",
-    "description": "College of Business and Social Sciences (CBSS) and College of Leadership Development Studies (CLDS). A three-storey ultra-modern structure with a total floor space of 12,748 m².",
+    "name": "CMSS / CLDS Building",
+    "description": "College of Business and Social Sciences (CMSS) and College of Leadership Development Studies (CLDS). A three-storey ultra-modern structure with a total floor space of 12,748 m².",
     "latitude": 6.671389,
     "longitude": 3.16,
     "category": "academic",
-    "tags": ["faculty", "department", "lecture", "class", "building", "cbss", "clds", "business", "social", "leadership"],
+    "tags": ["faculty", "department", "lecture", "class", "building", "cmss", "clds", "business", "social", "leadership"],
     "localizedNames": {
-      "yo": "Ile CBSS/CLDS",
-      "ig": "Ụlọ CBSS/CLDS",
-      "pidgin": "CBSS/CLDS Building"
+      "yo": "Ile CMSS/CLDS",
+      "ig": "Ụlọ CMSS/CLDS",
+      "pidgin": "CMSS/CLDS Building"
     }
   },
   {
