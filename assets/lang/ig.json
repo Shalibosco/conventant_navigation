@@ -33,6 +33,8 @@
   "voice_tap_to_speak": "Kụọ mic iji kwuo",
   "voice_listening": "Na-ege ntị...",
   "voice_processing": "Na-arụ ọrụ...",
+  "voice_speaking": "Na-ekwu okwu...",
+  "voice_error": "Njehie — Kụọ ka nwaa ọzọ",
   "voice_try_saying": "Nwaa ikwu:",
   "voice_you_said": "Ị kwuru",
   "voice_assistant_label": "Onye Enyemaka",
@@ -59,10 +61,20 @@
   "settings_clear_cache": "Hichapụ",
   "settings_download_tiles": "Budata Maapụ Ụlọ Akwụkwọ",
   "settings_cache_cleared": "Ahichapụ ibi nchekwa maapụ",
+  "settings_tiles_downloaded": "Ebubatala tile maapụ ụlọ akwụkwọ",
+  "settings_download_failed": "Nbudata dara. Lelee njikọ ịntanetị ma nwaa ọzọ.",
+  "settings_download_progress": "{percent}% ebudatara",
+  "settings_download_dialog_title": "Budata Maapụ Offline",
+  "settings_download_dialog_content": "Nke a ga-ebudata tile maapụ Covenant University maka offline. Ịntanetị dị mkpa. Nha: 20-50 MB.",
   "settings_about": "Banyere",
+  "version": "Ụdị",
+  "university": "Mahadum",
+  "campus": "Kampụs",
 
   "error_location_unavailable": "Ebe m nọ adịghị ugbu a",
   "error_no_route": "Enweghị ike ịchọta ụzọ. Na-egosi ụzọ ọtọ.",
+  "error_invalid_category": "Ụdị na-ezighi ezi",
+  "error_route_not_found": "Ahụghị ụzọ maka {route}",
   "error_generic": "Ihe mere. Biko nwaa ọzọ.",
 
   "permission_location_title": "Ikike Ebe",
@@ -74,5 +86,11 @@
   "btn_cancel": "Kagbuo",
   "btn_download": "Budata",
   "btn_close": "Mechie",
-  "btn_ok": "Ọ Dị Mma"
+  "btn_ok": "Ọ Dị Mma",
+  "search_results_count": "Achọtara ebe {count}",
+  "no_results": "Achọtaghị ebe ọ bụla",
+  "no_results_subtitle": "Biko nwaa ihe ọzọ",
+  "info_empty": "Enweghị ozi dị",
+  "map_getting_location": "Na-enweta ebe ị nọ...",
+  "offline_banner": "Offline - A na-eji data maapụ echekwara"
 }

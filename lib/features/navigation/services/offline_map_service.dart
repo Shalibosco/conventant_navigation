@@ -8,6 +8,8 @@ import '../../../core/constants/app_constants.dart';
 
 class OfflineMapService {
   static Directory? _cacheDir;
+  static const String _lightStyle = 'light';
+  static const String _darkStyle = 'dark';
 
   Future<Directory> getTileCacheDirectory() async {
     if (_cacheDir != null) return _cacheDir!;
@@ -18,6 +20,18 @@ class OfflineMapService {
     }
     _cacheDir = tileDir;
     return tileDir;
+  }
+
+  String? get cacheDirectoryPath => _cacheDir?.path;
+
+  File? getTileFileSync({
+    required String style,
+    required int z,
+    required int x,
+    required int y,
+  }) {
+    if (_cacheDir == null) return null;
+    return File('${_cacheDir!.path}/${_sanitizeStyle(style)}/$z/$x/$y.png');
   }
 
   Future<int> getCacheSizeInMB() async {
@@ -48,6 +62,7 @@ class OfflineMapService {
   /// Pre-caches OSM tiles for the campus bounding box at zoom levels 14–18.
   Future<void> preCacheCampusTiles({
     void Function(double progress)? onProgress,
+    bool includeDarkTiles = true,
   }) async {
     final tiles = _getTileCoordinates(
       north: AppConstants.campusBoundNorth,
@@ -59,10 +74,30 @@ class OfflineMapService {
     );
 
     int completed = 0;
+    final total = tiles.length * (includeDarkTiles ? 2 : 1);
+
     for (final tile in tiles) {
-      await _downloadTile(tile[0], tile[1], tile[2]);
+      await _downloadTile(
+        style: _lightStyle,
+        z: tile[0],
+        x: tile[1],
+        y: tile[2],
+      );
       completed++;
-      onProgress?.call(completed / tiles.length);
+      onProgress?.call(completed / total);
+    }
+
+    if (includeDarkTiles) {
+      for (final tile in tiles) {
+        await _downloadTile(
+          style: _darkStyle,
+          z: tile[0],
+          x: tile[1],
+          y: tile[2],
+        );
+        completed++;
+        onProgress?.call(completed / total);
+      }
     }
   }
 
@@ -103,14 +138,39 @@ class OfflineMapService {
         .floor();
   }
 
-  Future<void> _downloadTile(int z, int x, int y) async {
+  String _sanitizeStyle(String style) {
+    if (style == _darkStyle) return _darkStyle;
+    return _lightStyle;
+  }
+
+  String _getTileUrl({
+    required String style,
+    required int z,
+    required int x,
+    required int y,
+  }) {
+    final mapStyle = _sanitizeStyle(style);
+    if (mapStyle == _darkStyle) {
+      const subdomains = ['a', 'b', 'c', 'd'];
+      final subdomain = subdomains[(x + y) % subdomains.length];
+      return 'https://$subdomain.basemaps.cartocdn.com/dark_all/$z/$x/$y.png';
+    }
+    return 'https://tile.openstreetmap.org/$z/$x/$y.png';
+  }
+
+  Future<void> _downloadTile({
+    required String style,
+    required int z,
+    required int x,
+    required int y,
+  }) async {
     try {
       final dir = await getTileCacheDirectory();
-      final file = File('${dir.path}/$z/$x/$y.png');
+      final file = File('${dir.path}/${_sanitizeStyle(style)}/$z/$x/$y.png');
       if (file.existsSync()) return;
       file.parent.createSync(recursive: true);
 
-      final url = 'https://tile.openstreetmap.org/$z/$x/$y.png';
+      final url = _getTileUrl(style: style, z: z, x: x, y: y);
       final response = await http.get(
         Uri.parse(url),
         headers: {

@@ -6,6 +6,7 @@ import '../../features/navigation/screens/category_list_screen.dart';
 import '../../features/information/screens/info_screen.dart';
 import '../../features/voice_assistant/screens/voice_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
+import '../../features/multilingual/localization/app_localization.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -27,8 +28,8 @@ class AppRouter {
         final args = settings.arguments as Map<String, dynamic>?;
         if (args == null) {
           return MaterialPageRoute(
-            builder: (_) => const Scaffold(
-              body: Center(child: Text('Invalid category')),
+            builder: (context) => Scaffold(
+              body: Center(child: Text(context.t('error_invalid_category'))),
             ),
           );
         }
@@ -51,9 +52,14 @@ class AppRouter {
 
       default:
         return MaterialPageRoute(
-          builder: (_) => Scaffold(
+          builder: (context) => Scaffold(
             body: Center(
-              child: Text('No route found for ${settings.name}'),
+              child: Text(
+                context.tArgs(
+                  'error_route_not_found',
+                  {'route': settings.name ?? ''},
+                ),
+              ),
             ),
           ),
         );

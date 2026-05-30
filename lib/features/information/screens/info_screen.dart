@@ -8,6 +8,7 @@ import '../../../data/repositories/info_repository.dart';
 import '../../../data/models/info_model.dart';
 import '../../../core/di/service_locator.dart';
 import '../../multilingual/providers/language_provider.dart';
+import '../../multilingual/localization/app_localization.dart';
 import '../../../core/theme/app_theme.dart';
 
 class InfoScreen extends StatefulWidget {
@@ -25,18 +26,18 @@ class _InfoScreenState extends State<InfoScreen>
   List<InfoModel> _allItems = [];
   bool _isLoading = true;
 
-  final List<Map<String, dynamic>> _tabs = const [
-    {'label': 'All',        'category': 'all',      'icon': Icons.apps_rounded},
-    {'label': 'Rules',      'category': 'rule',     'icon': Icons.gavel_rounded},
-    {'label': 'Facilities', 'category': 'facility', 'icon': Icons.apartment_rounded},
-    {'label': 'Contacts',   'category': 'contact',  'icon': Icons.call_rounded},
-    {'label': 'Events',     'category': 'event',    'icon': Icons.event_rounded},
+  List<Map<String, dynamic>> _getTabs(BuildContext context) => [
+    {'label': context.t('info_tab_all'),        'category': 'all',      'icon': Icons.apps_rounded},
+    {'label': context.t('info_tab_rules'),      'category': 'rule',     'icon': Icons.gavel_rounded},
+    {'label': context.t('info_tab_facilities'), 'category': 'facility', 'icon': Icons.apartment_rounded},
+    {'label': context.t('info_tab_contacts'),   'category': 'contact',  'icon': Icons.call_rounded},
+    {'label': context.t('info_tab_events'),     'category': 'event',    'icon': Icons.event_rounded},
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _tabs.length, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _loadInfo();
   }
 
@@ -65,10 +66,11 @@ class _InfoScreenState extends State<InfoScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final langCode = context.watch<LanguageProvider>().langCode;
+    final tabs = _getTabs(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Campus Information'),
+        title: Text(context.t('info_title')),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -78,7 +80,7 @@ class _InfoScreenState extends State<InfoScreen>
           labelColor: AppTheme.cuNavy,
           // ✅ Fixed: Swapped withOpacity to withValues to avoid precision loss
           unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-          tabs: _tabs.map((tab) {
+          tabs: tabs.map((tab) {
             return Tab(
               child: Row(
                 children: [
@@ -95,7 +97,7 @@ class _InfoScreenState extends State<InfoScreen>
           ? const Center(child: CircularProgressIndicator())
           : TabBarView(
         controller: _tabController,
-        children: _tabs.map((tab) {
+        children: tabs.map((tab) {
           final items = _getFilteredItems(tab['category'] as String);
           return _InfoList(items: items, langCode: langCode);
         }).toList(),
@@ -158,7 +160,7 @@ class _InfoList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const Center(child: Text('No information available'));
+      return Center(child: Text(context.t('info_empty')));
     }
     return ListView.builder(
       padding: const EdgeInsets.all(16),

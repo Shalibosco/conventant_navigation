@@ -33,6 +33,8 @@
   "voice_tap_to_speak": "Press mic to talk",
   "voice_listening": "I dey hear you...",
   "voice_processing": "I dey process...",
+  "voice_speaking": "I dey talk...",
+  "voice_error": "Error — Tap try again",
   "voice_try_saying": "Try talk like dis:",
   "voice_you_said": "You talk say",
   "voice_assistant_label": "Assistant",
@@ -59,10 +61,20 @@
   "settings_clear_cache": "Clear",
   "settings_download_tiles": "Download Campus Map",
   "settings_cache_cleared": "Map cache don clear",
+  "settings_tiles_downloaded": "Campus tiles don download finish",
+  "settings_download_failed": "Download fail. Check your connection try again.",
+  "settings_download_progress": "{percent}% don download",
+  "settings_download_dialog_title": "Download Offline Map",
+  "settings_download_dialog_content": "This go download Covenant University map tiles for offline use. Internet needed. Size fit be 20-50 MB.",
   "settings_about": "About",
+  "version": "Version",
+  "university": "University",
+  "campus": "Campus",
 
   "error_location_unavailable": "Your location no dey available yet",
   "error_no_route": "No find route. Showing straight path.",
+  "error_invalid_category": "Category no correct",
+  "error_route_not_found": "No route found for {route}",
   "error_generic": "Something happen. Try again abeg.",
 
   "permission_location_title": "Location Permission",
@@ -74,5 +86,11 @@
   "btn_cancel": "Cancel",
   "btn_download": "Download",
   "btn_close": "Close",
-  "btn_ok": "OK"
+  "btn_ok": "OK",
+  "search_results_count": "I find {count} places",
+  "no_results": "No find any place",
+  "no_results_subtitle": "Try another one abeg",
+  "info_empty": "No information dey available",
+  "map_getting_location": "I dey get your location...",
+  "offline_banner": "Offline - I dey use cached map data"
 }

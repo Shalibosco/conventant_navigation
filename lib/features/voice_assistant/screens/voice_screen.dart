@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/voice_provider.dart';
 import '../widgets/voice_ui.dart';
 import '../../multilingual/providers/language_provider.dart';
+import '../../multilingual/localization/app_localization.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -22,7 +23,7 @@ class VoiceScreen extends StatelessWidget {
     final languageName = AppConstants.languageNames[langProvider.langCode] ?? 'English';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Voice Assistant')),
+      appBar: AppBar(title: Text(context.t('voice_title'))),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -49,14 +50,14 @@ class VoiceScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               Text(
-                'CU Voice Assistant',
+                context.t('voice_title'),
                 style: theme.textTheme.headlineSmall,
               ).animate().fadeIn(delay: 200.ms),
 
               const SizedBox(height: 8),
 
               Text(
-                'Speak in $languageName',
+                context.tArgs('voice_speak_in', {'language': languageName}),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.55), // ✅ Fixed withValues
                 ),
@@ -72,7 +73,7 @@ class VoiceScreen extends StatelessWidget {
               // ── Recognized text bubble ────────────────────
               if (voiceProvider.recognizedText.isNotEmpty)
                 _TextBubble(
-                  label: 'You said',
+                  label: context.t('voice_you_said'),
                   text: voiceProvider.recognizedText,
                   color: AppTheme.cuNavy, // ✅ Fixed cuNavy
                 ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2),
@@ -80,7 +81,7 @@ class VoiceScreen extends StatelessWidget {
               if (voiceProvider.responseText.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 _TextBubble(
-                  label: 'Assistant',
+                  label: context.t('voice_assistant_label'),
                   text: voiceProvider.responseText,
                   color: AppTheme.navGreen, // ✅ Fixed navGreen
                 ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2),
@@ -180,7 +181,7 @@ class _ExampleCommands extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Try saying:',
+          context.t('voice_try_saying'),
           style: theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.onSurface.withValues(alpha: 0.55), // ✅ Fixed withValues
           ),

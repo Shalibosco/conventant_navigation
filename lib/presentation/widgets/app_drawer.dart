@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/multilingual/providers/language_provider.dart';
+import '../../features/multilingual/localization/app_localization.dart';
+import '../../features/voice_assistant/providers/voice_provider.dart';
 import '../../presentation/providers/app_state_provider.dart';
 import '../../core/routes/app_router.dart';
 import '../../core/theme/app_theme.dart';
@@ -35,7 +37,7 @@ class AppDrawer extends StatelessWidget {
                 children: [
                   _DrawerItem(
                     icon: Icons.map_rounded,
-                    label: 'Campus Map',
+                    label: context.t('nav_map'),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.pushNamedAndRemoveUntil(
@@ -46,7 +48,7 @@ class AppDrawer extends StatelessWidget {
 
                   _DrawerItem(
                     icon: Icons.mic_rounded,
-                    label: 'Voice Assistant',
+                    label: context.t('nav_voice'),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.pushNamed(context, AppRoutes.voice);
@@ -55,7 +57,7 @@ class AppDrawer extends StatelessWidget {
 
                   _DrawerItem(
                     icon: Icons.info_outline_rounded,
-                    label: 'Campus Information',
+                    label: context.t('nav_info'),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.pushNamed(context, AppRoutes.info);
@@ -64,7 +66,7 @@ class AppDrawer extends StatelessWidget {
 
                   _DrawerItem(
                     icon: Icons.settings_rounded,
-                    label: 'Settings',
+                    label: context.t('nav_settings'),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.pushNamed(context, AppRoutes.settings);
@@ -78,7 +80,7 @@ class AppDrawer extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 4, vertical: 4),
                     child: Text(
-                      'Language',
+                      context.t('settings_language'),
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: AppTheme.cuNavy, // ✅ Swapped primaryColor to cuNavy
                         fontWeight: FontWeight.w700,
@@ -90,7 +92,10 @@ class AppDrawer extends StatelessWidget {
                     final isSelected = langProvider.isSelected(entry.key);
                     return ListTile(
                       dense: true,
-                      onTap: () => langProvider.setLanguage(entry.key),
+                      onTap: () {
+                        langProvider.setLanguage(entry.key);
+                        context.read<VoiceProvider>().setLanguage(entry.key);
+                      },
                       leading: Container(
                         width: 32,
                         height: 32,

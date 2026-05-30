@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/voice_provider.dart';
+import '../../multilingual/localization/app_localization.dart';
 import '../../../core/theme/app_theme.dart';
 
 class VoiceUI extends StatelessWidget {
@@ -20,7 +21,7 @@ class VoiceUI extends StatelessWidget {
         // ── Status label ─────────────────────────────────────
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
-          child: _buildStatusText(voiceProvider, theme),
+          child: _buildStatusText(voiceProvider, context),
         ),
 
         const SizedBox(height: 10),
@@ -40,28 +41,31 @@ class VoiceUI extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusText(VoiceProvider provider, ThemeData theme) {
+  Widget _buildStatusText(VoiceProvider provider, BuildContext context) {
+    final theme = Theme.of(context);
     String text;
 
     switch (provider.state) {
       case VoiceState.listening:
         text = provider.partialText.isNotEmpty
             ? '"${provider.partialText}"'
-            : 'Listening...';
+            : context.t('voice_listening');
         break;
       case VoiceState.processing:
-        text = 'Processing...';
+        text = context.t('voice_processing');
         break;
       case VoiceState.speaking:
         text = provider.responseText.isNotEmpty
             ? provider.responseText
-            : 'Speaking...';
+            : context.t('voice_speaking');
         break;
       case VoiceState.error:
-        text = 'Try again';
+        text = context.t('voice_error');
         break;
       default:
-        text = 'Tap mic to speak';
+        text = provider.languageWarning.isNotEmpty
+            ? provider.languageWarning
+            : context.t('voice_tap_to_speak');
     }
 
     return Container(

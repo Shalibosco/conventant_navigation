@@ -18,6 +18,7 @@ class VoiceProvider extends ChangeNotifier {
   String _recognizedText = '';
   String _responseText = '';
   String _errorMessage = '';
+  String _languageWarning = '';
   VoiceCommand? _lastCommand;
   String _currentLang = 'en';
 
@@ -27,6 +28,7 @@ class VoiceProvider extends ChangeNotifier {
   String get recognizedText => _recognizedText;
   String get responseText => _responseText;
   String get errorMessage => _errorMessage;
+  String get languageWarning => _languageWarning;
   VoiceCommand? get lastCommand => _lastCommand;
   bool get isListening => _state == VoiceState.listening;
   bool get isSpeaking => _state == VoiceState.speaking;
@@ -41,11 +43,13 @@ class VoiceProvider extends ChangeNotifier {
     _currentLang = langCode;
     await _ttsService.initialize(langCode: langCode);
     await _speechService.initialize();
+    await _refreshLocaleWarning();
   }
 
   Future<void> setLanguage(String langCode) async {
     _currentLang = langCode;
     await _ttsService.setLanguage(langCode);
+    await _refreshLocaleWarning();
   }
 
   // ── Start listening ───────────────────────────────────────
@@ -100,6 +104,25 @@ class VoiceProvider extends ChangeNotifier {
       _setState(VoiceState.error);
       await Future.delayed(const Duration(seconds: 2));
       _setState(VoiceState.idle);
+    }
+  }
+
+  Future<void> _refreshLocaleWarning() async {
+    try {
+      final report = await _speechService.negotiateLocale(_currentLang);
+      final nextWarning = report.fallback
+          ? 'Speech language pack not found. Using ${report.resolved}.'
+          : '';
+      if (_languageWarning != nextWarning) {
+        _languageWarning = nextWarning;
+        notifyListeners();
+      }
+    } catch (_) {
+      const nextWarning = 'Speech recognition is not available on this device.';
+      if (_languageWarning != nextWarning) {
+        _languageWarning = nextWarning;
+        notifyListeners();
+      }
     }
   }
 

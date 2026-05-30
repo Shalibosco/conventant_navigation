@@ -33,6 +33,8 @@
   "voice_tap_to_speak": "Tẹ mic láti sọrọ",
   "voice_listening": "Ń gbọ́...",
   "voice_processing": "Ń ṣiṣẹ...",
+  "voice_speaking": "Ń sọ̀rọ̀...",
+  "voice_error": "Àṣìṣe — Tẹ láti tún gbìyànjú",
   "voice_try_saying": "Gbiyanju sọ:",
   "voice_you_said": "O sọ",
   "voice_assistant_label": "Olùrànlọ́wọ́",
@@ -59,10 +61,20 @@
   "settings_clear_cache": "Paarẹ",
   "settings_download_tiles": "Gba Maapu Ile-ẹkọ Wọle",
   "settings_cache_cleared": "Ibi ipamọ maapu ti paarẹ",
+  "settings_tiles_downloaded": "Awọn tile maapu ile-ẹkọ ti gba wọle",
+  "settings_download_failed": "Gbigba wọle kuna. Jọwọ ṣayẹwo asopọ ayelujara.",
+  "settings_download_progress": "{percent}% ti gba wọle",
+  "settings_download_dialog_title": "Gba Maapu Aisinaini Wọle",
+  "settings_download_dialog_content": "Eyi yoo gba awọn tile maapu Covenant University fun lilo laisi ayelujara. O nilo ayelujara. Iwọn: 20-50 MB.",
   "settings_about": "Nípa",
+  "version": "Ẹya",
+  "university": "Yunifásítì",
+  "campus": "Kampọsi",
 
   "error_location_unavailable": "Ibi mi ko si ni bayi",
   "error_no_route": "Ko le ri ipa-ọna. Ń ṣe afihan ọna taara.",
+  "error_invalid_category": "Ẹka ti ko tọ",
+  "error_route_not_found": "A ko ri ọna fun {route}",
   "error_generic": "Nkan kan ṣẹlẹ. Jọwọ gbiyanju lẹẹkansii.",
 
   "permission_location_title": "Igbanilaaye Ibi",
@@ -74,5 +86,11 @@
   "btn_cancel": "Fagilee",
   "btn_download": "Gba wọle",
   "btn_close": "Pa",
-  "btn_ok": "O dara"
+  "btn_ok": "O dara",
+  "search_results_count": "A rí ibi {count}",
+  "no_results": "A kò rí ibi kankan",
+  "no_results_subtitle": "Ẹ jọwọ ẹ gbiyanju nkan mìíràn",
+  "info_empty": "Ko si alaye to wa",
+  "map_getting_location": "A n gba ipo rẹ...",
+  "offline_banner": "Ko si ayelujara - A n lo data maapu ti a fipamọ"
 }

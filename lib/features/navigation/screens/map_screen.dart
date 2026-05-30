@@ -13,6 +13,7 @@ import '../widgets/map_widget.dart';
 import '../../voice_assistant/providers/voice_provider.dart';
 import '../../voice_assistant/services/voice_command_handler.dart';
 import '../../multilingual/providers/language_provider.dart';
+import '../../multilingual/localization/app_localization.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../core/routes/app_router.dart';
@@ -20,6 +21,8 @@ import '../../../data/models/location_model.dart';
 import '../../information/screens/info_screen.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../../voice_assistant/widgets/voice_fab.dart';
+import '../services/offline_map_service.dart';
+import '../../../core/di/service_locator.dart';
 import '../../../presentation/widgets/app_drawer.dart';
 
 class MapScreen extends StatefulWidget {
@@ -30,6 +33,7 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final MapController _mapController = MapController();
   final PanelController _panelController = PanelController();
   final TextEditingController _searchController = TextEditingController();
@@ -47,7 +51,9 @@ class _MapScreenState extends State<MapScreen> {
     final nav = context.read<NavigationProvider>();
     final voice = context.read<VoiceProvider>();
     final lang = context.read<LanguageProvider>();
+    final offlineMapService = sl<OfflineMapService>();
 
+    await offlineMapService.getTileCacheDirectory();
     await nav.initialize();
     await voice.initialize(lang.langCode);
     
@@ -95,7 +101,7 @@ class _MapScreenState extends State<MapScreen> {
     if (nav.userLocation != null) {
       _flyTo(nav.userLocation!);
     } else {
-      Helpers.showSnackBar(context, 'Getting your location...');
+      Helpers.showSnackBar(context, context.t('map_getting_location'));
       await nav.fetchUserLocation();
       if (nav.userLocation != null) _flyTo(nav.userLocation!);
     }
@@ -115,6 +121,7 @@ class _MapScreenState extends State<MapScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       drawer: const AppDrawer(),
       body: SlidingUpPanel(
@@ -155,13 +162,14 @@ class _MapScreenState extends State<MapScreen> {
                         children: [
                           _TopButton(
                             icon: Icons.menu_rounded,
-                            onTap: () => Scaffold.of(context).openDrawer(),
+                            onTap: () => _scaffoldKey.currentState?.openDrawer(),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
                               child: _SearchBar(
                                 controller: _searchController,
                                 focusNode: _searchFocus,
+                                hintText: context.t('map_search_hint'),
                                 onChanged: (q) {
                                   nav.search(q);
                                   setState(() => _searchExpanded = q.isNotEmpty);
@@ -240,12 +248,14 @@ class _MapScreenState extends State<MapScreen> {
 class _SearchBar extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
+  final String hintText;
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
 
   const _SearchBar({
     required this.controller,
     required this.focusNode,
+    required this.hintText,
     required this.onChanged,
     required this.onClear,
   });
@@ -277,7 +287,7 @@ class _SearchBar extends StatelessWidget {
               onChanged: onChanged,
               style: theme.textTheme.bodyLarge,
               decoration: InputDecoration(
-                hintText: 'Search campus locations...',
+                hintText: hintText,
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -359,15 +369,15 @@ class _SearchResults extends StatelessWidget {
 class _CategoryChips extends StatelessWidget {
   const _CategoryChips();
 
-  final List<Map<String, dynamic>> _filters = const [
-    {'label': 'All', 'value': 'all', 'icon': Icons.grid_view_rounded},
-    {'label': 'Academic', 'value': 'academic', 'icon': Icons.school_rounded},
-    {'label': 'Hostel', 'value': 'hostel', 'icon': Icons.bed_rounded},
-    {'label': 'Food', 'value': 'food', 'icon': Icons.restaurant_rounded},
-    {'label': 'Worship', 'value': 'worship', 'icon': Icons.church_rounded},
-    {'label': 'Sports', 'value': 'sports', 'icon': Icons.sports_soccer_rounded},
-    {'label': 'Admin', 'value': 'admin', 'icon': Icons.business_rounded},
-    {'label': 'Medical', 'value': 'medical', 'icon': Icons.local_hospital_rounded},
+  List<Map<String, dynamic>> _getFilters(BuildContext context) => [
+    {'label': context.t('filter_all'),      'value': 'all',      'icon': Icons.grid_view_rounded},
+    {'label': context.t('filter_academic'), 'value': 'academic', 'icon': Icons.school_rounded},
+    {'label': context.t('filter_hostel'),   'value': 'hostel',   'icon': Icons.bed_rounded},
+    {'label': context.t('filter_food'),     'value': 'food',     'icon': Icons.restaurant_rounded},
+    {'label': context.t('filter_worship'),  'value': 'worship',  'icon': Icons.church_rounded},
+    {'label': context.t('filter_sports'),   'value': 'sports',   'icon': Icons.sports_soccer_rounded},
+    {'label': context.t('filter_admin'),    'value': 'admin',    'icon': Icons.business_rounded},
+    {'label': context.t('filter_medical'),  'value': 'medical',  'icon': Icons.local_hospital_rounded},
   ];
 
   void _onCategoryTap(BuildContext context, String category, String label) {
@@ -395,14 +405,16 @@ class _CategoryChips extends StatelessWidget {
   Widget build(BuildContext context) {
     final nav = context.watch<NavigationProvider>();
     final theme = Theme.of(context);
+    final filters = _getFilters(context);
+
     return SizedBox(
       height: 36,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: _filters.length,
+        itemCount: filters.length,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (_, i) {
-          final f = _filters[i];
+          final f = filters[i];
           final active = nav.activeFilter == f['value'];
           return GestureDetector(
             onTap: () => _onCategoryTap(
@@ -514,20 +526,20 @@ class _NavigationPanel extends StatelessWidget {
               children: [
                 _Stat(
                     icon: Icons.straighten_rounded,
-                    label: 'Distance',
+                    label: context.t('nav_distance'),
                     value: Helpers.formatDistance(nav.distanceToDestination),
                     color: AppTheme.cuNavy),
                 Container(width: 1, height: 36, color: AppTheme.lightBorder),
                 _Stat(
                     icon: Icons.directions_walk_rounded,
-                    label: 'Walk Time',
+                    label: context.t('nav_walk_time'),
                     value: nav.estimatedTime,
                     color: AppTheme.navGreen),
                 Container(width: 1, height: 36, color: AppTheme.lightBorder),
                 _Stat(
                     icon: Icons.route_rounded,
-                    label: 'Route',
-                    value: nav.hasRoute ? 'Ready' : '...',
+                    label: context.t('nav_route'),
+                    value: nav.hasRoute ? context.t('nav_route_ready') : '...',
                     color: AppTheme.cuGold),
               ],
             ),
@@ -538,7 +550,7 @@ class _NavigationPanel extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: onClose,
               icon: const Icon(Icons.close_rounded, size: 18),
-              label: const Text('End Navigation'),
+              label: Text(context.t('btn_cancel')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.errorRed,
                 foregroundColor: Colors.white,

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../multilingual/providers/language_provider.dart';
+import '../../multilingual/localization/app_localization.dart';
+import '../../voice_assistant/providers/voice_provider.dart';
 import '../../../presentation/providers/app_state_provider.dart';
 import '../../navigation/services/offline_map_service.dart';
 import '../../../core/di/service_locator.dart';
@@ -47,7 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _offlineService.clearTileCache();
     await _loadCacheSize();
     setState(() => _clearingCache = false);
-    if (mounted) Helpers.showSnackBar(context, 'Map cache cleared');
+    if (mounted) Helpers.showSnackBar(context, context.t('settings_cache_cleared'));
   }
 
   @override
@@ -55,15 +57,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final theme = Theme.of(context);
     final langProvider = context.watch<LanguageProvider>();
     final appState = context.watch<AppStateProvider>();
+    final voiceProvider = context.watch<VoiceProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(context.t('settings_title'))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
 
           // ── Language ───────────────────────────────────────
-          const _SectionHeader(title: 'Language', icon: Icons.language_rounded), // ✅ Added const
+          _SectionHeader(title: context.t('settings_language'), icon: Icons.language_rounded),
           const SizedBox(height: 10),
           ...AppConstants.languageNames.entries.map((entry) {
             return _LanguageTile(
@@ -71,9 +74,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               langName: entry.value,
               isSelected: langProvider.isSelected(entry.key),
               onTap: () async {
+                final appState = context.read<AppStateProvider>();
+                final voice = context.read<VoiceProvider>();
+                
                 await langProvider.setLanguage(entry.key);
-                await context.read<AppStateProvider>()
-                    .onLanguageChanged(entry.key);
+                await appState.onLanguageChanged(entry.key);
+                await voice.setLanguage(entry.key);
               },
             ).animate(delay: 50.ms).fadeIn().slideX(begin: -0.05);
           }),
@@ -81,13 +87,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // ── Appearance ─────────────────────────────────────
-          const _SectionHeader(title: 'Appearance', icon: Icons.palette_rounded), // ✅ Added const
+          _SectionHeader(title: context.t('settings_appearance'), icon: Icons.palette_rounded),
           const SizedBox(height: 10),
           Card(
             child: SwitchListTile(
-              title: Text('Dark Mode', style: theme.textTheme.titleMedium),
+              title: Text(context.t('settings_dark_mode'), style: theme.textTheme.titleMedium),
               subtitle: Text(
-                appState.isDarkMode ? 'Dark theme enabled' : 'Light theme enabled',
+                appState.isDarkMode ? context.t('settings_dark_mode_on') : context.t('settings_dark_mode_off'),
                 style: theme.textTheme.bodySmall,
               ),
               value: appState.isDarkMode,
@@ -103,7 +109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // ── Offline Maps ───────────────────────────────────
-          const _SectionHeader(title: 'Offline Maps', icon: Icons.map_outlined), // ✅ Added const
+          _SectionHeader(title: context.t('settings_offline_maps'), icon: Icons.map_outlined),
           const SizedBox(height: 10),
           Card(
             child: Padding(
@@ -120,12 +126,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Tile Cache',
+                            Text(context.t('settings_tile_cache'),
                                 style: theme.textTheme.titleMedium),
                             Text(
                               _loadingCacheSize
-                                  ? 'Calculating...'
-                                  : '$_cacheSizeMB MB used',
+                                  ? context.t('settings_cache_calculating')
+                                  : context.tArgs('settings_cache_size', {'size': '$_cacheSizeMB'}),
                               style: theme.textTheme.bodySmall,
                             ),
                           ],
@@ -137,7 +143,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ? const SizedBox(
                             width: 16, height: 16,
                             child: CircularProgressIndicator(strokeWidth: 2))
-                            : const Text('Clear'),
+                            : Text(context.t('settings_clear_cache')),
                       ),
                     ],
                   ),
@@ -150,7 +156,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${(_downloadProgress * 100).toStringAsFixed(0)}% downloaded',
+                      context.tArgs(
+                        'settings_download_progress',
+                        {'percent': (_downloadProgress * 100).toStringAsFixed(0)},
+                      ),
                       style: theme.textTheme.bodySmall,
                     ),
                     const SizedBox(height: 8),
@@ -160,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: OutlinedButton.icon(
                         onPressed: () => _showDownloadDialog(context),
                         icon: const Icon(Icons.download_rounded),
-                        label: const Text('Download Campus Tiles'),
+                        label: Text(context.t('settings_download_tiles')),
                       ),
                     ),
                 ],
@@ -171,20 +180,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // ── About ──────────────────────────────────────────
-          const _SectionHeader(title: 'About', icon: Icons.info_outline_rounded), // ✅ Added const
+          _SectionHeader(title: context.t('settings_about'), icon: Icons.info_outline_rounded),
           const SizedBox(height: 10),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _AboutRow(label: 'App Name',   value: AppConstants.appName),
+                  _AboutRow(label: context.t('app_name'),   value: AppConstants.appName),
                   const Divider(height: 16),
-                  _AboutRow(label: 'Version',    value: AppConstants.appVersion),
+                  _AboutRow(label: context.t('version'),    value: AppConstants.appVersion),
                   const Divider(height: 16),
-                  _AboutRow(label: 'University', value: AppConstants.universityName),
+                  _AboutRow(label: context.t('university'), value: AppConstants.universityName),
                   const Divider(height: 16),
-                  _AboutRow(label: 'Campus',     value: AppConstants.universityAddr), // ✅ Swapped universityAddress to universityAddr
+                  _AboutRow(label: context.t('campus'),     value: AppConstants.universityAddr), // ✅ Swapped universityAddress to universityAddr
                 ],
               ),
             ),
@@ -207,10 +216,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (mounted) setState(() => _downloadProgress = p);
         },
       );
-      if (mounted) Helpers.showSnackBar(context, 'Campus tiles downloaded');
+      if (mounted) Helpers.showSnackBar(context, context.t('settings_tiles_downloaded'));
     } catch (e) {
       if (mounted) {
-        Helpers.showSnackBar(context, 'Download failed — check connection',
+        Helpers.showSnackBar(context, context.t('settings_download_failed'),
             isError: true);
       }
     } finally {
@@ -223,20 +232,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Download Offline Map'),
-        content: const Text(
-            'This will download map tiles for the Covenant University campus for offline use. Requires internet and uses approximately 20–50 MB.'),
+        title: Text(context.t('settings_download_dialog_title')),
+        content: Text(context.t('settings_download_dialog_content')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(context.t('btn_cancel')),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               _startDownload();
             },
-            child: const Text('Download'),
+            child: Text(context.t('btn_download')),
           ),
         ],
       ),

@@ -16,6 +16,42 @@ class SpeechService {
   bool get isListening => _isListening;
   bool get isInitialized => _isInitialized;
 
+  String _normalizeLocale(String locale) =>
+      locale.replaceAll('_', '-').toLowerCase();
+
+  String? _bestLocaleMatch(String requestedLocale, List<LocaleName> available) {
+    final requested = _normalizeLocale(requestedLocale);
+
+    for (final locale in available) {
+      if (_normalizeLocale(locale.localeId) == requested) {
+        return locale.localeId;
+      }
+    }
+
+    final requestedLanguage = requested.split('-').first;
+    for (final locale in available) {
+      if (_normalizeLocale(locale.localeId).startsWith('$requestedLanguage-') ||
+          _normalizeLocale(locale.localeId) == requestedLanguage) {
+        return locale.localeId;
+      }
+    }
+
+    for (final locale in available) {
+      if (_normalizeLocale(locale.localeId) == 'en-ng') {
+        return locale.localeId;
+      }
+    }
+
+    for (final locale in available) {
+      if (_normalizeLocale(locale.localeId).startsWith('en-') ||
+          _normalizeLocale(locale.localeId) == 'en') {
+        return locale.localeId;
+      }
+    }
+
+    return available.isNotEmpty ? available.first.localeId : null;
+  }
+
   // ── Request mic permission then init ─────────────────────
   Future<bool> initialize() async {
     try {
@@ -57,7 +93,7 @@ class SpeechService {
       throw const VoiceException('Speech recognition not available on this device.');
     }
 
-    final locale = AppConstants.sttLanguageCodes[langCode] ?? 'en_NG';
+    final locale = await resolveLocaleIdForLanguage(langCode);
     String? finalResult;
 
     try {
@@ -106,6 +142,26 @@ class SpeechService {
   Future<List<LocaleName>> availableLocales() async {
     if (!_isInitialized) await initialize();
     return _stt.locales();
+  }
+
+  Future<String> resolveLocaleIdForLanguage(String langCode) async {
+    if (!_isInitialized) await initialize();
+    final requested = AppConstants.sttLanguageCodes[langCode] ?? 'en_NG';
+    final available = await _stt.locales();
+    final resolved = _bestLocaleMatch(requested, available);
+    if (resolved == null) {
+      throw const VoiceException('No speech recognition locale available on this device.');
+    }
+    return resolved;
+  }
+
+  Future<({String requested, String resolved, bool fallback})>
+      negotiateLocale(String langCode) async {
+    final requested = AppConstants.sttLanguageCodes[langCode] ?? 'en_NG';
+    final resolved = await resolveLocaleIdForLanguage(langCode);
+    final fallback =
+        _normalizeLocale(requested) != _normalizeLocale(resolved);
+    return (requested: requested, resolved: resolved, fallback: fallback);
   }
 
   void dispose() => _stt.cancel();

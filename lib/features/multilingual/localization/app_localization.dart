@@ -7,14 +7,9 @@ import '../../../core/constants/app_constants.dart';
 
 class AppLocalization {
   final Locale locale;
-  final String _langCode;
   Map<String, String> _strings = {};
 
-  // Holds the TRUE selected lang code (e.g. 'pidgin') even when
-  // Flutter's Locale maps it to 'en' for system compatibility.
-  static String activeLangCode = 'en';
-
-  AppLocalization(this.locale, this._langCode);
+  AppLocalization(this.locale);
 
   static AppLocalization of(BuildContext context) {
     return Localizations.of<AppLocalization>(context, AppLocalization)!;
@@ -23,8 +18,7 @@ class AppLocalization {
   static const LocalizationsDelegate<AppLocalization> delegate =
   _AppLocalizationDelegate();
   Future<void> load() async {
-    // Use activeLangCode (the real one) not locale.languageCode
-    final targetCode = _langCode == 'en' ? activeLangCode : _langCode;
+    final targetCode = resolveLanguageCode(locale);
 
     try {
       final jsonString = await rootBundle.loadString(
@@ -59,6 +53,23 @@ class AppLocalization {
     args.forEach((k, v) => result = result.replaceAll('{$k}', v));
     return result;
   }
+
+  static String resolveLanguageCode(Locale locale) {
+    if (locale.languageCode == 'en') {
+      switch (locale.countryCode) {
+        case 'BJ':
+          return 'yo';
+        case 'GH':
+          return 'ig';
+        case 'PG':
+          return 'pidgin';
+        default:
+          return 'en';
+      }
+    }
+
+    return 'en';
+  }
 }
 
 // ── Extension for easy access ─────────────────────────────
@@ -75,14 +86,12 @@ class _AppLocalizationDelegate
 
   @override
   bool isSupported(Locale locale) {
-    // 'en' covers both English and Pidgin (no official Pidgin locale code)
-    const supported = ['en', 'yo', 'ig'];
-    return supported.contains(locale.languageCode);
+    return locale.languageCode == 'en';
   }
 
   @override
   Future<AppLocalization> load(Locale locale) async {
-    final localization = AppLocalization(locale, locale.languageCode);
+    final localization = AppLocalization(locale);
     await localization.load();
     return localization;
   }

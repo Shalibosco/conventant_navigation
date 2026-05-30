@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../data/models/info_model.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../multilingual/localization/app_localization.dart';
 
 class InfoCard extends StatelessWidget {
   final InfoModel item;
@@ -85,7 +86,7 @@ class InfoCard extends StatelessWidget {
             if (item.lastUpdated != null) ...[
               const SizedBox(height: 10),
               Text(
-                'Last updated: ${item.lastUpdated}',
+                context.tArgs('info_last_updated', {'date': item.lastUpdated!}),
                 style: theme.textTheme.labelSmall?.copyWith(
                   // ✅ Fixed: withValues instead of withOpacity
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.4),

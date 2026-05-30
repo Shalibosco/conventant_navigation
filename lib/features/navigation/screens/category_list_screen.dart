@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../providers/navigation_provider.dart';
+import '../../multilingual/localization/app_localization.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../data/models/location_model.dart';
@@ -128,7 +129,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                   child: Text(
-                    '${locations.length} location${locations.length > 1 ? 's' : ''} found',
+                    context.tArgs('search_results_count', {'count': '${locations.length}'}),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppTheme.lightSubText,
                     ),
@@ -158,12 +159,12 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No locations found',
+                        context.t('no_results'),
                         style: theme.textTheme.titleMedium,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Check back later or try another category',
+                        context.t('no_results_subtitle'),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: AppTheme.lightSubText,
                         ),

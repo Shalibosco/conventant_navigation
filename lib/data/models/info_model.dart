@@ -24,21 +24,25 @@ class InfoModel extends Equatable {
   });
 
   factory InfoModel.fromJson(Map<String, dynamic> json) {
+    final rawCategory = (json['category'] as String? ?? 'facility').toLowerCase();
+    final normalizedCategory = _normalizeCategory(rawCategory);
+
+    final localizedTitlesRaw = json['localizedTitles'] ?? json['localizedNames'];
+    final localizedContentRaw = json['localizedContent'] ?? json['localizedDescriptions'];
+
     return InfoModel(
       id: json['id'] as String,
-      title: json['title'] as String,
-      content: json['content'] as String,
-      category: json['category'] as String,
-      iconName: json['iconName'] as String?,
+      title: (json['title'] ?? json['name'] ?? 'Untitled').toString(),
+      content: (json['content'] ?? json['description'] ?? '').toString(),
+      category: normalizedCategory,
+      iconName: (json['iconName'] as String?) ?? _defaultIconForCategory(normalizedCategory),
 
-      // Fixed: Cast json['localizedTitles'] as Map to fix the 'dynamic' error 👇
-      localizedTitles: json['localizedTitles'] != null
-          ? Map<String, String>.from(json['localizedTitles'] as Map)
+      localizedTitles: localizedTitlesRaw != null
+          ? Map<String, String>.from(localizedTitlesRaw as Map)
           : null,
 
-      // Fixed: Same casting applied here 👇
-      localizedContent: json['localizedContent'] != null
-          ? Map<String, String>.from(json['localizedContent'] as Map)
+      localizedContent: localizedContentRaw != null
+          ? Map<String, String>.from(localizedContentRaw as Map)
           : null,
 
       lastUpdated: json['lastUpdated'] as String?,
@@ -61,6 +65,33 @@ class InfoModel extends Equatable {
 
   String getLocalizedContent(String langCode) =>
       localizedContent?[langCode] ?? content;
+
+  static String _normalizeCategory(String category) {
+    switch (category) {
+      case 'rule':
+      case 'facility':
+      case 'contact':
+      case 'event':
+        return category;
+      case 'admin':
+        return 'contact';
+      default:
+        return 'facility';
+    }
+  }
+
+  static String _defaultIconForCategory(String category) {
+    switch (category) {
+      case 'rule':
+        return 'rule';
+      case 'contact':
+        return 'admin';
+      case 'event':
+        return 'event';
+      default:
+        return 'academic';
+    }
+  }
 
   @override
   List<Object?> get props => [id, title, category];

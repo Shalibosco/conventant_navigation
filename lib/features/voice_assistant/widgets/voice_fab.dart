@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lottie/lottie.dart';
 import '../providers/voice_provider.dart';
+import '../../multilingual/localization/app_localization.dart';
 import '../../../core/theme/app_theme.dart';
 
 class VoiceFab extends StatelessWidget {
@@ -51,11 +52,11 @@ class _StatusPill extends StatelessWidget {
 
     switch (voice.state) {
       case VoiceState.listening:
-        text = voice.partialText.isNotEmpty ? '"${voice.partialText}"' : 'Listening...';
+        text = voice.partialText.isNotEmpty ? '"${voice.partialText}"' : context.t('voice_listening');
         bg   = AppTheme.voiceListening;
         break;
       case VoiceState.processing:
-        text = 'Processing...';
+        text = context.t('voice_processing');
         bg   = AppTheme.cuNavy;
         break;
       case VoiceState.speaking:
@@ -63,15 +64,17 @@ class _StatusPill extends StatelessWidget {
             ? voice.responseText.length > 50
             ? '${voice.responseText.substring(0, 50)}...'
             : voice.responseText
-            : 'Speaking...';
+            : context.t('voice_speaking');
         bg   = AppTheme.navGreen;
         break;
       case VoiceState.error:
-        text     = 'Tap to try again';
+        text     = context.t('voice_error');
         bg       = AppTheme.errorRed;
         break;
       default:
-        text     = 'Tap mic to speak';
+        text     = voice.languageWarning.isNotEmpty
+            ? voice.languageWarning
+            : context.t('voice_tap_to_speak');
         bg       = Colors.black.withValues(alpha: 0.65);
     }
 

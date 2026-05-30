@@ -133,10 +133,12 @@ class _CUNavigateAppState extends State<CUNavigateApp> {
 
             // ── Localization ──────────────────────────────
             locale: langProvider.locale,
-            supportedLocales: AppConstants.supportedLocales
-                .map((code) => Locale(code == 'pidgin' ? 'en' : code))
-                .toSet()
-                .toList(),
+            supportedLocales: const [
+              Locale('en'),
+              Locale.fromSubtags(languageCode: 'en', countryCode: 'BJ'),
+              Locale.fromSubtags(languageCode: 'en', countryCode: 'GH'),
+              Locale.fromSubtags(languageCode: 'en', countryCode: 'PG'),
+            ],
             localizationsDelegates: const [
               AppLocalization.delegate,
               GlobalMaterialLocalizations.delegate,
@@ -144,6 +146,13 @@ class _CUNavigateAppState extends State<CUNavigateApp> {
               GlobalCupertinoLocalizations.delegate,
             ],
             localeResolutionCallback: (locale, supportedLocales) {
+              for (final supported in supportedLocales) {
+                if (supported.languageCode == locale?.languageCode &&
+                    supported.countryCode == locale?.countryCode &&
+                    supported.scriptCode == locale?.scriptCode) {
+                  return supported;
+                }
+              }
               for (final supported in supportedLocales) {
                 if (supported.languageCode == locale?.languageCode) {
                   return supported;
@@ -188,7 +197,7 @@ class _OfflineBanner extends StatelessWidget {
           const Icon(Icons.wifi_off_rounded, color: Colors.white, size: 14),
           const SizedBox(width: 8),
           Text(
-            'Offline — Using cached map data',
+            context.t('offline_banner'),
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w600,

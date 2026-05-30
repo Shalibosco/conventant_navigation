@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -12,61 +12,52 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # --- Map & Navigation ---
-  flutter_map: ^8.2.2
+  flutter_map: ^8.3.0
   latlong2: ^0.9.1
-  flutter_polyline_points: ^2.1.0
+  flutter_polyline_points: ^3.1.0
 
-  # --- Location ---
-  geolocator: ^11.0.0
-  geocoding: ^3.0.0
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
 
-  # --- Offline / Local Storage ---
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  shared_preferences: ^2.2.2
-  path_provider: ^2.1.2
+  shared_preferences: ^2.5.5
+  path_provider: ^2.1.4
 
-  # --- Voice (native) ---
-  speech_to_text: ^7.0.0
+  speech_to_text: ^7.4.0
   flutter_tts: ^4.0.2
-  permission_handler: ^11.3.1
+  permission_handler: ^12.0.1
 
-  # --- State Management ---
   provider: ^6.1.2
+  get_it: ^9.2.1
 
-  # --- Dependency Injection ---
-  get_it: ^7.6.7
+  connectivity_plus: ^7.1.1
+  http: ^1.2.2
 
-  # --- Networking ---
-  connectivity_plus: ^6.0.0
-  http: ^1.2.0
-
-  # --- UI & UX ---
   flutter_animate: ^4.5.0
-  google_fonts: ^6.2.1
-  flutter_svg: ^2.0.10+1
+  google_fonts: ^8.1.0
+  flutter_svg: ^2.3.0
   intl: ^0.20.2
   sliding_up_panel: ^2.0.0+1
-  lottie: ^3.1.0
+  lottie: ^3.3.3
 
-  # --- Utils ---
   equatable: ^2.0.5
-  logger: ^2.2.0
+  logger: ^2.7.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.14.3   # ✅ ADDED — generates the missing launcher_icon
+  flutter_launcher_icons: ^0.14.4
   hive_generator: ^2.0.1
-  build_runner: ^2.4.9
-  flutter_lints: ^3.0.0
+  build_runner: ^2.4.13
+  flutter_lints: ^6.0.0
 
-# ✅ Launcher icon config — generates mipmap/launcher_icon referenced in AndroidManifest.xml
 flutter_launcher_icons:
   android: "ic_launcher"
   ios: false
-  image_path: "assets/images/convenant.png"
+  image_path: "assets/images/app_icon.png"
+  adaptive_icon_background: "#4B0082"
+  adaptive_icon_foreground: "assets/images/app_icon.png"
 
 flutter:
   uses-material-design: true
