@@ -72,6 +72,13 @@ class VoiceProvider extends ChangeNotifier {
       );
 
       if (result == null || result.trim().isEmpty) {
+        _responseText = _currentLang == 'yo'
+            ? 'Mi ò gbọ́ dáadáa. Jọwọ gbìyànjú lẹ́ẹ̀kansi ní ohun kedere.'
+            : _currentLang == 'ig'
+            ? 'Anụrụ m ya nke ọma. Biko kwuo ọzọ nke ọma.'
+            : _currentLang == 'pidgin'
+            ? 'I no hear am well. Abeg talk am again clear.'
+            : 'I did not catch that. Please speak clearly and try again.';
         _setState(VoiceState.idle);
         return;
       }
@@ -112,7 +119,7 @@ class VoiceProvider extends ChangeNotifier {
     try {
       final report = await _speechService.negotiateLocale(_currentLang);
       final nextWarning = report.fallback
-          ? 'Speech language pack not found. Using ${report.resolved}.'
+          ? 'Voice language fallback: using ${report.resolved}. Install offline speech pack for best results.'
           : '';
       if (_languageWarning != nextWarning) {
         _languageWarning = nextWarning;
