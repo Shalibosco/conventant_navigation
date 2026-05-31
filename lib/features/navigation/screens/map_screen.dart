@@ -72,7 +72,7 @@ class _MapScreenState extends State<MapScreen> {
     switch (cmd.type) {
       case VoiceCommandType.navigate:
         if (cmd.resolvedLocation != null) {
-          nav.navigateTo(cmd.resolvedLocation!);
+          nav.navigateTo(cmd.resolvedLocation!, announce: false);
           _focusOnDestination(
             LatLng(
               cmd.resolvedLocation!.latitude,

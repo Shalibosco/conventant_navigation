@@ -17,11 +17,13 @@ class VoiceCommand {
   final String? query;
   final String? category;
   final LocationModel? resolvedLocation;
+  final int? matchCount;
   const VoiceCommand({
     required this.type,
     this.query,
     this.category,
     this.resolvedLocation,
+    this.matchCount,
   });
 }
 
@@ -150,14 +152,58 @@ class VoiceCommandHandler {
     }
 
     if (query.isNotEmpty) {
-      final bestMatch = await _resolveBestLocation(query);
-      if (bestMatch != null) {
+      final (locs, _) = await _repo.searchLocations(query);
+      if (locs != null && locs.isNotEmpty) {
+        final exactMatches = locs
+            .where((loc) => _isExactLocationMatch(loc, query))
+            .toList();
+
+        if (exactMatches.length == 1) {
+          return VoiceCommand(
+            type: VoiceCommandType.navigate,
+            query: query,
+            resolvedLocation: exactMatches.first,
+            matchCount: 1,
+          );
+        }
+
+        final wordCount = _wordCount(query);
+        if (wordCount <= 1) {
+          return VoiceCommand(
+            type: VoiceCommandType.search,
+            query: query,
+            matchCount: locs.length,
+          );
+        }
+
+        if (!hasNavigationKeyword) {
+          return VoiceCommand(
+            type: VoiceCommandType.search,
+            query: query,
+            matchCount: locs.length,
+          );
+        }
+
+        final (bestMatch, bestScore) = _resolveBestLocationFromMatches(
+          query,
+          locs,
+        );
+        if (bestMatch != null && bestScore >= 120) {
+          return VoiceCommand(
+            type: VoiceCommandType.navigate,
+            query: query,
+            resolvedLocation: bestMatch,
+            matchCount: locs.length,
+          );
+        }
+
         return VoiceCommand(
-          type: VoiceCommandType.navigate,
+          type: VoiceCommandType.search,
           query: query,
-          resolvedLocation: bestMatch,
+          matchCount: locs.length,
         );
       }
+
       final cat = _extractCat(query);
       if (cat != null) {
         return VoiceCommand(
@@ -187,10 +233,22 @@ class VoiceCommandHandler {
         .trim();
   }
 
-  Future<LocationModel?> _resolveBestLocation(String query) async {
-    final (locs, _) = await _repo.searchLocations(query);
-    if (locs == null || locs.isEmpty) return null;
+  bool _isExactLocationMatch(LocationModel loc, String query) {
+    final normalizedQuery = _normalize(query);
+    return _locationSearchFields(
+      loc,
+    ).any((field) => _normalize(field) == normalizedQuery);
+  }
 
+  int _wordCount(String text) {
+    final parts = _normalize(text).split(' ');
+    return parts.where((part) => part.trim().isNotEmpty).length;
+  }
+
+  (LocationModel?, int) _resolveBestLocationFromMatches(
+    String query,
+    List<LocationModel> locs,
+  ) {
     final normalizedQuery = _normalize(query);
     LocationModel? best;
     var bestScore = -1;
@@ -203,19 +261,12 @@ class VoiceCommandHandler {
       }
     }
 
-    return best ?? locs.first;
+    return (best ?? locs.first, bestScore);
   }
 
   int _scoreLocation(LocationModel loc, String query) {
     var score = 0;
-    final fields = <String>[
-      loc.name,
-      loc.description,
-      loc.category,
-      ...?loc.localizedNames?.values,
-      ...?loc.localizedDescriptions?.values,
-      ...?loc.tags,
-    ];
+    final fields = _locationSearchFields(loc);
 
     for (final field in fields) {
       final normalized = _normalize(field);
@@ -231,6 +282,17 @@ class VoiceCommandHandler {
     return score;
   }
 
+  List<String> _locationSearchFields(LocationModel loc) {
+    return <String>[
+      loc.name,
+      loc.description,
+      loc.category,
+      ...?loc.localizedNames?.values,
+      ...?loc.localizedDescriptions?.values,
+      ...?loc.tags,
+    ];
+  }
+
   String? _extractCat(String t) {
     for (final e in _catMap.entries) {
       if (t.contains(_normalize(e.key))) return e.value;
@@ -242,14 +304,16 @@ class VoiceCommandHandler {
   String buildResponse(VoiceCommand cmd, String lang) {
     final name =
         cmd.resolvedLocation?.getLocalizedName(lang) ?? cmd.query ?? '';
+    final info = _locationInfoSnippet(cmd.resolvedLocation, lang);
+    final infoPart = info.isNotEmpty ? '$info ' : '';
     switch (cmd.type) {
       case VoiceCommandType.navigate:
         return _r(
           lang,
-          en: 'Navigating to $name. Follow the blue route on the map.',
-          yo: 'Mo ń lọ sí $name. Tẹle ipa-ọna bulu lórí maapu.',
-          ig: 'Ana m agagharị gaa $name. Soro ụzọ ọcha n\'ime maapụ.',
-          pid: 'I dey take you go $name. Follow di blue line for map.',
+          en: 'Navigating to $name. ${infoPart}Follow the route on the map.',
+          yo: 'Mo ń lọ sí $name. ${infoPart}Tẹle ipa-ọna lórí maapu.',
+          ig: 'Ana m agagharị gaa $name. ${infoPart}Soro ụzọ ahụ n\'ime maapụ.',
+          pid: 'I dey take you go $name. ${infoPart}Follow route for map.',
         );
       case VoiceCommandType.whereAmI:
         return _r(
@@ -268,12 +332,21 @@ class VoiceCommandHandler {
           pid: 'I dey show all ${cmd.category} places for map.',
         );
       case VoiceCommandType.search:
+        final count = cmd.matchCount ?? 0;
         return _r(
           lang,
-          en: 'Searching for ${cmd.query}.',
-          yo: 'Mo ń wá ${cmd.query}.',
-          ig: 'Ana m achọ ${cmd.query}.',
-          pid: 'I dey search for ${cmd.query}.',
+          en: count > 0
+              ? 'I found $count matching locations for ${cmd.query}. Check the list on the map.'
+              : 'Searching for ${cmd.query}.',
+          yo: count > 0
+              ? 'Mo rí ibi $count tó ba ${cmd.query} mu. Wo akojọ lori maapu.'
+              : 'Mo ń wá ${cmd.query}.',
+          ig: count > 0
+              ? 'Achọtara m ebe $count dakọtara na ${cmd.query}. Lelee ndepụta na maapụ.'
+              : 'Ana m achọ ${cmd.query}.',
+          pid: count > 0
+              ? 'I see $count places wey match ${cmd.query}. Check the list for map.'
+              : 'I dey search for ${cmd.query}.',
         );
       case VoiceCommandType.help:
         return _r(
@@ -292,6 +365,19 @@ class VoiceCommandHandler {
           pid: 'Sorry, I no hear well. Try talk: Take me go Library.',
         );
     }
+  }
+
+  String _locationInfoSnippet(LocationModel? loc, String lang) {
+    if (loc == null) return '';
+    final description = loc.getLocalizedDescription(lang).trim();
+    if (description.isEmpty) return '';
+
+    final firstSentence = description.split(RegExp(r'[.!?]')).first.trim();
+    final compact = firstSentence.isEmpty ? description : firstSentence;
+    final clipped = compact.length > 90
+        ? '${compact.substring(0, 90)}...'
+        : compact;
+    return clipped;
   }
 
   String _r(

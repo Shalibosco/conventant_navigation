@@ -447,7 +447,7 @@ class NavigationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void navigateTo(LocationModel destination) {
+  void navigateTo(LocationModel destination, {bool announce = true}) {
     _selectedDestination = destination;
     _isNavigating = true;
     _lastRouteFrom = null;
@@ -464,7 +464,7 @@ class NavigationProvider extends ChangeNotifier {
 
     unawaited(_prepareNavigationRoute());
 
-    if (_voiceProvider != null) {
+    if (announce && _voiceProvider != null) {
       _voiceProvider!.speak(
         _navigatingPhrase(destination.getLocalizedName(_activeVoiceLang)),
       );
