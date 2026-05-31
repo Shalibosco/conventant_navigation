@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/navigation_provider.dart';
+import '../../multilingual/providers/language_provider.dart';
+import '../../multilingual/localization/app_localization.dart';
 import '../../../core/utils/helpers.dart';
 
 class MapSearchBar extends StatefulWidget {
@@ -40,6 +42,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final navProvider = context.watch<NavigationProvider>();
+    final langCode = context.watch<LanguageProvider>().langCode;
 
     return Column(
       children: [
@@ -60,8 +63,11 @@ class _MapSearchBarState extends State<MapSearchBar> {
           child: Row(
             children: [
               const SizedBox(width: 14),
-              Icon(Icons.search_rounded,
-                  color: theme.colorScheme.primary, size: 22),
+              Icon(
+                Icons.search_rounded,
+                color: theme.colorScheme.primary,
+                size: 22,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: TextField(
@@ -70,9 +76,11 @@ class _MapSearchBarState extends State<MapSearchBar> {
                   onChanged: (v) => _onSearchChanged(v, navProvider),
                   style: theme.textTheme.bodyLarge,
                   decoration: InputDecoration(
-                    hintText: 'Search buildings, hostels, offices...',
+                    hintText: context.t('map_search_hint'),
                     hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.45,
+                      ),
                     ),
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
@@ -87,9 +95,11 @@ class _MapSearchBarState extends State<MapSearchBar> {
                   onTap: () => _clear(navProvider),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Icon(Icons.close_rounded,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                        size: 20),
+                    child: Icon(
+                      Icons.close_rounded,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      size: 20,
+                    ),
                   ),
                 ),
               const SizedBox(width: 4),
@@ -117,18 +127,21 @@ class _MapSearchBarState extends State<MapSearchBar> {
               shrinkWrap: true,
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: navProvider.searchResults.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
+              separatorBuilder: (_, _) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final loc = navProvider.searchResults[index];
                 return ListTile(
-                  contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
                   leading: Container(
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: Helpers.getCategoryColor(loc.category)
-                          .withValues(alpha: 0.15),
+                      color: Helpers.getCategoryColor(
+                        loc.category,
+                      ).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -137,12 +150,18 @@ class _MapSearchBarState extends State<MapSearchBar> {
                       size: 20,
                     ),
                   ),
-                  title: Text(loc.name, style: theme.textTheme.titleMedium),
+                  title: Text(
+                    loc.getLocalizedName(langCode),
+                    style: theme.textTheme.titleMedium,
+                  ),
                   subtitle: Text(
-                    Helpers.capitalize(loc.category),
+                    _categoryLabel(context, loc.category),
                     style: theme.textTheme.bodySmall,
                   ),
-                  trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 14,
+                  ),
                   onTap: () {
                     _clear(navProvider);
                     navProvider.navigateTo(loc);
@@ -153,40 +172,70 @@ class _MapSearchBarState extends State<MapSearchBar> {
           ),
 
         // ── Category Filter Chips ───────────────────────────
-        if (!_isExpanded) ...[
-          const SizedBox(height: 10),
-          _CategoryFilterRow(),
-        ],
+        if (!_isExpanded) ...[const SizedBox(height: 10), _CategoryFilterRow()],
       ],
     );
   }
 }
 
 class _CategoryFilterRow extends StatelessWidget {
-  final List<Map<String, dynamic>> _filters = const [
-    {'label': 'All',     'value': 'all',      'icon': Icons.grid_view_rounded},
-    {'label': 'Academic','value': 'academic', 'icon': Icons.school_rounded},
-    {'label': 'Hostel',  'value': 'hostel',   'icon': Icons.bed_rounded},
-    {'label': 'Food',    'value': 'food',     'icon': Icons.restaurant_rounded},
-    {'label': 'Worship', 'value': 'worship',  'icon': Icons.church_rounded},
-    {'label': 'Sports',  'value': 'sports',   'icon': Icons.sports_soccer_rounded},
-    {'label': 'Admin',   'value': 'admin',    'icon': Icons.business_rounded},
-    {'label': 'Medical', 'value': 'medical',  'icon': Icons.local_hospital_rounded},
+  List<Map<String, dynamic>> _filters(BuildContext context) => [
+    {
+      'label': context.t('filter_all'),
+      'value': 'all',
+      'icon': Icons.grid_view_rounded,
+    },
+    {
+      'label': context.t('filter_academic'),
+      'value': 'academic',
+      'icon': Icons.school_rounded,
+    },
+    {
+      'label': context.t('filter_hostel'),
+      'value': 'hostel',
+      'icon': Icons.bed_rounded,
+    },
+    {
+      'label': context.t('filter_food'),
+      'value': 'food',
+      'icon': Icons.restaurant_rounded,
+    },
+    {
+      'label': context.t('filter_worship'),
+      'value': 'worship',
+      'icon': Icons.church_rounded,
+    },
+    {
+      'label': context.t('filter_sports'),
+      'value': 'sports',
+      'icon': Icons.sports_soccer_rounded,
+    },
+    {
+      'label': context.t('filter_admin'),
+      'value': 'admin',
+      'icon': Icons.business_rounded,
+    },
+    {
+      'label': context.t('filter_medical'),
+      'value': 'medical',
+      'icon': Icons.local_hospital_rounded,
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<NavigationProvider>();
     final theme = Theme.of(context);
+    final filters = _filters(context);
 
     return SizedBox(
       height: 36,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: _filters.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemCount: filters.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          final filter = _filters[index];
+          final filter = filters[index];
           final isActive = navProvider.activeFilter == filter['value'];
 
           return GestureDetector(
@@ -224,8 +273,7 @@ class _CategoryFilterRow extends StatelessWidget {
                       color: isActive
                           ? Colors.white
                           : theme.colorScheme.onSurface,
-                      fontWeight:
-                      isActive ? FontWeight.w600 : FontWeight.w400,
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
                 ],
@@ -235,5 +283,26 @@ class _CategoryFilterRow extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+String _categoryLabel(BuildContext context, String category) {
+  switch (category) {
+    case 'academic':
+      return context.t('filter_academic');
+    case 'hostel':
+      return context.t('filter_hostel');
+    case 'food':
+      return context.t('filter_food');
+    case 'worship':
+      return context.t('filter_worship');
+    case 'sports':
+      return context.t('filter_sports');
+    case 'admin':
+      return context.t('filter_admin');
+    case 'medical':
+      return context.t('filter_medical');
+    default:
+      return Helpers.capitalize(category);
   }
 }

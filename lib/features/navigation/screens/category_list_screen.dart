@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../providers/navigation_provider.dart';
 import '../../multilingual/localization/app_localization.dart';
+import '../../multilingual/providers/language_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../data/models/location_model.dart';
@@ -40,7 +41,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
     categoryLocations = nav.searchResults.isEmpty
         ? <LocationModel>[] // If no results, show empty for now
         : nav.searchResults;
-    
+
     // If no filtered results, load from all locations (fallback)
     if (categoryLocations.isEmpty) {
       // We need to filter from all locations - this is a limitation
@@ -51,8 +52,9 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
   @override
   Widget build(BuildContext context) {
     final nav = context.read<NavigationProvider>();
+    final langCode = context.watch<LanguageProvider>().langCode;
     final theme = Theme.of(context);
-    
+
     // Get locations for this category
     final locations = nav.searchResults.isNotEmpty
         ? nav.searchResults
@@ -63,7 +65,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
 
     return PopScope(
       canPop: true,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, _) {
         if (didPop) {
           // Reset filters when going back
           nav.filterByCategory('all');
@@ -129,7 +131,9 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                   child: Text(
-                    context.tArgs('search_results_count', {'count': '${locations.length}'}),
+                    context.tArgs('search_results_count', {
+                      'count': '${locations.length}',
+                    }),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppTheme.lightSubText,
                     ),
@@ -175,18 +179,16 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
               )
             else
               SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final location = locations[index];
-                    return _LocationTile(
-                      location: location,
-                      categoryColor: categoryColor,
-                      onNavigate: () => _navigateTo(location),
-                      index: index,
-                    );
-                  },
-                  childCount: locations.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final location = locations[index];
+                  return _LocationTile(
+                    location: location,
+                    langCode: langCode,
+                    categoryColor: categoryColor,
+                    onNavigate: () => _navigateTo(location),
+                    index: index,
+                  );
+                }, childCount: locations.length),
               ),
 
             // ── Bottom padding ─────────────────────────────────
@@ -202,7 +204,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
     nav.filterByCategory('all');
     nav.search('');
     nav.navigateTo(location);
-    
+
     // Pop this screen and return to map
     Navigator.pop(context);
   }
@@ -211,12 +213,14 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
 // ── Individual Location Tile ───────────────────────────────────
 class _LocationTile extends StatelessWidget {
   final LocationModel location;
+  final String langCode;
   final Color categoryColor;
   final VoidCallback onNavigate;
   final int index;
 
   const _LocationTile({
     required this.location,
+    required this.langCode,
     required this.categoryColor,
     required this.onNavigate,
     required this.index,
@@ -229,7 +233,7 @@ class _LocationTile extends StatelessWidget {
     final userLocation = nav.userLocation;
 
     // Calculate distance if user location is available
-    String distanceText = 'Distance unknown';
+    String distanceText = context.t('distance_unknown');
     if (userLocation != null) {
       final destLatLng = LatLng(location.latitude, location.longitude);
       const Distance distance = Distance();
@@ -241,120 +245,123 @@ class _LocationTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: GestureDetector(
         onTap: onNavigate,
-        child: Container(
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: categoryColor.withValues(alpha: 0.2),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                // ── Category Badge ────────────────────────────
-                Container(
-                  width: 56,
-                  height: 56,
+        child:
+            Container(
                   decoration: BoxDecoration(
-                    color: categoryColor.withValues(alpha: 0.12),
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Helpers.getCategoryIcon(location.category),
-                    color: categoryColor,
-                    size: 28,
-                  ),
-                ),
-
-                const SizedBox(width: 12),
-
-                // ── Location Info ─────────────────────────────
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        location.name,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.straighten_rounded,
-                            size: 14,
-                            color: AppTheme.lightSubText,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            distanceText,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: AppTheme.lightSubText,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Container(
-                            width: 1,
-                            height: 12,
-                            color: AppTheme.lightBorder,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              location.description,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: AppTheme.lightSubText,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                    border: Border.all(
+                      color: categoryColor.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        // ── Category Badge ────────────────────────────
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: categoryColor.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Helpers.getCategoryIcon(location.category),
+                            color: categoryColor,
+                            size: 28,
+                          ),
+                        ),
 
-                const SizedBox(width: 8),
+                        const SizedBox(width: 12),
 
-                // ── Navigation Arrow ──────────────────────────
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: categoryColor.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
+                        // ── Location Info ─────────────────────────────
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                location.getLocalizedName(langCode),
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.straighten_rounded,
+                                    size: 14,
+                                    color: AppTheme.lightSubText,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    distanceText,
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: AppTheme.lightSubText,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Container(
+                                    width: 1,
+                                    height: 12,
+                                    color: AppTheme.lightBorder,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      location.getLocalizedDescription(
+                                        langCode,
+                                      ),
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: AppTheme.lightSubText,
+                                          ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        // ── Navigation Arrow ──────────────────────────
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: categoryColor.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: categoryColor,
+                            size: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: categoryColor,
-                    size: 16,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ).animate(delay: (index * 50).ms).fadeIn(duration: 300.ms).slideX(
-              begin: -0.1,
-              duration: 300.ms,
-            ),
+                )
+                .animate(delay: (index * 50).ms)
+                .fadeIn(duration: 300.ms)
+                .slideX(begin: -0.1, duration: 300.ms),
       ),
     );
   }
 }
-

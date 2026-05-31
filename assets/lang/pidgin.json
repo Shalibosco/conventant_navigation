@@ -91,6 +91,7 @@
   "no_results": "No find any place",
   "no_results_subtitle": "Try another one abeg",
   "info_empty": "No information dey available",
+  "distance_unknown": "Distance never show yet",
   "map_getting_location": "I dey get your location...",
   "offline_banner": "Offline - I dey use cached map data"
 }

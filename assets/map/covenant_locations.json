@@ -1,464 +1,894 @@
 [
-  {
-    "id": "loc_001",
-    "name": "CU Gate",
-    "description": "Main entrance and security checkpoint of Covenant University.",
-    "latitude": 6.677778,
-    "longitude": 3.1625,
-    "category": "admin",
-    "tags": ["cu", "office", "security", "gate", "admin"],
-    "localizedNames": {
-      "yo": "Ẹnu-bode CU",
-      "ig": "Ọnụ Ụzọ CU",
-      "pidgin": "CU Gate"
+    {
+        "id":  "loc_001",
+        "name":  "CU Gate",
+        "description":  "Main entrance and security checkpoint of Covenant University.",
+        "latitude":  6.677778,
+        "longitude":  3.1625,
+        "category":  "admin",
+        "tags":  [
+                     "cu",
+                     "office",
+                     "security",
+                     "gate",
+                     "admin"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ẹnu-bode CU",
+                               "ig":  "Ọnụ Ụzọ CU",
+                               "pidgin":  "CU Gate"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi ni enu-bode akọkọ ati aaye aabo Covenant University.",
+                                      "ig":  "Nke a bu onu uzo isi na ebe nche Covenant University.",
+                                      "pidgin":  "Na the main gate and security checkpoint for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_002",
+        "name":  "CU Stadium",
+        "description":  "University sports stadium used for athletic events and ceremonies.",
+        "latitude":  6.675556,
+        "longitude":  3.161944,
+        "category":  "sports",
+        "tags":  [
+                     "cu",
+                     "athletics",
+                     "stadium",
+                     "sports",
+                     "field"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ibi Idaraya CU",
+                               "ig":  "Ebe Egwuregwu CU",
+                               "pidgin":  "CU Stadium"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ibi idaraya ni Covenant University.",
+                                      "ig":  "Nke a bu ebe egwuregwu na Covenant University.",
+                                      "pidgin":  "Na sports area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_003",
+        "name":  "EIE Building",
+        "description":  "Electrical and Information Engineering faculty building. Houses 11 laboratories, 1 workshop, 3 classrooms and 46 offices.",
+        "latitude":  6.675556,
+        "longitude":  3.162222,
+        "category":  "academic",
+        "tags":  [
+                     "faculty",
+                     "department",
+                     "lecture",
+                     "class",
+                     "building",
+                     "lab",
+                     "eie",
+                     "engineering"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile EIE",
+                               "ig":  "Ụlọ EIE",
+                               "pidgin":  "EIE Building"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile eko ati iwadi ni Covenant University.",
+                                      "ig":  "Nke a bu ebe omumu na nyocha na Covenant University.",
+                                      "pidgin":  "Na academic area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_004",
+        "name":  "Civil Engineering Building",
+        "description":  "College of Engineering — Civil Engineering. Houses 7 laboratories, 1 workshop, 4 classrooms and 26 offices.",
+        "latitude":  6.674444,
+        "longitude":  3.162222,
+        "category":  "academic",
+        "tags":  [
+                     "faculty",
+                     "department",
+                     "civil",
+                     "lecture",
+                     "class",
+                     "building",
+                     "lab",
+                     "engineering"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Injinia Civil",
+                               "ig":  "Ụlọ Injinia Civil",
+                               "pidgin":  "Civil Building"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile eko ati iwadi ni Covenant University.",
+                                      "ig":  "Nke a bu ebe omumu na nyocha na Covenant University.",
+                                      "pidgin":  "Na academic area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_005",
+        "name":  "Mechanical Engineering Building",
+        "description":  "College of Engineering — Mechanical Engineering. Houses 11 laboratories, 5 workshops, 3 classrooms and 40 offices.",
+        "latitude":  6.673333,
+        "longitude":  3.1625,
+        "category":  "academic",
+        "tags":  [
+                     "faculty",
+                     "department",
+                     "lecture",
+                     "class",
+                     "mechanical",
+                     "building",
+                     "lab",
+                     "engineering"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Injinia Mechanical",
+                               "ig":  "Ụlọ Injinia Mechanical",
+                               "pidgin":  "Mechanical Building"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile eko ati iwadi ni Covenant University.",
+                                      "ig":  "Nke a bu ebe omumu na nyocha na Covenant University.",
+                                      "pidgin":  "Na academic area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_006",
+        "name":  "ALDC Building",
+        "description":  "African Leadership Development Centre. Houses a 500-capacity conference hall with gallery, seminar room, two dining halls and a gymnasium.",
+        "latitude":  6.671944,
+        "longitude":  3.1625,
+        "category":  "academic",
+        "tags":  [
+                     "faculty",
+                     "department",
+                     "aldc",
+                     "conference",
+                     "seminar",
+                     "building",
+                     "leadership"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile ALDC",
+                               "ig":  "Ụlọ ALDC",
+                               "pidgin":  "ALDC Building"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile eko ati iwadi ni Covenant University.",
+                                      "ig":  "Nke a bu ebe omumu na nyocha na Covenant University.",
+                                      "pidgin":  "Na academic area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_007",
+        "name":  "CU Guest House",
+        "description":  "Official university guest accommodation with executive suites, mini-suites and standard rooms. Features two conference halls accommodating up to 300 guests.",
+        "latitude":  6.671667,
+        "longitude":  3.1625,
+        "category":  "admin",
+        "tags":  [
+                     "cu",
+                     "guest",
+                     "accommodation",
+                     "conference",
+                     "hotel",
+                     "admin"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Alejo CU",
+                               "ig":  "Ụlọ Ọbịa CU",
+                               "pidgin":  "CU Guest House"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile isakoso ni Covenant University.",
+                                      "ig":  "Nke a bu ebe nlekota na ochichi na Covenant University.",
+                                      "pidgin":  "Na admin area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_008",
+        "name":  "Cafeteria 2",
+        "description":  "One of three strategically located cafeterias on campus serving both local and continental dishes for staff and students.",
+        "latitude":  6.672222,
+        "longitude":  3.161944,
+        "category":  "food",
+        "tags":  [
+                     "restaurant",
+                     "dining",
+                     "cafeteria",
+                     "food",
+                     "canteen",
+                     "eat"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Ounjẹ 2",
+                               "ig":  "Kafeteria 2",
+                               "pidgin":  "Cafeteria 2"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Okan ninu awon cafeteria meta lori campus ti n pese ounje agbegbe ati kariaye fun osise ati akekoo.",
+                                      "ig":  "Otu n\u0027ime kafeteria ato di na campus, na-enye nri obodo na nke mba ofesi nye ndi oru na umu akwukwo.",
+                                      "pidgin":  "Na one of the three campus cafeterias wey dey serve local and continental food for staff and students."
+                                  }
+    },
+    {
+        "id":  "loc_009",
+        "name":  "CUCRID Building",
+        "description":  "Centre for Research, Innovation and Discovery (CUCRID). A new generation research complex functioning as the hub of the University\u0027s research efforts.",
+        "latitude":  6.672778,
+        "longitude":  3.160833,
+        "category":  "academic",
+        "tags":  [
+                     "faculty",
+                     "department",
+                     "research",
+                     "innovation",
+                     "cucrid",
+                     "building",
+                     "lab"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile CUCRID",
+                               "ig":  "Ụlọ CUCRID",
+                               "pidgin":  "CUCRID Building"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile eko ati iwadi ni Covenant University.",
+                                      "ig":  "Nke a bu ebe omumu na nyocha na Covenant University.",
+                                      "pidgin":  "Na academic area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_010",
+        "name":  "Senate Building",
+        "description":  "Main administrative hub of the University. A six-floor building with penthouse, 26.9m high — the tallest on campus. Houses offices of Principal Officers and a Senate chamber seating 240 members.",
+        "latitude":  6.678611,
+        "longitude":  3.160278,
+        "category":  "admin",
+        "tags":  [
+                     "office",
+                     "senate",
+                     "admin",
+                     "principal",
+                     "administration"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Igbimọ",
+                               "ig":  "Ụlọ Senate",
+                               "pidgin":  "Senate Building"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile isakoso ni Covenant University.",
+                                      "ig":  "Nke a bu ebe nlekota na ochichi na Covenant University.",
+                                      "pidgin":  "Na admin area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_011",
+        "name":  "Lecture Theatre",
+        "description":  "Two major air-conditioned lecture halls: Hall 1 seats 2,500 students and Hall 2 seats 1,400. Equipped with full multimedia teaching and learning facilities.",
+        "latitude":  6.674167,
+        "longitude":  3.158889,
+        "category":  "academic",
+        "tags":  [
+                     "faculty",
+                     "lecture",
+                     "class",
+                     "building",
+                     "theatre",
+                     "hall",
+                     "auditorium"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Ikẹkọ Nla",
+                               "ig":  "Ụlọ Ọmụmụ Nnukwu",
+                               "pidgin":  "Lecture Theatre"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile eko ati iwadi ni Covenant University.",
+                                      "ig":  "Nke a bu ebe omumu na nyocha na Covenant University.",
+                                      "pidgin":  "Na academic area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_012",
+        "name":  "Diamond Bank",
+        "description":  "On-campus Diamond Bank branch and ATM services.",
+        "latitude":  6.673889,
+        "longitude":  3.157778,
+        "category":  "admin",
+        "tags":  [
+                     "office",
+                     "bank",
+                     "atm",
+                     "admin",
+                     "diamond",
+                     "finance"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Ifowopamọ Diamond",
+                               "ig":  "Ụlọ Ego Diamond",
+                               "pidgin":  "Diamond Bank"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile isakoso ni Covenant University.",
+                                      "ig":  "Nke a bu ebe nlekota na ochichi na Covenant University.",
+                                      "pidgin":  "Na admin area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_013",
+        "name":  "Petroleum and Chemical Building",
+        "description":  "Faculty of Petroleum and Chemical Engineering.",
+        "latitude":  6.674167,
+        "longitude":  3.157222,
+        "category":  "academic",
+        "tags":  [
+                     "petroleum",
+                     "faculty",
+                     "department",
+                     "lecture",
+                     "class",
+                     "building",
+                     "lab",
+                     "chemical",
+                     "engineering"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Epo ati Kemika",
+                               "ig":  "Ụlọ Mmanụ na Kemịkal",
+                               "pidgin":  "Petroleum Building"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile eko ati iwadi ni Covenant University.",
+                                      "ig":  "Nke a bu ebe omumu na nyocha na Covenant University.",
+                                      "pidgin":  "Na academic area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_014",
+        "name":  "Zenith Bank / ICT Centre",
+        "description":  "On-campus Zenith Bank branch and university ICT support centre.",
+        "latitude":  6.674167,
+        "longitude":  3.156944,
+        "category":  "admin",
+        "tags":  [
+                     "office",
+                     "bank",
+                     "ict",
+                     "zenith",
+                     "admin",
+                     "technology",
+                     "finance"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Zenith/ICT",
+                               "ig":  "Ụlọ Zenith/ICT",
+                               "pidgin":  "Zenith Bank/ICT"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile isakoso ni Covenant University.",
+                                      "ig":  "Nke a bu ebe nlekota na ochichi na Covenant University.",
+                                      "pidgin":  "Na admin area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_015",
+        "name":  "CST Building",
+        "description":  "College of Science and Technology. A three-storey complex with 25 lecture rooms, 17 science laboratories, 45 offices, 4 conference rooms and state-of-the-art computer laboratories with ~250 networked PCs.",
+        "latitude":  6.673333,
+        "longitude":  3.159167,
+        "category":  "academic",
+        "tags":  [
+                     "cst",
+                     "faculty",
+                     "department",
+                     "lecture",
+                     "class",
+                     "building",
+                     "lab",
+                     "science",
+                     "technology"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile CST",
+                               "ig":  "Ụlọ CST",
+                               "pidgin":  "CST Building"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile eko ati iwadi ni Covenant University.",
+                                      "ig":  "Nke a bu ebe omumu na nyocha na Covenant University.",
+                                      "pidgin":  "Na academic area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_016",
+        "name":  "CMSS / CLDS Building",
+        "description":  "College of Business and Social Sciences (CMSS) and College of Leadership Development Studies (CLDS). A three-storey ultra-modern structure with a total floor space of 12,748 m².",
+        "latitude":  6.671389,
+        "longitude":  3.16,
+        "category":  "academic",
+        "tags":  [
+                     "faculty",
+                     "department",
+                     "lecture",
+                     "class",
+                     "building",
+                     "cmss",
+                     "clds",
+                     "business",
+                     "social",
+                     "leadership"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile CMSS/CLDS",
+                               "ig":  "Ụlọ CMSS/CLDS",
+                               "pidgin":  "CMSS/CLDS Building"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile eko ati iwadi ni Covenant University.",
+                                      "ig":  "Nke a bu ebe omumu na nyocha na Covenant University.",
+                                      "pidgin":  "Na academic area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_017",
+        "name":  "CEDS Building",
+        "description":  "Centre for Entrepreneurial Development Studies (CEDS). Houses 8 lecture rooms, 3 workshop spaces, a 150-capacity multipurpose hall and 19 office spaces.",
+        "latitude":  6.671389,
+        "longitude":  3.161111,
+        "category":  "academic",
+        "tags":  [
+                     "faculty",
+                     "department",
+                     "lecture",
+                     "class",
+                     "building",
+                     "ceds",
+                     "entrepreneurship",
+                     "workshop"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile CEDS",
+                               "ig":  "Ụlọ CEDS",
+                               "pidgin":  "CEDS Building"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile eko ati iwadi ni Covenant University.",
+                                      "ig":  "Nke a bu ebe omumu na nyocha na Covenant University.",
+                                      "pidgin":  "Na academic area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_018",
+        "name":  "Dorcas Hall",
+        "description":  "Female student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
+        "latitude":  6.671944,
+        "longitude":  3.156389,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "accommodation",
+                     "dorcas",
+                     "hall",
+                     "hostel",
+                     "residence",
+                     "female"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Dorcas",
+                               "ig":  "Ụlọ Dorcas",
+                               "pidgin":  "Dorcas Hall"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe awon akekoo obinrin. O ni yara apapo, buttery, yara foonu, saluni ati ofisi isakoso.",
+                                      "ig":  "Nke a bu ulo obibi umu akwukwo nwanyi. O nwere ime ulo nzuko, buttery, ime ekwenti, ebe mma na ofisi nlekota.",
+                                      "pidgin":  "Na female student hostel. E get common room, buttery, phone room, salon and admin office."
+                                  }
+    },
+    {
+        "id":  "loc_019",
+        "name":  "CU Chapel",
+        "description":  "Covenant University Chapel — an ultra-modern architectural masterpiece seating 3,500. Houses the Chaplaincy, Directorate of Physical Planning and Development, and the Student Council offices.",
+        "latitude":  6.67,
+        "longitude":  3.157778,
+        "category":  "worship",
+        "tags":  [
+                     "prayer",
+                     "cu",
+                     "worship",
+                     "service",
+                     "chapel",
+                     "church",
+                     "chaplaincy"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ṣọọ̀sì CU",
+                               "ig":  "Ụlọ Ọzọ CU",
+                               "pidgin":  "CU Chapel"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Sooṣi pataki Covenant University pẹlu ijoko to ju 3,500 lo ati awon ofisi chaplaincy ati council akekoo.",
+                                      "ig":  "Nke a bu chapel isi nke Covenant University nwere oche kariri 3,500 tinyere ofisi chaplaincy na student council.",
+                                      "pidgin":  "Na the main Covenant University chapel, e fit sit over 3,500 people and e get chaplaincy and student council offices."
+                                  }
+    },
+    {
+        "id":  "loc_020",
+        "name":  "Centre for Learning Resources (CLR)",
+        "description":  "University Library — an ultra-modern glass structure on three floors totalling 11,300 m². Accommodates ~2,500 readers and 500 staff and postgraduate students.",
+        "latitude":  6.67,
+        "longitude":  3.157222,
+        "category":  "academic",
+        "tags":  [
+                     "library",
+                     "cu",
+                     "clr",
+                     "books",
+                     "reading",
+                     "research",
+                     "resources",
+                     "study"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile-ikawe CU",
+                               "ig":  "Ụlọ Akwụkwọ CU",
+                               "pidgin":  "CU Library"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ile-ikawe yunifasiti to tobi lori ipakà meta, pẹlu aaye kika ati ohun elo iwadi fun akekoo ati awon osise.",
+                                      "ig":  "Nke a bu ulo akwukwo ukwu nke mahadum n\u0027elu ulo ato, nwere ebe ogugu na akụrụngwa nyocha maka umu akwukwo na ndi oru.",
+                                      "pidgin":  "Na the university main library for three floors, with reading spaces and research resources for students and staff."
+                                  }
+    },
+    {
+        "id":  "loc_021",
+        "name":  "Eagle Square",
+        "description":  "Open recreational square and social gathering space.",
+        "latitude":  6.671111,
+        "longitude":  3.154722,
+        "category":  "recreation",
+        "tags":  [
+                     "square",
+                     "park",
+                     "eagle",
+                     "social",
+                     "recreation",
+                     "relax"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Pápá Eagle",
+                               "ig":  "Ogige Eagle",
+                               "pidgin":  "Eagle Square"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ibi isinmi ati ajosepo ni Covenant University.",
+                                      "ig":  "Nke a bu ebe ezumike na nturu ugo na Covenant University.",
+                                      "pidgin":  "Na recreation area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_022",
+        "name":  "Deborah Hall",
+        "description":  "Female student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
+        "latitude":  6.671111,
+        "longitude":  3.155278,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "accommodation",
+                     "hall",
+                     "hostel",
+                     "residence",
+                     "deborah",
+                     "female"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Deborah",
+                               "ig":  "Ụlọ Deborah",
+                               "pidgin":  "Deborah Hall"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe awon akekoo obinrin. O ni yara apapo, buttery, yara foonu, saluni ati ofisi isakoso.",
+                                      "ig":  "Nke a bu ulo obibi umu akwukwo nwanyi. O nwere ime ulo nzuko, buttery, ime ekwenti, ebe mma na ofisi nlekota.",
+                                      "pidgin":  "Na female student hostel. E get common room, buttery, phone room, salon and admin office."
+                                  }
+    },
+    {
+        "id":  "loc_023",
+        "name":  "Lydia Hall",
+        "description":  "Female student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
+        "latitude":  6.671667,
+        "longitude":  3.155278,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "accommodation",
+                     "hall",
+                     "hostel",
+                     "lydia",
+                     "residence",
+                     "female"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Lydia",
+                               "ig":  "Ụlọ Lydia",
+                               "pidgin":  "Lydia Hall"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe awon akekoo obinrin. O ni yara apapo, buttery, yara foonu, saluni ati ofisi isakoso.",
+                                      "ig":  "Nke a bu ulo obibi umu akwukwo nwanyi. O nwere ime ulo nzuko, buttery, ime ekwenti, ebe mma na ofisi nlekota.",
+                                      "pidgin":  "Na female student hostel. E get common room, buttery, phone room, salon and admin office."
+                                  }
+    },
+    {
+        "id":  "loc_024",
+        "name":  "Mary Hall",
+        "description":  "Female student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
+        "latitude":  6.671667,
+        "longitude":  3.154722,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "accommodation",
+                     "hall",
+                     "hostel",
+                     "residence",
+                     "mary",
+                     "female"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Mary",
+                               "ig":  "Ụlọ Mary",
+                               "pidgin":  "Mary Hall"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe awon akekoo obinrin. O ni yara apapo, buttery, yara foonu, saluni ati ofisi isakoso.",
+                                      "ig":  "Nke a bu ulo obibi umu akwukwo nwanyi. O nwere ime ulo nzuko, buttery, ime ekwenti, ebe mma na ofisi nlekota.",
+                                      "pidgin":  "Na female student hostel. E get common room, buttery, phone room, salon and admin office."
+                                  }
+    },
+    {
+        "id":  "loc_025",
+        "name":  "Joshua Hall",
+        "description":  "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
+        "latitude":  6.669444,
+        "longitude":  3.155556,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "joshua",
+                     "accommodation",
+                     "hall",
+                     "hostel",
+                     "residence",
+                     "male"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Joshua",
+                               "ig":  "Ụlọ Joshua",
+                               "pidgin":  "Joshua Hall"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe awon akekoo okunrin. O ni yara apapo, buttery, yara foonu, saluni ati ofisi isakoso.",
+                                      "ig":  "Nke a bu ulo obibi umu akwukwo nwoke. O nwere ime ulo nzuko, buttery, ime ekwenti, ebe mma na ofisi nlekota.",
+                                      "pidgin":  "Na male student hostel. E get common room, buttery, phone room, salon and admin office."
+                                  }
+    },
+    {
+        "id":  "loc_026",
+        "name":  "Peter Hall",
+        "description":  "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
+        "latitude":  6.668333,
+        "longitude":  3.154722,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "accommodation",
+                     "hall",
+                     "peter",
+                     "hostel",
+                     "residence",
+                     "male"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Peter",
+                               "ig":  "Ụlọ Peter",
+                               "pidgin":  "Peter Hall"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe awon akekoo okunrin. O ni yara apapo, buttery, yara foonu, saluni ati ofisi isakoso.",
+                                      "ig":  "Nke a bu ulo obibi umu akwukwo nwoke. O nwere ime ulo nzuko, buttery, ime ekwenti, ebe mma na ofisi nlekota.",
+                                      "pidgin":  "Na male student hostel. E get common room, buttery, phone room, salon and admin office."
+                                  }
+    },
+    {
+        "id":  "loc_027",
+        "name":  "CU Medical Centre",
+        "description":  "Covenant University Medical Centre offering primary, secondary and certain tertiary health services. Strategically located close to the halls of residence for easy access.",
+        "latitude":  6.668333,
+        "longitude":  3.155278,
+        "category":  "medical",
+        "tags":  [
+                     "clinic",
+                     "cu",
+                     "doctor",
+                     "hospital",
+                     "medical",
+                     "pharmacy",
+                     "health"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile-iwosan CU",
+                               "ig":  "Ụlọ Ọgwụgwọ CU",
+                               "pidgin":  "CU Medical Centre"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Eyi je ile iwosan ni Covenant University.",
+                                      "ig":  "Nke a bu ebe ahuike na ogwugwo na Covenant University.",
+                                      "pidgin":  "Na medical area for Covenant University."
+                                  }
+    },
+    {
+        "id":  "loc_028",
+        "name":  "Cafeteria 1",
+        "description":  "One of three strategically located cafeterias on campus serving both local and continental dishes for staff and students.",
+        "latitude":  6.669444,
+        "longitude":  3.154167,
+        "category":  "food",
+        "tags":  [
+                     "restaurant",
+                     "dining",
+                     "cafeteria",
+                     "food",
+                     "canteen",
+                     "eat"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Ounjẹ 1",
+                               "ig":  "Kafeteria 1",
+                               "pidgin":  "Cafeteria 1"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Okan ninu awon cafeteria meta lori campus ti n pese ounje agbegbe ati kariaye fun osise ati akekoo.",
+                                      "ig":  "Otu n\u0027ime kafeteria ato di na campus, na-enye nri obodo na nke mba ofesi nye ndi oru na umu akwukwo.",
+                                      "pidgin":  "Na one of the three campus cafeterias wey dey serve local and continental food for staff and students."
+                                  }
+    },
+    {
+        "id":  "loc_029",
+        "name":  "John Hall",
+        "description":  "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
+        "latitude":  6.669167,
+        "longitude":  3.153333,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "accommodation",
+                     "john",
+                     "hall",
+                     "hostel",
+                     "residence",
+                     "male"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile John",
+                               "ig":  "Ụlọ John",
+                               "pidgin":  "John Hall"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe awon akekoo okunrin. O ni yara apapo, buttery, yara foonu, saluni ati ofisi isakoso.",
+                                      "ig":  "Nke a bu ulo obibi umu akwukwo nwoke. O nwere ime ulo nzuko, buttery, ime ekwenti, ebe mma na ofisi nlekota.",
+                                      "pidgin":  "Na male student hostel. E get common room, buttery, phone room, salon and admin office."
+                                  }
+    },
+    {
+        "id":  "loc_030",
+        "name":  "Paul Hall",
+        "description":  "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
+        "latitude":  6.670278,
+        "longitude":  3.153611,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "accommodation",
+                     "hall",
+                     "hostel",
+                     "residence",
+                     "paul",
+                     "male"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Paul",
+                               "ig":  "Ụlọ Paul",
+                               "pidgin":  "Paul Hall"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe awon akekoo okunrin. O ni yara apapo, buttery, yara foonu, saluni ati ofisi isakoso.",
+                                      "ig":  "Nke a bu ulo obibi umu akwukwo nwoke. O nwere ime ulo nzuko, buttery, ime ekwenti, ebe mma na ofisi nlekota.",
+                                      "pidgin":  "Na male student hostel. E get common room, buttery, phone room, salon and admin office."
+                                  }
+    },
+    {
+        "id":  "loc_031",
+        "name":  "Joseph Hall",
+        "description":  "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
+        "latitude":  6.670556,
+        "longitude":  3.153056,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "accommodation",
+                     "hall",
+                     "joseph",
+                     "hostel",
+                     "residence",
+                     "male"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Joseph",
+                               "ig":  "Ụlọ Joseph",
+                               "pidgin":  "Joseph Hall"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe awon akekoo okunrin. O ni yara apapo, buttery, yara foonu, saluni ati ofisi isakoso.",
+                                      "ig":  "Nke a bu ulo obibi umu akwukwo nwoke. O nwere ime ulo nzuko, buttery, ime ekwenti, ebe mma na ofisi nlekota.",
+                                      "pidgin":  "Na male student hostel. E get common room, buttery, phone room, salon and admin office."
+                                  }
+    },
+    {
+        "id":  "loc_032",
+        "name":  "Daniel Hall",
+        "description":  "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
+        "latitude":  6.671667,
+        "longitude":  3.152778,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "accommodation",
+                     "daniel",
+                     "hall",
+                     "hostel",
+                     "residence",
+                     "male"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ile Daniel",
+                               "ig":  "Ụlọ Daniel",
+                               "pidgin":  "Daniel Hall"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe awon akekoo okunrin. O ni yara apapo, buttery, yara foonu, saluni ati ofisi isakoso.",
+                                      "ig":  "Nke a bu ulo obibi umu akwukwo nwoke. O nwere ime ulo nzuko, buttery, ime ekwenti, ebe mma na ofisi nlekota.",
+                                      "pidgin":  "Na male student hostel. E get common room, buttery, phone room, salon and admin office."
+                                  }
+    },
+    {
+        "id":  "loc_033",
+        "name":  "Postgraduate Hall of Residence",
+        "description":  "Male and female postgraduate halls of residence. Two buildings of 4 floors each with 200 rooms per building, accommodating 400 students each. Serviced by a cafeteria accommodating 1,000–1,500 persons.",
+        "latitude":  6.666667,
+        "longitude":  3.156389,
+        "category":  "hostel",
+        "tags":  [
+                     "dormitory",
+                     "accommodation",
+                     "hall",
+                     "hostel",
+                     "residence",
+                     "postgraduate",
+                     "pg"
+                 ],
+        "localizedNames":  {
+                               "yo":  "Ibugbe Postgraduate",
+                               "ig":  "Ụlọ Obibi Postgraduate",
+                               "pidgin":  "PG Residence"
+                           },
+        "localizedDescriptions":  {
+                                      "yo":  "Ibugbe postgraduate fun okunrin ati obinrin; ile mejeeji ni ipakà merin, yara 200 kọọkan, ati cafeteria nla.",
+                                      "ig":  "Ulo obibi postgraduate maka nwoke na nwanyi; ulo abuo nwere ulo elu ano, ime ulo 200 nke o bula, tinyere cafeteria buru ibu.",
+                                      "pidgin":  "Na postgraduate residence for male and female students, two blocks with four floors and 200 rooms each plus a large cafeteria."
+                                  }
     }
-  },
-  {
-    "id": "loc_002",
-    "name": "CU Stadium",
-    "description": "University sports stadium used for athletic events and ceremonies.",
-    "latitude": 6.675556,
-    "longitude": 3.161944,
-    "category": "sports",
-    "tags": ["cu", "athletics", "stadium", "sports", "field"],
-    "localizedNames": {
-      "yo": "Ibi Idaraya CU",
-      "ig": "Ebe Egwuregwu CU",
-      "pidgin": "CU Stadium"
-    }
-  },
-  {
-    "id": "loc_003",
-    "name": "EIE Building",
-    "description": "Electrical and Information Engineering faculty building. Houses 11 laboratories, 1 workshop, 3 classrooms and 46 offices.",
-    "latitude": 6.675556,
-    "longitude": 3.162222,
-    "category": "academic",
-    "tags": ["faculty", "department", "lecture", "class", "building", "lab", "eie", "engineering"],
-    "localizedNames": {
-      "yo": "Ile EIE",
-      "ig": "Ụlọ EIE",
-      "pidgin": "EIE Building"
-    }
-  },
-  {
-    "id": "loc_004",
-    "name": "Civil Engineering Building",
-    "description": "College of Engineering — Civil Engineering. Houses 7 laboratories, 1 workshop, 4 classrooms and 26 offices.",
-    "latitude": 6.674444,
-    "longitude": 3.162222,
-    "category": "academic",
-    "tags": ["faculty", "department", "civil", "lecture", "class", "building", "lab", "engineering"],
-    "localizedNames": {
-      "yo": "Ile Injinia Civil",
-      "ig": "Ụlọ Injinia Civil",
-      "pidgin": "Civil Building"
-    }
-  },
-  {
-    "id": "loc_005",
-    "name": "Mechanical Engineering Building",
-    "description": "College of Engineering — Mechanical Engineering. Houses 11 laboratories, 5 workshops, 3 classrooms and 40 offices.",
-    "latitude": 6.673333,
-    "longitude": 3.1625,
-    "category": "academic",
-    "tags": ["faculty", "department", "lecture", "class", "mechanical", "building", "lab", "engineering"],
-    "localizedNames": {
-      "yo": "Ile Injinia Mechanical",
-      "ig": "Ụlọ Injinia Mechanical",
-      "pidgin": "Mechanical Building"
-    }
-  },
-  {
-    "id": "loc_006",
-    "name": "ALDC Building",
-    "description": "African Leadership Development Centre. Houses a 500-capacity conference hall with gallery, seminar room, two dining halls and a gymnasium.",
-    "latitude": 6.671944,
-    "longitude": 3.1625,
-    "category": "academic",
-    "tags": ["faculty", "department", "aldc", "conference", "seminar", "building", "leadership"],
-    "localizedNames": {
-      "yo": "Ile ALDC",
-      "ig": "Ụlọ ALDC",
-      "pidgin": "ALDC Building"
-    }
-  },
-  {
-    "id": "loc_007",
-    "name": "CU Guest House",
-    "description": "Official university guest accommodation with executive suites, mini-suites and standard rooms. Features two conference halls accommodating up to 300 guests.",
-    "latitude": 6.671667,
-    "longitude": 3.1625,
-    "category": "admin",
-    "tags": ["cu", "guest", "accommodation", "conference", "hotel", "admin"],
-    "localizedNames": {
-      "yo": "Ile Alejo CU",
-      "ig": "Ụlọ Ọbịa CU",
-      "pidgin": "CU Guest House"
-    }
-  },
-  {
-    "id": "loc_008",
-    "name": "Cafeteria 2",
-    "description": "One of three strategically located cafeterias on campus serving both local and continental dishes for staff and students.",
-    "latitude": 6.672222,
-    "longitude": 3.161944,
-    "category": "food",
-    "tags": ["restaurant", "dining", "cafeteria", "food", "canteen", "eat"],
-    "localizedNames": {
-      "yo": "Ile Ounjẹ 2",
-      "ig": "Ụlọ Ọrịa 2",
-      "pidgin": "Cafeteria 2"
-    }
-  },
-  {
-    "id": "loc_009",
-    "name": "CUCRID Building",
-    "description": "Centre for Research, Innovation and Discovery (CUCRID). A new generation research complex functioning as the hub of the University's research efforts.",
-    "latitude": 6.672778,
-    "longitude": 3.160833,
-    "category": "academic",
-    "tags": ["faculty", "department", "research", "innovation", "cucrid", "building", "lab"],
-    "localizedNames": {
-      "yo": "Ile CUCRID",
-      "ig": "Ụlọ CUCRID",
-      "pidgin": "CUCRID Building"
-    }
-  },
-  {
-    "id": "loc_010",
-    "name": "Senate Building",
-    "description": "Main administrative hub of the University. A six-floor building with penthouse, 26.9m high — the tallest on campus. Houses offices of Principal Officers and a Senate chamber seating 240 members.",
-    "latitude": 6.678611,
-    "longitude": 3.160278,
-    "category": "admin",
-    "tags": ["office", "senate", "admin", "principal", "administration"],
-    "localizedNames": {
-      "yo": "Ile Igbimọ",
-      "ig": "Ụlọ Senate",
-      "pidgin": "Senate Building"
-    }
-  },
-  {
-    "id": "loc_011",
-    "name": "Lecture Theatre",
-    "description": "Two major air-conditioned lecture halls: Hall 1 seats 2,500 students and Hall 2 seats 1,400. Equipped with full multimedia teaching and learning facilities.",
-    "latitude": 6.674167,
-    "longitude": 3.158889,
-    "category": "academic",
-    "tags": ["faculty", "lecture", "class", "building", "theatre", "hall", "auditorium"],
-    "localizedNames": {
-      "yo": "Ile Ikẹkọ Nla",
-      "ig": "Ụlọ Ọmụmụ Nnukwu",
-      "pidgin": "Lecture Theatre"
-    }
-  },
-  {
-    "id": "loc_012",
-    "name": "Diamond Bank",
-    "description": "On-campus Diamond Bank branch and ATM services.",
-    "latitude": 6.673889,
-    "longitude": 3.157778,
-    "category": "admin",
-    "tags": ["office", "bank", "atm", "admin", "diamond", "finance"],
-    "localizedNames": {
-      "yo": "Ile Ifowopamọ Diamond",
-      "ig": "Ụlọ Ego Diamond",
-      "pidgin": "Diamond Bank"
-    }
-  },
-  {
-    "id": "loc_013",
-    "name": "Petroleum and Chemical Building",
-    "description": "Faculty of Petroleum and Chemical Engineering.",
-    "latitude": 6.674167,
-    "longitude": 3.157222,
-    "category": "academic",
-    "tags": ["petroleum", "faculty", "department", "lecture", "class", "building", "lab", "chemical", "engineering"],
-    "localizedNames": {
-      "yo": "Ile Epo ati Kemika",
-      "ig": "Ụlọ Mmanụ na Kemịkal",
-      "pidgin": "Petroleum Building"
-    }
-  },
-  {
-    "id": "loc_014",
-    "name": "Zenith Bank / ICT Centre",
-    "description": "On-campus Zenith Bank branch and university ICT support centre.",
-    "latitude": 6.674167,
-    "longitude": 3.156944,
-    "category": "admin",
-    "tags": ["office", "bank", "ict", "zenith", "admin", "technology", "finance"],
-    "localizedNames": {
-      "yo": "Ile Zenith/ICT",
-      "ig": "Ụlọ Zenith/ICT",
-      "pidgin": "Zenith Bank/ICT"
-    }
-  },
-  {
-    "id": "loc_015",
-    "name": "CST Building",
-    "description": "College of Science and Technology. A three-storey complex with 25 lecture rooms, 17 science laboratories, 45 offices, 4 conference rooms and state-of-the-art computer laboratories with ~250 networked PCs.",
-    "latitude": 6.673333,
-    "longitude": 3.159167,
-    "category": "academic",
-    "tags": ["cst", "faculty", "department", "lecture", "class", "building", "lab", "science", "technology"],
-    "localizedNames": {
-      "yo": "Ile CST",
-      "ig": "Ụlọ CST",
-      "pidgin": "CST Building"
-    }
-  },
-  {
-    "id": "loc_016",
-    "name": "CMSS / CLDS Building",
-    "description": "College of Business and Social Sciences (CMSS) and College of Leadership Development Studies (CLDS). A three-storey ultra-modern structure with a total floor space of 12,748 m².",
-    "latitude": 6.671389,
-    "longitude": 3.16,
-    "category": "academic",
-    "tags": ["faculty", "department", "lecture", "class", "building", "cmss", "clds", "business", "social", "leadership"],
-    "localizedNames": {
-      "yo": "Ile CMSS/CLDS",
-      "ig": "Ụlọ CMSS/CLDS",
-      "pidgin": "CMSS/CLDS Building"
-    }
-  },
-  {
-    "id": "loc_017",
-    "name": "CEDS Building",
-    "description": "Centre for Entrepreneurial Development Studies (CEDS). Houses 8 lecture rooms, 3 workshop spaces, a 150-capacity multipurpose hall and 19 office spaces.",
-    "latitude": 6.671389,
-    "longitude": 3.161111,
-    "category": "academic",
-    "tags": ["faculty", "department", "lecture", "class", "building", "ceds", "entrepreneurship", "workshop"],
-    "localizedNames": {
-      "yo": "Ile CEDS",
-      "ig": "Ụlọ CEDS",
-      "pidgin": "CEDS Building"
-    }
-  },
-  {
-    "id": "loc_018",
-    "name": "Dorcas Hall",
-    "description": "Female student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
-    "latitude": 6.671944,
-    "longitude": 3.156389,
-    "category": "hostel",
-    "tags": ["dormitory", "accommodation", "dorcas", "hall", "hostel", "residence", "female"],
-    "localizedNames": {
-      "yo": "Ile Dorcas",
-      "ig": "Ụlọ Dorcas",
-      "pidgin": "Dorcas Hall"
-    }
-  },
-  {
-    "id": "loc_019",
-    "name": "CU Chapel",
-    "description": "Covenant University Chapel — an ultra-modern architectural masterpiece seating 3,500. Houses the Chaplaincy, Directorate of Physical Planning and Development, and the Student Council offices.",
-    "latitude": 6.67,
-    "longitude": 3.157778,
-    "category": "worship",
-    "tags": ["prayer", "cu", "worship", "service", "chapel", "church", "chaplaincy"],
-    "localizedNames": {
-      "yo": "Ṣọọ̀sì CU",
-      "ig": "Ụlọ Ọzọ CU",
-      "pidgin": "CU Chapel"
-    }
-  },
-  {
-    "id": "loc_020",
-    "name": "Centre for Learning Resources (CLR)",
-    "description": "University Library — an ultra-modern glass structure on three floors totalling 11,300 m². Accommodates ~2,500 readers and 500 staff and postgraduate students.",
-    "latitude": 6.67,
-    "longitude": 3.157222,
-    "category": "academic",
-    "tags": ["library", "cu", "clr", "books", "reading", "research", "resources", "study"],
-    "localizedNames": {
-      "yo": "Ile-ikawe CU",
-      "ig": "Ụlọ Akwụkwọ CU",
-      "pidgin": "CU Library"
-    }
-  },
-  {
-    "id": "loc_021",
-    "name": "Eagle Square",
-    "description": "Open recreational square and social gathering space.",
-    "latitude": 6.671111,
-    "longitude": 3.154722,
-    "category": "recreation",
-    "tags": ["square", "park", "eagle", "social", "recreation", "relax"],
-    "localizedNames": {
-      "yo": "Pápá Eagle",
-      "ig": "Ogige Eagle",
-      "pidgin": "Eagle Square"
-    }
-  },
-  {
-    "id": "loc_022",
-    "name": "Deborah Hall",
-    "description": "Female student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
-    "latitude": 6.671111,
-    "longitude": 3.155278,
-    "category": "hostel",
-    "tags": ["dormitory", "accommodation", "hall", "hostel", "residence", "deborah", "female"],
-    "localizedNames": {
-      "yo": "Ile Deborah",
-      "ig": "Ụlọ Deborah",
-      "pidgin": "Deborah Hall"
-    }
-  },
-  {
-    "id": "loc_023",
-    "name": "Lydia Hall",
-    "description": "Female student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
-    "latitude": 6.671667,
-    "longitude": 3.155278,
-    "category": "hostel",
-    "tags": ["dormitory", "accommodation", "hall", "hostel", "lydia", "residence", "female"],
-    "localizedNames": {
-      "yo": "Ile Lydia",
-      "ig": "Ụlọ Lydia",
-      "pidgin": "Lydia Hall"
-    }
-  },
-  {
-    "id": "loc_024",
-    "name": "Mary Hall",
-    "description": "Female student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
-    "latitude": 6.671667,
-    "longitude": 3.154722,
-    "category": "hostel",
-    "tags": ["dormitory", "accommodation", "hall", "hostel", "residence", "mary", "female"],
-    "localizedNames": {
-      "yo": "Ile Mary",
-      "ig": "Ụlọ Mary",
-      "pidgin": "Mary Hall"
-    }
-  },
-  {
-    "id": "loc_025",
-    "name": "Joshua Hall",
-    "description": "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
-    "latitude": 6.669444,
-    "longitude": 3.155556,
-    "category": "hostel",
-    "tags": ["dormitory", "joshua", "accommodation", "hall", "hostel", "residence", "male"],
-    "localizedNames": {
-      "yo": "Ile Joshua",
-      "ig": "Ụlọ Joshua",
-      "pidgin": "Joshua Hall"
-    }
-  },
-  {
-    "id": "loc_026",
-    "name": "Peter Hall",
-    "description": "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
-    "latitude": 6.668333,
-    "longitude": 3.154722,
-    "category": "hostel",
-    "tags": ["dormitory", "accommodation", "hall", "peter", "hostel", "residence", "male"],
-    "localizedNames": {
-      "yo": "Ile Peter",
-      "ig": "Ụlọ Peter",
-      "pidgin": "Peter Hall"
-    }
-  },
-  {
-    "id": "loc_027",
-    "name": "CU Medical Centre",
-    "description": "Covenant University Medical Centre offering primary, secondary and certain tertiary health services. Strategically located close to the halls of residence for easy access.",
-    "latitude": 6.668333,
-    "longitude": 3.155278,
-    "category": "medical",
-    "tags": ["clinic", "cu", "doctor", "hospital", "medical", "pharmacy", "health"],
-    "localizedNames": {
-      "yo": "Ile-iwosan CU",
-      "ig": "Ụlọ Ọgwụgwọ CU",
-      "pidgin": "CU Medical Centre"
-    }
-  },
-  {
-    "id": "loc_028",
-    "name": "Cafeteria 1",
-    "description": "One of three strategically located cafeterias on campus serving both local and continental dishes for staff and students.",
-    "latitude": 6.669444,
-    "longitude": 3.154167,
-    "category": "food",
-    "tags": ["restaurant", "dining", "cafeteria", "food", "canteen", "eat"],
-    "localizedNames": {
-      "yo": "Ile Ounjẹ 1",
-      "ig": "Ụlọ Ọrịa 1",
-      "pidgin": "Cafeteria 1"
-    }
-  },
-  {
-    "id": "loc_029",
-    "name": "John Hall",
-    "description": "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
-    "latitude": 6.669167,
-    "longitude": 3.153333,
-    "category": "hostel",
-    "tags": ["dormitory", "accommodation", "john", "hall", "hostel", "residence", "male"],
-    "localizedNames": {
-      "yo": "Ile John",
-      "ig": "Ụlọ John",
-      "pidgin": "John Hall"
-    }
-  },
-  {
-    "id": "loc_030",
-    "name": "Paul Hall",
-    "description": "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
-    "latitude": 6.670278,
-    "longitude": 3.153611,
-    "category": "hostel",
-    "tags": ["dormitory", "accommodation", "hall", "hostel", "residence", "paul", "male"],
-    "localizedNames": {
-      "yo": "Ile Paul",
-      "ig": "Ụlọ Paul",
-      "pidgin": "Paul Hall"
-    }
-  },
-  {
-    "id": "loc_031",
-    "name": "Joseph Hall",
-    "description": "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
-    "latitude": 6.670556,
-    "longitude": 3.153056,
-    "category": "hostel",
-    "tags": ["dormitory", "accommodation", "hall", "joseph", "hostel", "residence", "male"],
-    "localizedNames": {
-      "yo": "Ile Joseph",
-      "ig": "Ụlọ Joseph",
-      "pidgin": "Joseph Hall"
-    }
-  },
-  {
-    "id": "loc_032",
-    "name": "Daniel Hall",
-    "description": "Male student residential hall. Includes common rooms, buttery, telephone room, beauty salon and administrative office.",
-    "latitude": 6.671667,
-    "longitude": 3.152778,
-    "category": "hostel",
-    "tags": ["dormitory", "accommodation", "daniel", "hall", "hostel", "residence", "male"],
-    "localizedNames": {
-      "yo": "Ile Daniel",
-      "ig": "Ụlọ Daniel",
-      "pidgin": "Daniel Hall"
-    }
-  },
-  {
-    "id": "loc_033",
-    "name": "Postgraduate Hall of Residence",
-    "description": "Male and female postgraduate halls of residence. Two buildings of 4 floors each with 200 rooms per building, accommodating 400 students each. Serviced by a cafeteria accommodating 1,000–1,500 persons.",
-    "latitude": 6.666667,
-    "longitude": 3.156389,
-    "category": "hostel",
-    "tags": ["dormitory", "accommodation", "hall", "hostel", "residence", "postgraduate", "pg"],
-    "localizedNames": {
-      "yo": "Ibugbe Postgraduate",
-      "ig": "Ụlọ Obibi Postgraduate",
-      "pidgin": "PG Residence"
-    }
-  }
 ]

@@ -251,7 +251,11 @@ class NavigationProvider extends ChangeNotifier {
     final dist = distanceToDestination;
 
     if (dist < 15) {
-      _voiceProvider!.speak(_arrivedPhrase(_selectedDestination!.name));
+      _voiceProvider!.speak(
+        _arrivedPhrase(
+          _selectedDestination!.getLocalizedName(_activeVoiceLang),
+        ),
+      );
       cancelNavigation();
     }
   }
@@ -427,8 +431,15 @@ class NavigationProvider extends ChangeNotifier {
     if (_searchQuery.isNotEmpty) {
       final q = _searchQuery.toLowerCase();
       results = results.where((loc) {
-        return loc.name.toLowerCase().contains(q) ||
-            loc.category.toLowerCase().contains(q);
+        final fields = <String>[
+          loc.name,
+          loc.category,
+          loc.description,
+          ...?loc.localizedNames?.values,
+          ...?loc.localizedDescriptions?.values,
+          ...?loc.tags,
+        ];
+        return fields.any((field) => field.toLowerCase().contains(q));
       }).toList();
     }
 
@@ -454,7 +465,9 @@ class NavigationProvider extends ChangeNotifier {
     unawaited(_prepareNavigationRoute());
 
     if (_voiceProvider != null) {
-      _voiceProvider!.speak(_navigatingPhrase(destination.name));
+      _voiceProvider!.speak(
+        _navigatingPhrase(destination.getLocalizedName(_activeVoiceLang)),
+      );
     }
 
     notifyListeners();

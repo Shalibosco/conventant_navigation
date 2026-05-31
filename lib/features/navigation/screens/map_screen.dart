@@ -357,6 +357,7 @@ class _SearchResults extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final langCode = context.watch<LanguageProvider>().langCode;
     return Container(
       margin: const EdgeInsets.only(top: 6),
       constraints: const BoxConstraints(maxHeight: 260),
@@ -397,9 +398,12 @@ class _SearchResults extends StatelessWidget {
                 size: 20,
               ),
             ),
-            title: Text(loc.name, style: theme.textTheme.titleMedium),
+            title: Text(
+              loc.getLocalizedName(langCode),
+              style: theme.textTheme.titleMedium,
+            ),
             subtitle: Text(
-              Helpers.capitalize(loc.category),
+              _categoryLabel(context, loc.category),
               style: theme.textTheme.bodySmall,
             ),
             trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
@@ -408,6 +412,27 @@ class _SearchResults extends StatelessWidget {
         },
       ),
     ).animate().fadeIn(duration: 200.ms).slideY(begin: -0.05);
+  }
+
+  String _categoryLabel(BuildContext context, String category) {
+    switch (category) {
+      case 'academic':
+        return context.t('filter_academic');
+      case 'hostel':
+        return context.t('filter_hostel');
+      case 'food':
+        return context.t('filter_food');
+      case 'worship':
+        return context.t('filter_worship');
+      case 'sports':
+        return context.t('filter_sports');
+      case 'admin':
+        return context.t('filter_admin');
+      case 'medical':
+        return context.t('filter_medical');
+      default:
+        return Helpers.capitalize(category);
+    }
   }
 }
 
@@ -545,6 +570,7 @@ class _NavigationPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nav = context.watch<NavigationProvider>();
+    final langCode = context.watch<LanguageProvider>().langCode;
     final dest = nav.selectedDestination;
     final theme = Theme.of(context);
     if (dest == null) return const SizedBox.shrink();
@@ -584,13 +610,13 @@ class _NavigationPanel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      dest.name,
+                      dest.getLocalizedName(langCode),
                       style: theme.textTheme.titleLarge,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      Helpers.capitalize(dest.category),
+                      _categoryLabel(context, dest.category),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: AppTheme.lightSubText,
                       ),
@@ -666,6 +692,27 @@ class _NavigationPanel extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _categoryLabel(BuildContext context, String category) {
+    switch (category) {
+      case 'academic':
+        return context.t('filter_academic');
+      case 'hostel':
+        return context.t('filter_hostel');
+      case 'food':
+        return context.t('filter_food');
+      case 'worship':
+        return context.t('filter_worship');
+      case 'sports':
+        return context.t('filter_sports');
+      case 'admin':
+        return context.t('filter_admin');
+      case 'medical':
+        return context.t('filter_medical');
+      default:
+        return Helpers.capitalize(category);
+    }
   }
 }
 

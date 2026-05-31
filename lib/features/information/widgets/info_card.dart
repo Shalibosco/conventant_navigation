@@ -14,22 +14,33 @@ class InfoCard extends StatelessWidget {
 
   IconData _getIcon() {
     switch (item.iconName) {
-      case 'church':   return Icons.church_rounded;
-      case 'medical':  return Icons.local_hospital_rounded;
-      case 'admin':    return Icons.business_rounded;
-      case 'academic': return Icons.school_rounded;
-      case 'rule':     return Icons.gavel_rounded;
-      default:         return Icons.info_outline_rounded;
+      case 'church':
+        return Icons.church_rounded;
+      case 'medical':
+        return Icons.local_hospital_rounded;
+      case 'admin':
+        return Icons.business_rounded;
+      case 'academic':
+        return Icons.school_rounded;
+      case 'rule':
+        return Icons.gavel_rounded;
+      default:
+        return Icons.info_outline_rounded;
     }
   }
 
   Color _getCategoryColor() {
     switch (item.category) {
-      case 'rule':     return const Color(0xFFE53935); // Matches your AppTheme.errorRed
-      case 'facility': return AppTheme.cuNavy; // ✅ Fixed: Using cuNavy
-      case 'contact':  return AppTheme.navGreen; // ✅ Reused your AppTheme.navGreen
-      case 'event':    return AppTheme.cuGold; // ✅ Fixed: Using cuGold
-      default:         return AppTheme.cuNavy; // ✅ Fixed
+      case 'rule':
+        return const Color(0xFFE53935); // Matches your AppTheme.errorRed
+      case 'facility':
+        return AppTheme.cuNavy; // ✅ Fixed: Using cuNavy
+      case 'contact':
+        return AppTheme.navGreen; // ✅ Reused your AppTheme.navGreen
+      case 'event':
+        return AppTheme.cuGold; // ✅ Fixed: Using cuGold
+      default:
+        return AppTheme.cuNavy; // ✅ Fixed
     }
   }
 
@@ -62,16 +73,21 @@ class InfoCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     // ✅ Fixed: withValues instead of withOpacity
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    Helpers.capitalize(item.category),
-                    style: theme.textTheme.labelSmall
-                        ?.copyWith(color: color, fontWeight: FontWeight.w600),
+                    _categoryLabel(context, item.category),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: color,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -97,5 +113,20 @@ class InfoCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _categoryLabel(BuildContext context, String category) {
+    switch (category) {
+      case 'rule':
+        return context.t('info_tab_rules');
+      case 'facility':
+        return context.t('info_tab_facilities');
+      case 'contact':
+        return context.t('info_tab_contacts');
+      case 'event':
+        return context.t('info_tab_events');
+      default:
+        return Helpers.capitalize(category);
+    }
   }
 }

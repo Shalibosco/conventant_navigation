@@ -91,6 +91,7 @@
   "no_results": "No locations found",
   "no_results_subtitle": "Check back later or try another category",
   "info_empty": "No information available",
+  "distance_unknown": "Distance unknown",
   "map_getting_location": "Getting your location...",
   "offline_banner": "Offline - Using cached map data"
 }
