@@ -19,6 +19,7 @@ import 'features/multilingual/localization/app_localization.dart';
 import 'features/multilingual/providers/language_provider.dart';
 import 'features/navigation/providers/navigation_provider.dart';
 import 'features/navigation/services/location_service.dart';
+import 'features/navigation/services/offline_map_service.dart';
 import 'features/navigation/services/route_service.dart';
 import 'features/voice_assistant/providers/voice_provider.dart';
 import 'presentation/providers/app_state_provider.dart';
@@ -47,6 +48,7 @@ Future<void> main() async {
   // before the Dart VM service announces its port (which causes "Stuck at Launching").
   try {
     await initServiceLocator();
+    await sl<OfflineMapService>().getTileCacheDirectory();
   } catch (e, stack) {
     debugPrint('⚠️  initServiceLocator failed: $e\n$stack');
     // Fall through — runApp still executes so the VM service can connect

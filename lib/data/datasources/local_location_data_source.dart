@@ -48,8 +48,8 @@ class LocalLocationDataSourceImpl implements LocalLocationDataSource {
     try {
       final locations = await getLocations();
       return locations.firstWhere(
-            (loc) => loc.id == id,
-        orElse: () => throw StorageException('Location not found'),
+        (loc) => loc.id == id,
+        orElse: () => throw const StorageException('Location not found'),
       );
     } catch (e) {
       throw StorageException('Error finding location by ID: $e');
@@ -63,15 +63,37 @@ class LocalLocationDataSourceImpl implements LocalLocationDataSource {
 
       final locations = await getLocations();
       final searchLower = query.toLowerCase().trim();
+      final normalizedQuery = _normalizeForSearch(query);
 
       return locations.where((loc) {
-        return loc.name.toLowerCase().contains(searchLower) ||
-            loc.category.toLowerCase().contains(searchLower) ||
-            loc.description.toLowerCase().contains(searchLower);
+        final fields = <String>[
+          loc.name,
+          loc.category,
+          loc.description,
+          ...?loc.localizedNames?.values,
+          ...?loc.localizedDescriptions?.values,
+          ...?loc.tags,
+        ];
+
+        return fields.any((field) {
+          final lowerField = field.toLowerCase();
+          final normalizedField = _normalizeForSearch(field);
+          return lowerField.contains(searchLower) ||
+              normalizedField.contains(normalizedQuery);
+        });
       }).toList();
     } catch (e) {
       throw StorageException('Error searching locations: $e');
     }
+  }
+
+  String _normalizeForSearch(String input) {
+    return input
+        .toLowerCase()
+        .replaceAll(RegExp(r'[_-]+'), ' ')
+        .replaceAll(RegExp(r'[^\w\s]', unicode: true), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
   }
 
   @override
@@ -88,7 +110,7 @@ class LocalLocationDataSourceImpl implements LocalLocationDataSource {
   Future<void> cacheLocations(List<LocationModel> locations) async {
     try {
       final Map<String, LocationModel> locationMap = {
-        for (var loc in locations) loc.id: loc
+        for (var loc in locations) loc.id: loc,
       };
       await _locationBox.putAll(locationMap);
     } catch (e) {

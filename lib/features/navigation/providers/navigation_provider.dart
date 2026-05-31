@@ -17,7 +17,11 @@ class NavigationProvider extends ChangeNotifier {
   final RouteService _routeService;
   final MapTrailService _trailService = MapTrailService();
 
-  NavigationProvider(this._repository, this._locationService, this._routeService);
+  NavigationProvider(
+    this._repository,
+    this._locationService,
+    this._routeService,
+  );
 
   // 🛰️ State Variables
   LatLng? _userLocation;
@@ -31,7 +35,12 @@ class NavigationProvider extends ChangeNotifier {
   List<LatLng> _routePoints = [];
 
   StreamSubscription<LatLng>? _locationSubscription;
-  LatLng? _lastRouteFrom; // throttle: only recalculate route after >30m movement
+  LatLng?
+  _lastRouteFrom; // throttle: only recalculate route after >30m movement
+  DateTime? _lastGuidanceTime;
+  LatLng? _lastGuidancePoint;
+  final Set<int> _spokenDistanceCues = <int>{};
+  static const List<int> _distanceCueMeters = [20, 50, 100, 200, 300];
 
   // Voice direction control
   VoiceProvider? _voiceProvider;
@@ -59,7 +68,11 @@ class NavigationProvider extends ChangeNotifier {
           point: _userLocation!,
           width: 40,
           height: 40,
-          child: const Icon(Icons.person_pin_circle_rounded, color: Colors.blue, size: 40),
+          child: const Icon(
+            Icons.person_pin_circle_rounded,
+            color: Colors.blue,
+            size: 40,
+          ),
         ),
       );
     }
@@ -67,10 +80,17 @@ class NavigationProvider extends ChangeNotifier {
     if (_selectedDestination != null) {
       markers.add(
         Marker(
-          point: LatLng(_selectedDestination!.latitude, _selectedDestination!.longitude),
+          point: LatLng(
+            _selectedDestination!.latitude,
+            _selectedDestination!.longitude,
+          ),
           width: 45,
           height: 45,
-          child: const Icon(Icons.location_on_rounded, color: Colors.red, size: 45),
+          child: const Icon(
+            Icons.location_on_rounded,
+            color: Colors.red,
+            size: 45,
+          ),
         ),
       );
     }
@@ -81,30 +101,36 @@ class NavigationProvider extends ChangeNotifier {
   // 🛣️ Getter for OpenStreetMap UI Route Lines
   List<Polyline> get osmPolylines {
     final List<Polyline> polylines = [];
-    
+
     // Add user trail (breadcrumb trail) when navigating
-    if (_isNavigating && _trailService.hasTrail && _trailService.trailPoints.length > 1) {
+    if (_isNavigating &&
+        _trailService.hasTrail &&
+        _trailService.trailPoints.length > 1) {
       polylines.add(
         Polyline(
           points: _trailService.trailPoints,
-          color: const Color(0xFF4A90E2).withValues(alpha: 0.6), // Light blue trail
+          color: const Color(
+            0xFF4A90E2,
+          ).withValues(alpha: 0.6), // Light blue trail
           strokeWidth: 3.0,
           // isDotted: false,
         ),
       );
     }
-    
+
     // Add navigation route
     if (_routePoints.isNotEmpty) {
       polylines.add(
         Polyline(
           points: _routePoints,
-          color: const Color(0xFF800000), // ✅ Maroon Hex code for Covenant University
+          color: const Color(
+            0xFF800000,
+          ), // ✅ Maroon Hex code for Covenant University
           strokeWidth: 5.0,
         ),
       );
     }
-    
+
     return polylines;
   }
 
@@ -154,7 +180,8 @@ class NavigationProvider extends ChangeNotifier {
         if (_isNavigating) {
           _trailService.addTrailPoint(position);
           _maybeUpdateRoute(position);
-          _checkProximityAndSpeak(position);
+          _checkProximityAndSpeak();
+          _maybeSpeakNavigationGuidance(position);
         }
         notifyListeners();
       },
@@ -166,23 +193,111 @@ class NavigationProvider extends ChangeNotifier {
 
   void _maybeUpdateRoute(LatLng position) {
     if (_lastRouteFrom == null) {
-      _updateRoute();
+      unawaited(_updateRoute());
       return;
     }
     const distCalc = Distance();
     final moved = distCalc.as(LengthUnit.Meter, _lastRouteFrom!, position);
-    if (moved > 30) _updateRoute();
+    if (moved > 30) {
+      unawaited(_updateRoute());
+    }
   }
 
-  void _checkProximityAndSpeak(LatLng newPos) {
+  void _checkProximityAndSpeak() {
     if (_selectedDestination == null || _voiceProvider == null) return;
 
     final dist = distanceToDestination;
 
     if (dist < 15) {
-      _voiceProvider!.speak("You have arrived at ${_selectedDestination!.name}.");
+      _voiceProvider!.speak(
+        "You have arrived at ${_selectedDestination!.name}.",
+      );
       cancelNavigation();
     }
+  }
+
+  void _maybeSpeakNavigationGuidance(LatLng position) {
+    if (_selectedDestination == null || _voiceProvider == null) return;
+    if (_voiceProvider!.isListening || _voiceProvider!.isProcessing) return;
+
+    final remaining = distanceToDestination.round();
+    if (_trySpeakDistanceCue(remaining)) return;
+
+    final now = DateTime.now();
+    if (_lastGuidanceTime != null &&
+        now.difference(_lastGuidanceTime!).inSeconds < 18) {
+      return;
+    }
+
+    if (_lastGuidancePoint != null) {
+      const distCalc = Distance();
+      final moved = distCalc.as(
+        LengthUnit.Meter,
+        _lastGuidancePoint!,
+        position,
+      );
+      if (moved < 12) return;
+    }
+
+    final direction = _directionTowardNextPoint(position);
+    if (direction == null) return;
+
+    _voiceProvider!.speak('Continue $direction.');
+    _lastGuidanceTime = now;
+    _lastGuidancePoint = position;
+  }
+
+  bool _trySpeakDistanceCue(int remainingMeters) {
+    if (_voiceProvider == null) return false;
+
+    int? cue;
+    for (final mark in _distanceCueMeters) {
+      if (remainingMeters <= mark) {
+        cue = mark;
+        break;
+      }
+    }
+    if (cue == null) return false;
+    if (_spokenDistanceCues.contains(cue)) return false;
+
+    _spokenDistanceCues.add(cue);
+    _voiceProvider!.speak('You are about $cue meters away.');
+    _lastGuidanceTime = DateTime.now();
+    _lastGuidancePoint = _userLocation;
+    return true;
+  }
+
+  String? _directionTowardNextPoint(LatLng from) {
+    if (_routePoints.length < 2) return null;
+
+    var nearestIndex = 0;
+    var nearestDistance = double.infinity;
+    const distCalc = Distance();
+
+    for (var i = 0; i < _routePoints.length; i++) {
+      final d = distCalc.as(LengthUnit.Meter, from, _routePoints[i]);
+      if (d < nearestDistance) {
+        nearestDistance = d;
+        nearestIndex = i;
+      }
+    }
+
+    final targetIndex = (nearestIndex + 3).clamp(0, _routePoints.length - 1);
+    final target = _routePoints[targetIndex];
+    final bearing = distCalc.bearing(from, target);
+    return _bearingToDirection(bearing);
+  }
+
+  String _bearingToDirection(double bearing) {
+    final normalized = (bearing % 360 + 360) % 360;
+    if (normalized >= 337.5 || normalized < 22.5) return 'north';
+    if (normalized < 67.5) return 'north-east';
+    if (normalized < 112.5) return 'east';
+    if (normalized < 157.5) return 'south-east';
+    if (normalized < 202.5) return 'south';
+    if (normalized < 247.5) return 'south-west';
+    if (normalized < 292.5) return 'west';
+    return 'north-west';
   }
 
   void search(String query) {
@@ -214,41 +329,65 @@ class NavigationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-   void navigateTo(LocationModel destination) {
-     _selectedDestination = destination;
-     _isNavigating = true;
-     _lastRouteFrom = null;
+  void navigateTo(LocationModel destination) {
+    _selectedDestination = destination;
+    _isNavigating = true;
+    _lastRouteFrom = null;
+    _lastGuidanceTime = null;
+    _lastGuidancePoint = null;
+    _spokenDistanceCues.clear();
 
-     // Reset trail for new navigation
-     if (_userLocation != null) {
-       _trailService.resetTrail(_userLocation!);
-     } else {
-       _trailService.clearTrail();
-     }
+    // Reset trail for new navigation
+    if (_userLocation != null) {
+      _trailService.resetTrail(_userLocation!);
+    } else {
+      _trailService.clearTrail();
+    }
 
-     _updateRoute();
-     
-     if (_voiceProvider != null) {
-        _voiceProvider!.speak("Navigating to ${destination.name}. Follow the route on the map.");
-     }
+    unawaited(_prepareNavigationRoute());
 
-     notifyListeners();
-   }
+    if (_voiceProvider != null) {
+      _voiceProvider!.speak(
+        "Navigating to ${destination.name}. Follow the route on the map.",
+      );
+    }
 
-   void cancelNavigation() {
-     _isNavigating = false;
-     _selectedDestination = null;
-     _routePoints = [];
-     _trailService.clearTrail(); // Clear trail when navigation ends
-     notifyListeners();
-   }
+    notifyListeners();
+  }
+
+  void cancelNavigation() {
+    _isNavigating = false;
+    _selectedDestination = null;
+    _lastRouteFrom = null;
+    _lastGuidanceTime = null;
+    _lastGuidancePoint = null;
+    _spokenDistanceCues.clear();
+    _routePoints = [];
+    _trailService.clearTrail(); // Clear trail when navigation ends
+    notifyListeners();
+  }
+
+  Future<void> _prepareNavigationRoute() async {
+    if (_userLocation == null) {
+      await fetchUserLocation();
+    }
+    if (_userLocation != null && _selectedDestination != null) {
+      await _updateRoute();
+    }
+  }
 
   Future<void> _updateRoute() async {
     if (_userLocation == null || _selectedDestination == null) return;
 
     _lastRouteFrom = _userLocation;
-    final destLatLng = LatLng(_selectedDestination!.latitude, _selectedDestination!.longitude);
-    final points = await _routeService.getRoutePoints(_userLocation!, destLatLng);
+    final destLatLng = LatLng(
+      _selectedDestination!.latitude,
+      _selectedDestination!.longitude,
+    );
+    final points = await _routeService.getRoutePoints(
+      _userLocation!,
+      destLatLng,
+    );
 
     _routePoints = points;
     notifyListeners();

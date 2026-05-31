@@ -7,7 +7,7 @@ import 'package:latlong2/latlong.dart';
 
 class RouteService {
   static const String _osrmBase =
-      'http://router.project-osrm.org/route/v1/foot';
+      'https://router.project-osrm.org/route/v1/foot';
 
   /// Fetches walking route from OSRM. Falls back to straight-line on error.
   Future<List<LatLng>> getRoutePoints(LatLng start, LatLng end) async {
@@ -18,16 +18,13 @@ class RouteService {
         '?overview=full&geometries=geojson',
       );
 
-      final response = await http
-          .get(uri)
-          .timeout(const Duration(seconds: 8));
+      final response = await http.get(uri).timeout(const Duration(seconds: 8));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as Map<String, dynamic>;
         final routes = data['routes'] as List<dynamic>?;
         if (routes != null && routes.isNotEmpty) {
-          final geometry =
-              routes[0]['geometry'] as Map<String, dynamic>;
+          final geometry = routes[0]['geometry'] as Map<String, dynamic>;
           final coords = geometry['coordinates'] as List<dynamic>;
           // GeoJSON uses [longitude, latitude] ordering
           return coords.map((c) {

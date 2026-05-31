@@ -34,6 +34,15 @@ class OfflineMapService {
     return File('${_cacheDir!.path}/${_sanitizeStyle(style)}/$z/$x/$y.png');
   }
 
+  Future<void> cacheTileIfMissing({
+    required String style,
+    required int z,
+    required int x,
+    required int y,
+  }) async {
+    await _downloadTile(style: style, z: z, x: x, y: y);
+  }
+
   Future<int> getCacheSizeInMB() async {
     try {
       final dir = await getTileCacheDirectory();
@@ -130,9 +139,7 @@ class OfflineMapService {
 
   int _latToTile(double lat, int zoom) {
     final latRad = lat * math.pi / 180;
-    return ((1 -
-                math.log(math.tan(latRad) + 1 / math.cos(latRad)) /
-                    math.pi) /
+    return ((1 - math.log(math.tan(latRad) + 1 / math.cos(latRad)) / math.pi) /
             2 *
             (1 << zoom))
         .floor();
@@ -171,12 +178,15 @@ class OfflineMapService {
       file.parent.createSync(recursive: true);
 
       final url = _getTileUrl(style: style, z: z, x: x, y: y);
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'User-Agent': 'CUNavigate/1.0 (Covenant University campus navigation)',
-        },
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'User-Agent':
+                  'CUNavigate/1.0 (Covenant University campus navigation)',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         await file.writeAsBytes(response.bodyBytes);

@@ -55,8 +55,11 @@ class _MapScreenState extends State<MapScreen> {
 
     await offlineMapService.getTileCacheDirectory();
     await nav.initialize();
+    await nav.fetchUserLocation();
+    if (!mounted) return;
     await voice.initialize(lang.langCode);
-    
+    if (!mounted) return;
+
     // Link voice provider to navigation for directions
     nav.updateVoiceProvider(voice);
 
@@ -70,7 +73,12 @@ class _MapScreenState extends State<MapScreen> {
       case VoiceCommandType.navigate:
         if (cmd.resolvedLocation != null) {
           nav.navigateTo(cmd.resolvedLocation!);
-          _flyTo(LatLng(cmd.resolvedLocation!.latitude, cmd.resolvedLocation!.longitude));
+          _focusOnDestination(
+            LatLng(
+              cmd.resolvedLocation!.latitude,
+              cmd.resolvedLocation!.longitude,
+            ),
+          );
           _panelController.open();
         }
         break;
@@ -94,6 +102,22 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _flyTo(LatLng target, {double zoom = 16.5}) async {
     _mapController.move(target, zoom);
+  }
+
+  void _focusOnDestination(LatLng destination) {
+    final nav = context.read<NavigationProvider>();
+    final start = nav.userLocation;
+    if (start == null) {
+      _mapController.move(destination, 16.8);
+      return;
+    }
+    _mapController.fitCamera(
+      CameraFit.coordinates(
+        coordinates: [start, destination],
+        padding: const EdgeInsets.fromLTRB(48, 140, 48, 220),
+        maxZoom: 17.8,
+      ),
+    );
   }
 
   Future<void> _recenter() async {
@@ -132,17 +156,18 @@ class _MapScreenState extends State<MapScreen> {
         color: theme.colorScheme.surface,
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 20,
-              offset: const Offset(0, -4))
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
         ],
         panel: nav.isNavigating
             ? _NavigationPanel(
-          onClose: () {
-            nav.cancelNavigation();
-            _panelController.close();
-          },
-        )
+                onClose: () {
+                  nav.cancelNavigation();
+                  _panelController.close();
+                },
+              )
             : const SizedBox.shrink(),
         body: Stack(
           children: [
@@ -162,31 +187,35 @@ class _MapScreenState extends State<MapScreen> {
                         children: [
                           _TopButton(
                             icon: Icons.menu_rounded,
-                            onTap: () => _scaffoldKey.currentState?.openDrawer(),
+                            onTap: () =>
+                                _scaffoldKey.currentState?.openDrawer(),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                              child: _SearchBar(
-                                controller: _searchController,
-                                focusNode: _searchFocus,
-                                hintText: context.t('map_search_hint'),
-                                onChanged: (q) {
-                                  nav.search(q);
-                                  setState(() => _searchExpanded = q.isNotEmpty);
-                                },
-                                onClear: () {
-                                  _searchController.clear();
-                                  nav.search('');
-                                  setState(() => _searchExpanded = false);
-                                },
-                              )),
+                            child: _SearchBar(
+                              controller: _searchController,
+                              focusNode: _searchFocus,
+                              hintText: context.t('map_search_hint'),
+                              onChanged: (q) {
+                                nav.search(q);
+                                setState(() => _searchExpanded = q.isNotEmpty);
+                              },
+                              onClear: () {
+                                _searchController.clear();
+                                nav.search('');
+                                setState(() => _searchExpanded = false);
+                              },
+                            ),
+                          ),
                           const SizedBox(width: 10),
                           _TopButton(
                             icon: Icons.info_outline_rounded,
                             onTap: () => Navigator.push<void>(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const InfoScreen())),
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const InfoScreen(),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -199,7 +228,9 @@ class _MapScreenState extends State<MapScreen> {
                             setState(() => _searchExpanded = false);
                             _searchFocus.unfocus();
                             nav.navigateTo(loc);
-                            _flyTo(LatLng(loc.latitude, loc.longitude));
+                            _focusOnDestination(
+                              LatLng(loc.latitude, loc.longitude),
+                            );
                             _panelController.open();
                           },
                         ),
@@ -223,9 +254,9 @@ class _MapScreenState extends State<MapScreen> {
                   _MapFab(
                     icon: Icons.settings_rounded,
                     onTap: () => Navigator.push<void>(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const SettingsScreen())),
+                      context,
+                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                    ),
                   ),
                 ],
               ),
@@ -237,7 +268,6 @@ class _MapScreenState extends State<MapScreen> {
               right: 0,
               child: const Center(child: VoiceFab()),
             ),
-
           ],
         ),
       ),
@@ -270,9 +300,10 @@ class _SearchBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 16,
-              offset: const Offset(0, 4))
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Row(
@@ -293,8 +324,9 @@ class _SearchBar extends StatelessWidget {
                 focusedBorder: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
-                hintStyle: theme.textTheme.bodyMedium
-                    ?.copyWith(color: AppTheme.lightSubText),
+                hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.lightSubText,
+                ),
               ),
             ),
           ),
@@ -302,9 +334,13 @@ class _SearchBar extends StatelessWidget {
             GestureDetector(
               onTap: onClear,
               child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Icon(Icons.close_rounded,
-                      color: AppTheme.lightSubText, size: 20)),
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: AppTheme.lightSubText,
+                  size: 20,
+                ),
+              ),
             ),
         ],
       ),
@@ -329,34 +365,43 @@ class _SearchResults extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.10),
-              blurRadius: 12,
-              offset: const Offset(0, 4))
+            color: Colors.black.withValues(alpha: 0.10),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: ListView.separated(
         shrinkWrap: true,
         padding: const EdgeInsets.symmetric(vertical: 6),
         itemCount: results.length,
-        separatorBuilder: (_, __) => const Divider(height: 1, indent: 60),
+        separatorBuilder: (_, _) => const Divider(height: 1, indent: 60),
         itemBuilder: (_, i) {
           final loc = results[i];
           final color = Helpers.getCategoryColor(loc.category);
           return ListTile(
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 2,
+            ),
             leading: Container(
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10)),
-              child: Icon(Helpers.getCategoryIcon(loc.category),
-                  color: color, size: 20),
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Helpers.getCategoryIcon(loc.category),
+                color: color,
+                size: 20,
+              ),
             ),
             title: Text(loc.name, style: theme.textTheme.titleMedium),
-            subtitle: Text(Helpers.capitalize(loc.category),
-                style: theme.textTheme.bodySmall),
+            subtitle: Text(
+              Helpers.capitalize(loc.category),
+              style: theme.textTheme.bodySmall,
+            ),
             trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
             onTap: () => onSelect(loc),
           );
@@ -370,34 +415,63 @@ class _CategoryChips extends StatelessWidget {
   const _CategoryChips();
 
   List<Map<String, dynamic>> _getFilters(BuildContext context) => [
-    {'label': context.t('filter_all'),      'value': 'all',      'icon': Icons.grid_view_rounded},
-    {'label': context.t('filter_academic'), 'value': 'academic', 'icon': Icons.school_rounded},
-    {'label': context.t('filter_hostel'),   'value': 'hostel',   'icon': Icons.bed_rounded},
-    {'label': context.t('filter_food'),     'value': 'food',     'icon': Icons.restaurant_rounded},
-    {'label': context.t('filter_worship'),  'value': 'worship',  'icon': Icons.church_rounded},
-    {'label': context.t('filter_sports'),   'value': 'sports',   'icon': Icons.sports_soccer_rounded},
-    {'label': context.t('filter_admin'),    'value': 'admin',    'icon': Icons.business_rounded},
-    {'label': context.t('filter_medical'),  'value': 'medical',  'icon': Icons.local_hospital_rounded},
+    {
+      'label': context.t('filter_all'),
+      'value': 'all',
+      'icon': Icons.grid_view_rounded,
+    },
+    {
+      'label': context.t('filter_academic'),
+      'value': 'academic',
+      'icon': Icons.school_rounded,
+    },
+    {
+      'label': context.t('filter_hostel'),
+      'value': 'hostel',
+      'icon': Icons.bed_rounded,
+    },
+    {
+      'label': context.t('filter_food'),
+      'value': 'food',
+      'icon': Icons.restaurant_rounded,
+    },
+    {
+      'label': context.t('filter_worship'),
+      'value': 'worship',
+      'icon': Icons.church_rounded,
+    },
+    {
+      'label': context.t('filter_sports'),
+      'value': 'sports',
+      'icon': Icons.sports_soccer_rounded,
+    },
+    {
+      'label': context.t('filter_admin'),
+      'value': 'admin',
+      'icon': Icons.business_rounded,
+    },
+    {
+      'label': context.t('filter_medical'),
+      'value': 'medical',
+      'icon': Icons.local_hospital_rounded,
+    },
   ];
 
   void _onCategoryTap(BuildContext context, String category, String label) {
     final nav = context.read<NavigationProvider>();
-    
+
     // If "All" is selected, just filter on map
     if (category == 'all') {
       nav.filterByCategory('all');
       return;
     }
-    
+
     // Filter and navigate to category list
     nav.filterByCategory(category);
     Navigator.pushNamed(
       context,
       AppRoutes.categoryList,
-      arguments: {
-        'category': category,
-        'categoryLabel': label,
-      },
+      arguments: {'category': category, 'categoryLabel': label},
     );
   }
 
@@ -412,7 +486,7 @@ class _CategoryChips extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: filters.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, i) {
           final f = filters[i];
           final active = nav.activeFilter == f['value'];
@@ -430,23 +504,31 @@ class _CategoryChips extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.08),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2))
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
                 ],
               ),
-              child: Row(children: [
-                Icon(f['icon'] as IconData,
+              child: Row(
+                children: [
+                  Icon(
+                    f['icon'] as IconData,
                     size: 14,
-                    color: active ? Colors.white : AppTheme.lightSubText),
-                const SizedBox(width: 5),
-                Text(f['label'] as String,
+                    color: active ? Colors.white : AppTheme.lightSubText,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    f['label'] as String,
                     style: theme.textTheme.labelMedium?.copyWith(
-                        color:
-                        active ? Colors.white : theme.colorScheme.onSurface,
-                        fontWeight:
-                        active ? FontWeight.w600 : FontWeight.w400)),
-              ]),
+                      color: active
+                          ? Colors.white
+                          : theme.colorScheme.onSurface,
+                      fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -473,44 +555,61 @@ class _NavigationPanel extends StatelessWidget {
       child: Column(
         children: [
           Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                  color: AppTheme.lightBorder,
-                  borderRadius: BorderRadius.circular(2))),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppTheme.lightBorder,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
           const SizedBox(height: 16),
           Row(
             children: [
               Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(14)),
-                  child: Icon(Helpers.getCategoryIcon(dest.category),
-                      color: color, size: 26)),
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Helpers.getCategoryIcon(dest.category),
+                  color: color,
+                  size: 26,
+                ),
+              ),
               const SizedBox(width: 14),
               Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(dest.name,
-                          style: theme.textTheme.titleLarge,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis),
-                      Text(Helpers.capitalize(dest.category),
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: AppTheme.lightSubText)),
-                    ],
-                  )),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      dest.name,
+                      style: theme.textTheme.titleLarge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      Helpers.capitalize(dest.category),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppTheme.lightSubText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               GestureDetector(
-                  onTap: onClose,
-                  child: Container(
-                      width: 34,
-                      height: 34,
-                      decoration: const BoxDecoration(
-                          color: AppTheme.lightBorder, shape: BoxShape.circle),
-                      child: const Icon(Icons.close_rounded, size: 18))),
+                onTap: onClose,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: const BoxDecoration(
+                    color: AppTheme.lightBorder,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close_rounded, size: 18),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -525,22 +624,25 @@ class _NavigationPanel extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _Stat(
-                    icon: Icons.straighten_rounded,
-                    label: context.t('nav_distance'),
-                    value: Helpers.formatDistance(nav.distanceToDestination),
-                    color: AppTheme.cuNavy),
+                  icon: Icons.straighten_rounded,
+                  label: context.t('nav_distance'),
+                  value: Helpers.formatDistance(nav.distanceToDestination),
+                  color: AppTheme.cuNavy,
+                ),
                 Container(width: 1, height: 36, color: AppTheme.lightBorder),
                 _Stat(
-                    icon: Icons.directions_walk_rounded,
-                    label: context.t('nav_walk_time'),
-                    value: nav.estimatedTime,
-                    color: AppTheme.navGreen),
+                  icon: Icons.directions_walk_rounded,
+                  label: context.t('nav_walk_time'),
+                  value: nav.estimatedTime,
+                  color: AppTheme.navGreen,
+                ),
                 Container(width: 1, height: 36, color: AppTheme.lightBorder),
                 _Stat(
-                    icon: Icons.route_rounded,
-                    label: context.t('nav_route'),
-                    value: nav.hasRoute ? context.t('nav_route_ready') : '...',
-                    color: AppTheme.cuGold),
+                  icon: Icons.route_rounded,
+                  label: context.t('nav_route'),
+                  value: nav.hasRoute ? context.t('nav_route_ready') : '...',
+                  color: AppTheme.cuGold,
+                ),
               ],
             ),
           ),
@@ -556,7 +658,8 @@ class _NavigationPanel extends StatelessWidget {
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
             ),
           ),
@@ -581,13 +684,17 @@ class _Stat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
-    return Column(children: [
-      Icon(icon, color: color, size: 20),
-      const SizedBox(height: 4),
-      Text(value,
-          style: t.textTheme.titleMedium?.copyWith(color: color, fontSize: 13)),
-      Text(label, style: t.textTheme.labelSmall?.copyWith(fontSize: 10)),
-    ]);
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 20),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: t.textTheme.titleMedium?.copyWith(color: color, fontSize: 13),
+        ),
+        Text(label, style: t.textTheme.labelSmall?.copyWith(fontSize: 10)),
+      ],
+    );
   }
 }
 
@@ -610,9 +717,10 @@ class _TopButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withValues(alpha: 0.12),
-                blurRadius: 12,
-                offset: const Offset(0, 4))
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
           ],
         ),
         child: Icon(icon, color: AppTheme.cuNavy, size: 24),
@@ -640,9 +748,10 @@ class _MapFab extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withValues(alpha: 0.14),
-                blurRadius: 12,
-                offset: const Offset(0, 3))
+              color: Colors.black.withValues(alpha: 0.14),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
+            ),
           ],
         ),
         child: Icon(icon, color: AppTheme.cuNavy, size: 22),
@@ -650,4 +759,3 @@ class _MapFab extends StatelessWidget {
     );
   }
 }
-
