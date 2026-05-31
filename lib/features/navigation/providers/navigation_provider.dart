@@ -41,6 +41,48 @@ class NavigationProvider extends ChangeNotifier {
   LatLng? _lastGuidancePoint;
   final Set<int> _spokenDistanceCues = <int>{};
   static const List<int> _distanceCueMeters = [20, 50, 100, 200, 300];
+  static const Map<String, Map<String, String>> _directionLabels = {
+    'en': {
+      'north': 'north',
+      'north-east': 'north-east',
+      'east': 'east',
+      'south-east': 'south-east',
+      'south': 'south',
+      'south-west': 'south-west',
+      'west': 'west',
+      'north-west': 'north-west',
+    },
+    'yo': {
+      'north': 'ariwa',
+      'north-east': 'ariwa-oorun',
+      'east': 'oorun',
+      'south-east': 'guusu-oorun',
+      'south': 'guusu',
+      'south-west': 'guusu-iwo-oorun',
+      'west': 'iwo-oorun',
+      'north-west': 'ariwa-iwo-oorun',
+    },
+    'ig': {
+      'north': 'ugwu',
+      'north-east': 'ugwu-ọwụwa anyanwụ',
+      'east': 'ọwụwa anyanwụ',
+      'south-east': 'ndịda-ọwụwa anyanwụ',
+      'south': 'ndịda',
+      'south-west': 'ndịda-ọdịda anyanwụ',
+      'west': 'ọdịda anyanwụ',
+      'north-west': 'ugwu-ọdịda anyanwụ',
+    },
+    'pidgin': {
+      'north': 'north',
+      'north-east': 'north-east',
+      'east': 'east',
+      'south-east': 'south-east',
+      'south': 'south',
+      'south-west': 'south-west',
+      'west': 'west',
+      'north-west': 'north-west',
+    },
+  };
 
   // Voice direction control
   VoiceProvider? _voiceProvider;
@@ -209,9 +251,7 @@ class NavigationProvider extends ChangeNotifier {
     final dist = distanceToDestination;
 
     if (dist < 15) {
-      _voiceProvider!.speak(
-        "You have arrived at ${_selectedDestination!.name}.",
-      );
+      _voiceProvider!.speak(_arrivedPhrase(_selectedDestination!.name));
       cancelNavigation();
     }
   }
@@ -239,10 +279,11 @@ class NavigationProvider extends ChangeNotifier {
       if (moved < 12) return;
     }
 
-    final direction = _directionTowardNextPoint(position);
-    if (direction == null) return;
+    final directionKey = _directionTowardNextPoint(position);
+    if (directionKey == null) return;
+    final direction = _directionLabel(directionKey);
 
-    _voiceProvider!.speak('Continue $direction.');
+    _voiceProvider!.speak(_continuePhrase(direction));
     _lastGuidanceTime = now;
     _lastGuidancePoint = position;
   }
@@ -261,7 +302,7 @@ class NavigationProvider extends ChangeNotifier {
     if (_spokenDistanceCues.contains(cue)) return false;
 
     _spokenDistanceCues.add(cue);
-    _voiceProvider!.speak('You are about $cue meters away.');
+    _voiceProvider!.speak(_distancePhrase(cue));
     _lastGuidanceTime = DateTime.now();
     _lastGuidancePoint = _userLocation;
     return true;
@@ -285,10 +326,10 @@ class NavigationProvider extends ChangeNotifier {
     final targetIndex = (nearestIndex + 3).clamp(0, _routePoints.length - 1);
     final target = _routePoints[targetIndex];
     final bearing = distCalc.bearing(from, target);
-    return _bearingToDirection(bearing);
+    return _bearingToDirectionKey(bearing);
   }
 
-  String _bearingToDirection(double bearing) {
+  String _bearingToDirectionKey(double bearing) {
     final normalized = (bearing % 360 + 360) % 360;
     if (normalized >= 337.5 || normalized < 22.5) return 'north';
     if (normalized < 67.5) return 'north-east';
@@ -298,6 +339,72 @@ class NavigationProvider extends ChangeNotifier {
     if (normalized < 247.5) return 'south-west';
     if (normalized < 292.5) return 'west';
     return 'north-west';
+  }
+
+  String _directionLabel(String directionKey) {
+    final lang = _activeVoiceLang;
+    return _directionLabels[lang]?[directionKey] ??
+        _directionLabels['en']![directionKey] ??
+        directionKey;
+  }
+
+  String get _activeVoiceLang =>
+      _voiceProvider?.currentLanguageCode == 'yo' ||
+          _voiceProvider?.currentLanguageCode == 'ig' ||
+          _voiceProvider?.currentLanguageCode == 'pidgin'
+      ? _voiceProvider!.currentLanguageCode
+      : 'en';
+
+  String _navigatingPhrase(String placeName) {
+    switch (_activeVoiceLang) {
+      case 'yo':
+        return 'A ń lọ sí $placeName. Tẹ̀lé ipa-ọ̀nà lórí maapu.';
+      case 'ig':
+        return 'A na-aga $placeName. Soro ụzọ ahụ n\'ime maapụ.';
+      case 'pidgin':
+        return 'I dey navigate go $placeName. Follow route for map.';
+      default:
+        return 'Navigating to $placeName. Follow the route on the map.';
+    }
+  }
+
+  String _arrivedPhrase(String placeName) {
+    switch (_activeVoiceLang) {
+      case 'yo':
+        return 'O ti dé $placeName.';
+      case 'ig':
+        return 'I eruola $placeName.';
+      case 'pidgin':
+        return 'You don reach $placeName.';
+      default:
+        return 'You have arrived at $placeName.';
+    }
+  }
+
+  String _continuePhrase(String direction) {
+    switch (_activeVoiceLang) {
+      case 'yo':
+        return 'Tẹ̀síwájú sí $direction.';
+      case 'ig':
+        return 'Gaa n\'ihu n\'akụkụ $direction.';
+      case 'pidgin':
+        return 'Continue dey go $direction.';
+      default:
+        return 'Continue $direction.';
+    }
+  }
+
+  String _distancePhrase(int meters) {
+    switch (_activeVoiceLang) {
+      case 'yo':
+        return 'O kù bíi mita $meters.';
+      case 'ig':
+        return 'Ị fọdụrụ ihe dị ka mita $meters.';
+      case 'pidgin':
+        return 'You remain like $meters meters.';
+      default:
+        return 'You are about $meters meters away.';
+    }
   }
 
   void search(String query) {
@@ -347,9 +454,7 @@ class NavigationProvider extends ChangeNotifier {
     unawaited(_prepareNavigationRoute());
 
     if (_voiceProvider != null) {
-      _voiceProvider!.speak(
-        "Navigating to ${destination.name}. Follow the route on the map.",
-      );
+      _voiceProvider!.speak(_navigatingPhrase(destination.name));
     }
 
     notifyListeners();

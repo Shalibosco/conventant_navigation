@@ -30,6 +30,7 @@ class VoiceProvider extends ChangeNotifier {
   String get errorMessage => _errorMessage;
   String get languageWarning => _languageWarning;
   VoiceCommand? get lastCommand => _lastCommand;
+  String get currentLanguageCode => _currentLang;
   bool get isListening => _state == VoiceState.listening;
   bool get isSpeaking => _state == VoiceState.speaking;
   bool get isIdle => _state == VoiceState.idle;
@@ -81,7 +82,7 @@ class VoiceProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage = e.toString();
       _setState(VoiceState.error);
-      await Future.delayed(const Duration(seconds: 2));
+      await Future<void>.delayed(const Duration(seconds: 2));
       _setState(VoiceState.idle);
     }
   }
@@ -102,7 +103,7 @@ class VoiceProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage = 'Processing error: $e';
       _setState(VoiceState.error);
-      await Future.delayed(const Duration(seconds: 2));
+      await Future<void>.delayed(const Duration(seconds: 2));
       _setState(VoiceState.idle);
     }
   }
