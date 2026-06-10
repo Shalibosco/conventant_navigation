@@ -14,9 +14,12 @@ class LocationService {
     try {
       await _permissionsService.requestLocationPermission();
 
+      const settings = LocationSettings(
+        accuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 10),
+      );
       final Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 10),
+        locationSettings: settings,
       );
       return LatLng(position.latitude, position.longitude);
     } on PermissionException {
@@ -32,22 +35,27 @@ class LocationService {
       distanceFilter: 3, // update every 3 meters
     );
 
-    return Geolocator.getPositionStream(locationSettings: settings)
-        .map((Position pos) => LatLng(pos.latitude, pos.longitude));
+    return Geolocator.getPositionStream(
+      locationSettings: settings,
+    ).map((Position pos) => LatLng(pos.latitude, pos.longitude));
   }
 
   Future<double> getBearing(LatLng from, LatLng to) async {
     final bearing = Geolocator.bearingBetween(
-      from.latitude, from.longitude,
-      to.latitude, to.longitude,
+      from.latitude,
+      from.longitude,
+      to.latitude,
+      to.longitude,
     );
     return bearing;
   }
 
   Future<double> getDistanceBetween(LatLng from, LatLng to) async {
     return Geolocator.distanceBetween(
-      from.latitude, from.longitude,
-      to.latitude, to.longitude,
+      from.latitude,
+      from.longitude,
+      to.latitude,
+      to.longitude,
     );
   }
 

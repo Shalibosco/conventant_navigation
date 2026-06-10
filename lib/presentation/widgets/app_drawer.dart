@@ -41,7 +41,9 @@ class AppDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.pushNamedAndRemoveUntil(
-                        context, AppRoutes.map, (_) => false,
+                        context,
+                        AppRoutes.map,
+                        (_) => false,
                       );
                     },
                   ).animate(delay: 50.ms).fadeIn().slideX(begin: -0.1),
@@ -78,11 +80,14 @@ class AppDrawer extends StatelessWidget {
                   // Language quick-switch
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 4, vertical: 4),
+                      horizontal: 4,
+                      vertical: 4,
+                    ),
                     child: Text(
                       context.t('settings_language'),
                       style: theme.textTheme.labelMedium?.copyWith(
-                        color: AppTheme.cuNavy, // ✅ Swapped primaryColor to cuNavy
+                        color:
+                            AppTheme.cuNavy, // ✅ Swapped primaryColor to cuNavy
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -101,7 +106,8 @@ class AppDrawer extends StatelessWidget {
                         height: 32,
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppTheme.cuNavy // ✅ Swapped primaryColor to cuNavy
+                              ? AppTheme
+                                    .cuNavy // ✅ Swapped primaryColor to cuNavy
                               : theme.colorScheme.surfaceContainerHighest,
                           shape: BoxShape.circle,
                         ),
@@ -117,10 +123,16 @@ class AppDrawer extends StatelessWidget {
                           ),
                         ),
                       ),
-                      title: Text(entry.value, style: theme.textTheme.bodyMedium),
+                      title: Text(
+                        entry.value,
+                        style: theme.textTheme.bodyMedium,
+                      ),
                       trailing: isSelected
-                          ? const Icon(Icons.check_rounded,
-                          color: AppTheme.cuNavy, size: 18) // ✅ Swapped primaryColor to cuNavy
+                          ? const Icon(
+                              Icons.check_rounded,
+                              color: AppTheme.cuNavy,
+                              size: 18,
+                            ) // ✅ Swapped primaryColor to cuNavy
                           : null,
                     );
                   }),
@@ -137,7 +149,9 @@ class AppDrawer extends StatelessWidget {
                   Text(
                     '${AppConstants.appName} v${AppConstants.appVersion}',
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4), // ✅ Swapped withValues
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.4,
+                      ), // ✅ Swapped withValues
                     ),
                   ),
                   // Dark mode toggle
@@ -148,7 +162,8 @@ class AppDrawer extends StatelessWidget {
                       height: 24,
                       decoration: BoxDecoration(
                         color: appState.isDarkMode
-                            ? AppTheme.cuNavy // ✅ Swapped primaryColor to cuNavy
+                            ? AppTheme
+                                  .cuNavy // ✅ Swapped primaryColor to cuNavy
                             : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -171,7 +186,8 @@ class AppDrawer extends StatelessWidget {
                                 : Icons.light_mode,
                             size: 12,
                             color: appState.isDarkMode
-                                ? AppTheme.cuNavy // ✅ Swapped primaryColor to cuNavy
+                                ? AppTheme
+                                      .cuNavy // ✅ Swapped primaryColor to cuNavy
                                 : Colors.orange,
                           ),
                         ),
@@ -190,7 +206,7 @@ class AppDrawer extends StatelessWidget {
 
 // ── Drawer Header ─────────────────────────────────────────
 class _DrawerHeader extends StatelessWidget {
-  const _DrawerHeader({super.key}); // ✅ Made constructor const safely
+  const _DrawerHeader(); // ✅ Made constructor const safely
 
   @override
   Widget build(BuildContext context) {
@@ -198,11 +214,16 @@ class _DrawerHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-      decoration: const BoxDecoration( // ✅ Made BoxDecoration const
-        gradient: LinearGradient( // ✅ Made LinearGradient const since colors are fixed constants now
+      decoration: const BoxDecoration(
+        // ✅ Made BoxDecoration const
+        gradient: LinearGradient(
+          // ✅ Made LinearGradient const since colors are fixed constants now
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppTheme.cuNavy, Color(0xFF2D5FA6)], // ✅ Swapped primaryColor to cuNavy (assuming it's a const Color)
+          colors: [
+            AppTheme.cuNavy,
+            Color(0xFF2D5FA6),
+          ], // ✅ Swapped primaryColor to cuNavy (assuming it's a const Color)
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(20),
@@ -216,7 +237,9 @@ class _DrawerHeader extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2), // ✅ Swapped withValues
+              color: Colors.white.withValues(
+                alpha: 0.2,
+              ), // ✅ Swapped withValues
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
@@ -237,13 +260,18 @@ class _DrawerHeader extends StatelessWidget {
           Text(
             AppConstants.universityName,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: Colors.white.withValues(alpha: 0.7), // ✅ Swapped withValues
+              color: Colors.white.withValues(
+                alpha: 0.7,
+              ), // ✅ Swapped withValues
             ),
           ),
           Text(
-            AppConstants.universityAddr, // ✅ Swapped universityAddress to universityAddr
+            AppConstants
+                .universityAddr, // ✅ Swapped universityAddress to universityAddr
             style: theme.textTheme.labelSmall?.copyWith(
-              color: Colors.white.withValues(alpha: 0.55), // ✅ Swapped withValues
+              color: Colors.white.withValues(
+                alpha: 0.55,
+              ), // ✅ Swapped withValues
             ),
           ),
         ],
@@ -259,7 +287,6 @@ class _DrawerItem extends StatelessWidget {
   final VoidCallback onTap;
 
   const _DrawerItem({
-    super.key,
     required this.icon,
     required this.label,
     required this.onTap,

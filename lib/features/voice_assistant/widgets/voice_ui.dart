@@ -13,7 +13,6 @@ class VoiceUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final voiceProvider = context.watch<VoiceProvider>();
-    final theme = Theme.of(context);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -98,8 +97,8 @@ class _MicButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isListening  = state == VoiceState.listening;
-    final isSpeaking   = state == VoiceState.speaking;
+    final isListening = state == VoiceState.listening;
+    final isSpeaking = state == VoiceState.speaking;
     final isProcessing = state == VoiceState.processing;
 
     final Color bgColor;
@@ -133,25 +132,29 @@ class _MicButton extends StatelessWidget {
           ),
         ],
       ),
-      child: Icon(icon, color: Colors.white, size: 28), // ✅ Fixed: Removed 'const'
+      child: Icon(
+        icon,
+        color: Colors.white,
+        size: 28,
+      ), // ✅ Fixed: Removed 'const'
     );
 
     if (isListening) {
       button = button
           .animate(onPlay: (c) => c.repeat())
           .scale(
-        begin: const Offset(1.0, 1.0),
-        end: const Offset(1.12, 1.12),
-        duration: 700.ms,
-        curve: Curves.easeInOut,
-      )
+            begin: const Offset(1.0, 1.0),
+            end: const Offset(1.12, 1.12),
+            duration: 700.ms,
+            curve: Curves.easeInOut,
+          )
           .then()
           .scale(
-        begin: const Offset(1.12, 1.12),
-        end: const Offset(1.0, 1.0),
-        duration: 700.ms,
-        curve: Curves.easeInOut,
-      );
+            begin: const Offset(1.12, 1.12),
+            end: const Offset(1.0, 1.0),
+            duration: 700.ms,
+            curve: Curves.easeInOut,
+          );
     }
 
     if (isProcessing) {

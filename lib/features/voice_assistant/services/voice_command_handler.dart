@@ -39,6 +39,7 @@ class VoiceCommandHandler {
       'show me',
       'where is',
       'find',
+      'route to',
       'directions to',
       'how do i get to',
     ],
@@ -142,7 +143,7 @@ class VoiceCommandHandler {
         break;
       }
     }
-    query = _normalize(query);
+    query = _cleanNavigationQuery(query);
 
     if (query.isEmpty && extractedCategory != null) {
       return VoiceCommand(
@@ -206,11 +207,13 @@ class VoiceCommandHandler {
 
       final cat = _extractCat(query);
       if (cat != null) {
-        return VoiceCommand(
-          type: VoiceCommandType.listCategory,
-          query: query,
-          category: cat,
-        );
+        if (!hasNavigationKeyword) {
+          return VoiceCommand(
+            type: VoiceCommandType.listCategory,
+            query: query,
+            category: cat,
+          );
+        }
       }
       if (hasNavigationKeyword) {
         return VoiceCommand(type: VoiceCommandType.search, query: query);
@@ -231,6 +234,32 @@ class VoiceCommandHandler {
         .replaceAll(RegExp(r'[^\w\s]', unicode: true), ' ')
         .replaceAll(RegExp(r'\s+'), ' ')
         .trim();
+  }
+
+  String _cleanNavigationQuery(String text) {
+    final normalized = _normalize(text);
+    if (normalized.isEmpty) return normalized;
+
+    const fillerWords = {
+      'a',
+      'an',
+      'can',
+      'could',
+      'kindly',
+      'me',
+      'now',
+      'please',
+      'the',
+      'to',
+      'would',
+      'you',
+    };
+
+    final words = normalized
+        .split(' ')
+        .where((word) => word.isNotEmpty && !fillerWords.contains(word))
+        .toList();
+    return words.join(' ');
   }
 
   bool _isExactLocationMatch(LocationModel loc, String query) {

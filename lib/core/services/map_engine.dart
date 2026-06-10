@@ -30,7 +30,7 @@ abstract class MapEngine {
     required double initialZoom,
     required Set<UnifiedMarker> markers,
     required List<UnifiedLatLng> polylinePoints,
-    required Function(UnifiedLatLng) onTap,
+    required void Function(UnifiedLatLng) onTap,
   });
 
   /// Programmatic controls (Move camera, zoom, etc.)

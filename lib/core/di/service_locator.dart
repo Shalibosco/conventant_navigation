@@ -11,7 +11,6 @@ import '../services/permissions_service.dart';
 
 // ── Models
 import '../../data/models/location_model.dart';
-import '../../data/models/info_model.dart';
 
 // ── Data Sources
 import '../../data/datasources/local_location_data_source.dart';
@@ -52,38 +51,38 @@ Future<void> initServiceLocator() async {
 
   // ── Core Services ─────────────────────────────────────────
   sl.registerLazySingleton<StorageService>(
-        () => StorageService(sl<SharedPreferences>()),
+    () => StorageService(sl<SharedPreferences>()),
   );
   sl.registerLazySingleton<NetworkService>(() => NetworkService());
   sl.registerLazySingleton<PermissionsService>(() => PermissionsService());
 
   // ── Data Sources ──────────────────────────────────────────
   sl.registerLazySingleton<LocalLocationDataSource>(
-        () => LocalLocationDataSourceImpl(locationBox),
+    () => LocalLocationDataSourceImpl(locationBox),
   );
 
-  sl.registerLazySingleton<LocalInfoDataSource>(
-        () => LocalInfoDataSource(),
-  );
+  sl.registerLazySingleton<LocalInfoDataSource>(() => LocalInfoDataSource());
 
   // ── Repositories ──────────────────────────────────────────
   sl.registerLazySingleton<LocationRepository>(
-        () => LocationRepositoryImpl(sl<LocalLocationDataSource>()),
+    () => LocationRepositoryImpl(sl<LocalLocationDataSource>()),
   );
   sl.registerLazySingleton<InfoRepository>(
-        () => InfoRepositoryImpl(sl<LocalInfoDataSource>()), // ✅ Now it will recognize it!
+    () => InfoRepositoryImpl(
+      sl<LocalInfoDataSource>(),
+    ), // ✅ Now it will recognize it!
   );
 
   // ── Feature Services ──────────────────────────────────────
   sl.registerLazySingleton<LocationService>(
-        () => LocationService(sl<PermissionsService>()),
+    () => LocationService(sl<PermissionsService>()),
   );
-  sl.registerLazySingleton<RouteService>(() => RouteService());
+  sl.registerLazySingleton<RouteService>(() => const RouteService());
   sl.registerLazySingleton<OfflineMapService>(() => OfflineMapService());
 
   sl.registerLazySingleton<SpeechService>(() => SpeechService());
   sl.registerLazySingleton<TextToSpeechService>(() => TextToSpeechService());
   sl.registerLazySingleton<VoiceCommandHandler>(
-        () => VoiceCommandHandler(sl<LocationRepository>()),
+    () => VoiceCommandHandler(sl<LocationRepository>()),
   );
 }

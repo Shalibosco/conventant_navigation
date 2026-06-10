@@ -6,7 +6,7 @@ import 'package:equatable/equatable.dart';
 part 'location_model.g.dart';
 
 @HiveType(typeId: 0)
-class LocationModel extends HiveObject with EquatableMixin {
+class LocationModel with EquatableMixin {
   @HiveField(0)
   final String id;
 
@@ -29,7 +29,7 @@ class LocationModel extends HiveObject with EquatableMixin {
   final String? imageAssetPath;
 
   @HiveField(7)
-  final Map<String, String>? localizedNames;    // {yo: '...', ig: '...'}
+  final Map<String, String>? localizedNames; // {yo: '...', ig: '...'}
 
   @HiveField(8)
   final Map<String, String>? localizedDescriptions;
@@ -57,7 +57,7 @@ class LocationModel extends HiveObject with EquatableMixin {
     this.openingHours,
     this.phoneNumber,
   });
-// ── From JSON ─────────────────────────────────────────────
+  // ── From JSON ─────────────────────────────────────────────
   factory LocationModel.fromJson(Map<String, dynamic> json) {
     return LocationModel(
       id: json['id'] as String,

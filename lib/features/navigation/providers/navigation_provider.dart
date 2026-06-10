@@ -27,6 +27,8 @@ class NavigationProvider extends ChangeNotifier {
   LatLng? _userLocation;
   LocationModel? _selectedDestination;
   bool _isNavigating = false;
+  bool _isRerouting = false;
+  bool _isUpdatingRoute = false;
   String _activeFilter = 'all';
   String _searchQuery = '';
 
@@ -37,9 +39,11 @@ class NavigationProvider extends ChangeNotifier {
   StreamSubscription<LatLng>? _locationSubscription;
   LatLng?
   _lastRouteFrom; // throttle: only recalculate route after >30m movement
+  DateTime? _lastRerouteTime;
   DateTime? _lastGuidanceTime;
   LatLng? _lastGuidancePoint;
   final Set<int> _spokenDistanceCues = <int>{};
+  static const Duration _rerouteCooldown = Duration(seconds: 10);
   static const List<int> _distanceCueMeters = [20, 50, 100, 200, 300];
   static const Map<String, Map<String, String>> _directionLabels = {
     'en': {
@@ -91,6 +95,7 @@ class NavigationProvider extends ChangeNotifier {
   LatLng? get userLocation => _userLocation;
   LocationModel? get selectedDestination => _selectedDestination;
   bool get isNavigating => _isNavigating;
+  bool get isRerouting => _isRerouting;
   String get activeFilter => _activeFilter;
   List<LocationModel> get searchResults => _filteredLocations;
   bool get hasRoute => _routePoints.isNotEmpty;
@@ -217,11 +222,15 @@ class NavigationProvider extends ChangeNotifier {
     _locationSubscription?.cancel();
     _locationSubscription = _locationService.trackLocation().listen(
       (position) {
+        final previousLocation = _userLocation;
         _userLocation = position;
 
         if (_isNavigating) {
           _trailService.addTrailPoint(position);
-          _maybeUpdateRoute(position);
+          final heading = _movementHeading(previousLocation, position);
+          if (!_maybeReroute(position, heading)) {
+            _maybeUpdateRoute(position);
+          }
           _checkProximityAndSpeak();
           _maybeSpeakNavigationGuidance(position);
         }
@@ -231,6 +240,42 @@ class NavigationProvider extends ChangeNotifier {
         debugPrint('NavigationProvider: location stream error — $error');
       },
     );
+  }
+
+  double? _movementHeading(LatLng? previousLocation, LatLng currentLocation) {
+    if (previousLocation == null) return null;
+
+    const distCalc = Distance();
+    final moved = distCalc.as(
+      LengthUnit.Meter,
+      previousLocation,
+      currentLocation,
+    );
+    if (moved < 2) return null;
+
+    return distCalc.bearing(previousLocation, currentLocation);
+  }
+
+  bool _maybeReroute(LatLng position, double? heading) {
+    if (_routePoints.length < 2 || _isUpdatingRoute) return false;
+
+    final now = DateTime.now();
+    if (_lastRerouteTime != null &&
+        now.difference(_lastRerouteTime!) < _rerouteCooldown) {
+      return false;
+    }
+
+    final shouldReroute = _routeService.shouldReroute(
+      currentLocation: position,
+      routePoints: _routePoints,
+      heading: heading,
+    );
+    if (!shouldReroute) return false;
+
+    _lastRerouteTime = now;
+    _speakReroutingCue();
+    unawaited(_updateRoute(isRerouting: true));
+    return true;
   }
 
   void _maybeUpdateRoute(LatLng position) {
@@ -243,6 +288,16 @@ class NavigationProvider extends ChangeNotifier {
     if (moved > 30) {
       unawaited(_updateRoute());
     }
+  }
+
+  void _speakReroutingCue() {
+    if (_voiceProvider == null) return;
+    if (_voiceProvider!.isListening ||
+        _voiceProvider!.isProcessing ||
+        _voiceProvider!.isSpeaking) {
+      return;
+    }
+    _voiceProvider!.speak(_reroutingPhrase());
   }
 
   void _checkProximityAndSpeak() {
@@ -398,6 +453,19 @@ class NavigationProvider extends ChangeNotifier {
     }
   }
 
+  String _reroutingPhrase() {
+    switch (_activeVoiceLang) {
+      case 'yo':
+        return 'Mo ń tún ipa-ọ̀nà ṣe.';
+      case 'ig':
+        return 'Ana m agbakọ ụzọ ọhụrụ.';
+      case 'pidgin':
+        return 'I dey find new route.';
+      default:
+        return 'Rerouting. Follow the updated route on the map.';
+    }
+  }
+
   String _distancePhrase(int meters) {
     switch (_activeVoiceLang) {
       case 'yo':
@@ -450,7 +518,9 @@ class NavigationProvider extends ChangeNotifier {
   void navigateTo(LocationModel destination, {bool announce = true}) {
     _selectedDestination = destination;
     _isNavigating = true;
+    _isRerouting = false;
     _lastRouteFrom = null;
+    _lastRerouteTime = null;
     _lastGuidanceTime = null;
     _lastGuidancePoint = null;
     _spokenDistanceCues.clear();
@@ -475,8 +545,10 @@ class NavigationProvider extends ChangeNotifier {
 
   void cancelNavigation() {
     _isNavigating = false;
+    _isRerouting = false;
     _selectedDestination = null;
     _lastRouteFrom = null;
+    _lastRerouteTime = null;
     _lastGuidanceTime = null;
     _lastGuidancePoint = null;
     _spokenDistanceCues.clear();
@@ -494,21 +566,33 @@ class NavigationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> _updateRoute() async {
+  Future<void> _updateRoute({bool isRerouting = false}) async {
     if (_userLocation == null || _selectedDestination == null) return;
+    if (_isUpdatingRoute) return;
 
-    _lastRouteFrom = _userLocation;
+    _isUpdatingRoute = true;
+    if (isRerouting) {
+      _isRerouting = true;
+      notifyListeners();
+    }
+
+    final routeStart = _userLocation!;
     final destLatLng = LatLng(
       _selectedDestination!.latitude,
       _selectedDestination!.longitude,
     );
-    final points = await _routeService.getRoutePoints(
-      _userLocation!,
-      destLatLng,
-    );
 
-    _routePoints = points;
-    notifyListeners();
+    try {
+      final points = await _routeService.getRoutePoints(routeStart, destLatLng);
+      _lastRouteFrom = routeStart;
+      _routePoints = points;
+    } finally {
+      _isUpdatingRoute = false;
+      if (isRerouting) {
+        _isRerouting = false;
+      }
+      notifyListeners();
+    }
   }
 
   // 🛣️ Get trail distance in kilometers

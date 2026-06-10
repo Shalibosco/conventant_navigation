@@ -666,7 +666,11 @@ class _NavigationPanel extends StatelessWidget {
                 _Stat(
                   icon: Icons.route_rounded,
                   label: context.t('nav_route'),
-                  value: nav.hasRoute ? context.t('nav_route_ready') : '...',
+                  value: nav.isRerouting
+                      ? 'Rerouting...'
+                      : nav.hasRoute
+                      ? context.t('nav_route_ready')
+                      : '...',
                   color: AppTheme.cuGold,
                 ),
               ],

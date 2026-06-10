@@ -14,14 +14,18 @@ class OsmMapEngine implements MapEngine {
     required double initialZoom,
     required Set<UnifiedMarker> markers,
     required List<UnifiedLatLng> polylinePoints,
-    required Function(UnifiedLatLng) onTap,
+    required void Function(UnifiedLatLng) onTap,
   }) {
     return osm.FlutterMap(
       mapController: _controller,
       options: osm.MapOptions(
-        initialCenter: ll.LatLng(initialCenter.latitude, initialCenter.longitude),
+        initialCenter: ll.LatLng(
+          initialCenter.latitude,
+          initialCenter.longitude,
+        ),
         initialZoom: initialZoom,
-        onTap: (_, point) => onTap(UnifiedLatLng(point.latitude, point.longitude)),
+        onTap: (_, point) =>
+            onTap(UnifiedLatLng(point.latitude, point.longitude)),
       ),
       children: [
         osm.TileLayer(
@@ -31,20 +35,28 @@ class OsmMapEngine implements MapEngine {
         osm.PolylineLayer(
           polylines: [
             osm.Polyline(
-              points: polylinePoints.map((p) => ll.LatLng(p.latitude, p.longitude)).toList(),
+              points: polylinePoints
+                  .map((p) => ll.LatLng(p.latitude, p.longitude))
+                  .toList(),
               color: Colors.blue,
               strokeWidth: 5,
             ),
           ],
         ),
         osm.MarkerLayer(
-          markers: markers.map((m) => osm.Marker(
-            point: ll.LatLng(m.position.latitude, m.position.longitude),
-            child: GestureDetector(
-              onTap: m.onTap,
-              child: m.customIcon ?? const Icon(Icons.location_on, color: Colors.red),
-            ),
-          )).toList(),
+          markers: markers
+              .map(
+                (m) => osm.Marker(
+                  point: ll.LatLng(m.position.latitude, m.position.longitude),
+                  child: GestureDetector(
+                    onTap: m.onTap,
+                    child:
+                        m.customIcon ??
+                        const Icon(Icons.location_on, color: Colors.red),
+                  ),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
