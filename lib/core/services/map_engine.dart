@@ -13,13 +13,17 @@ class UnifiedMarker {
   final String id;
   final UnifiedLatLng position;
   final VoidCallback? onTap;
-  final Widget? customIcon; // Used for OSM
+  final Widget? customIcon;
+  final double? width;
+  final double? height;
 
   const UnifiedMarker({
     required this.id,
     required this.position,
     this.onTap,
     this.customIcon,
+    this.width,
+    this.height,
   });
 }
 

@@ -219,9 +219,15 @@ class NavigationProvider extends ChangeNotifier {
   }
 
   void startLocationTracking() {
-    _locationSubscription?.cancel();
-    _locationSubscription = _locationService.trackLocation().listen(
-      (position) {
+    unawaited(_startLocationTracking());
+  }
+
+  Future<void> _startLocationTracking() async {
+    await _locationSubscription?.cancel();
+    await _locationService.startTracking();
+
+    _locationSubscription = _locationService.locationStream.listen(
+      (LatLng position) {
         final previousLocation = _userLocation;
         _userLocation = position;
 
@@ -583,9 +589,9 @@ class NavigationProvider extends ChangeNotifier {
     );
 
     try {
-      final points = await _routeService.getRoutePoints(routeStart, destLatLng);
+      final route = await _routeService.getRoute(routeStart, destLatLng);
       _lastRouteFrom = routeStart;
-      _routePoints = points;
+      _routePoints = route.points;
     } finally {
       _isUpdatingRoute = false;
       if (isRerouting) {
@@ -596,7 +602,7 @@ class NavigationProvider extends ChangeNotifier {
   }
 
   // 🛣️ Get trail distance in kilometers
-  double get trailDistance => _trailService.getTotalTrailDistance();
+  double get trailDistance => _trailService.totalDistanceKm;
 
   @override
   void dispose() {

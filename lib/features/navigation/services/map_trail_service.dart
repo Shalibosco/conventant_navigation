@@ -1,72 +1,149 @@
 // lib/features/navigation/services/map_trail_service.dart
 // Tracks user movement and displays trail on map
 
-import 'package:latlong2/latlong.dart';
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
+import 'package:latlong2/latlong.dart';
 
 class MapTrailService extends ChangeNotifier {
-  final List<LatLng> _trailPoints = [];
-  final int _maxTrailLength =
-      500; // Keep last 500 points to avoid memory issues
+  // ── Configuration ─────────────────────────────────────────
+  /// Maximum number of points retained in the trail.
+  /// Older points are dropped when this is exceeded.
+  final int maxTrailLength;
 
-  List<LatLng> get trailPoints => List.unmodifiable(_trailPoints);
-  bool get hasTrail => _trailPoints.isNotEmpty;
+  /// Minimum distance in metres a new point must be from the last
+  /// before it is accepted. Filters out GPS jitter.
+  final double minDistanceMetres;
 
-  /// Add a location point to the trail
+  MapTrailService({
+    this.maxTrailLength = 500,
+    this.minDistanceMetres = 1.0,
+  });
+
+  // ── Internal state ────────────────────────────────────────
+  // Queue gives O(1) removeFirst (trim from front) vs List's O(n).
+  final Queue<LatLng> _trail = Queue<LatLng>();
+
+  // Incrementally maintained so getTotalTrailDistance() is O(1).
+  double _totalDistanceMetres = 0.0;
+
+  // Reused across all distance calculations — no per-call allocation.
+  static const Distance _distance = Distance();
+
+  // Cached unmodifiable view — rebuilt only when the trail changes.
+  List<LatLng>? _cachedView;
+
+  // ── Public getters ────────────────────────────────────────
+
+  /// An unmodifiable snapshot of the trail, cached between mutations.
+  List<LatLng> get trailPoints => _cachedView ??= List.unmodifiable(_trail);
+
+  bool get hasTrail => _trail.isNotEmpty;
+
+  /// Total trail distance in kilometres, maintained incrementally — O(1).
+  double get totalDistanceKm => _totalDistanceMetres / 1000;
+
+  // ── Mutation API ──────────────────────────────────────────
+
+  /// Adds [point] to the trail if it is at least [minDistanceMetres] from
+  /// the previous point (filters GPS jitter).
   void addTrailPoint(LatLng point) {
-    if (_trailPoints.isEmpty ||
-        _calculateDistance(_trailPoints.last, point) > 1) {
-      // Only add if it's more than 1 meter away from the last point
-      _trailPoints.add(point);
+    if (_trail.isNotEmpty &&
+        _dist(_trail.last, point) < minDistanceMetres) {
+      return; // too close — skip without notifying
+    }
 
-      // Keep trail bounded to prevent memory issues
-      if (_trailPoints.length > _maxTrailLength) {
-        _trailPoints.removeAt(0);
+    // Maintain incremental distance before trimming.
+    if (_trail.isNotEmpty) {
+      _totalDistanceMetres += _dist(_trail.last, point);
+    }
+
+    _trail.addLast(point);
+
+    // Trim oldest point when over capacity.
+    if (_trail.length > maxTrailLength) {
+      // Subtract the distance the removed segment contributed.
+      if (_trail.length >= 2) {
+        final removed = _trail.first;
+        _trail.removeFirst();
+        _totalDistanceMetres -= _dist(removed, _trail.first);
+        if (_totalDistanceMetres < 0) _totalDistanceMetres = 0;
+      } else {
+        _trail.removeFirst();
       }
-      notifyListeners();
     }
+
+    _invalidateCache();
+    notifyListeners();
   }
 
-  /// Add multiple points to trail
+  /// Adds multiple points in a single batch, notifying listeners only once.
   void addTrailPoints(List<LatLng> points) {
+    if (points.isEmpty) return;
+
     for (final point in points) {
-      addTrailPoint(point);
+      // Inline the filter + insert logic without calling notifyListeners each time.
+      if (_trail.isNotEmpty &&
+          _dist(_trail.last, point) < minDistanceMetres) {
+        continue;
+      }
+      if (_trail.isNotEmpty) {
+        _totalDistanceMetres += _dist(_trail.last, point);
+      }
+      _trail.addLast(point);
+
+      if (_trail.length > maxTrailLength) {
+        if (_trail.length >= 2) {
+          final removed = _trail.first;
+          _trail.removeFirst();
+          _totalDistanceMetres -= _dist(removed, _trail.first);
+          if (_totalDistanceMetres < 0) _totalDistanceMetres = 0;
+        } else {
+          _trail.removeFirst();
+        }
+      }
     }
+
+    _invalidateCache();
+    notifyListeners(); // single notification for the whole batch
   }
 
-  /// Clear the trail
+  /// Clears the trail and resets the distance counter.
   void clearTrail() {
-    _trailPoints.clear();
+    if (_trail.isEmpty) return; // no-op if already empty
+    _trail.clear();
+    _totalDistanceMetres = 0.0;
+    _invalidateCache();
     notifyListeners();
   }
 
-  /// Reset and start new trail
+  /// Clears the trail and starts fresh from [startPoint].
   void resetTrail(LatLng startPoint) {
-    _trailPoints.clear();
-    _trailPoints.add(startPoint);
+    _trail.clear();
+    _totalDistanceMetres = 0.0;
+    _trail.addLast(startPoint);
+    _invalidateCache();
     notifyListeners();
   }
 
-  /// Calculate distance between two points in meters
-  double _calculateDistance(LatLng p1, LatLng p2) {
-    const distance = Distance();
-    return distance.as(LengthUnit.Meter, p1, p2);
-  }
+  /// Returns a plain `List<LatLng>` copy suitable for polyline rendering
+  /// or export — independent of the internal cache.
+  List<LatLng> toList() => _trail.toList(growable: false);
 
-  /// Get total trail distance in kilometers
-  double getTotalTrailDistance() {
-    if (_trailPoints.length < 2) return 0.0;
+  // ── Helpers ───────────────────────────────────────────────
 
-    double total = 0.0;
-    for (int i = 0; i < _trailPoints.length - 1; i++) {
-      total += _calculateDistance(_trailPoints[i], _trailPoints[i + 1]);
-    }
-    return total / 1000; // Convert to km
-  }
+  double _dist(LatLng a, LatLng b) =>
+      _distance.as(LengthUnit.Meter, a, b);
+
+  void _invalidateCache() => _cachedView = null;
+
+  // ── Cleanup ───────────────────────────────────────────────
 
   @override
   void dispose() {
-    _trailPoints.clear();
+    _trail.clear();
+    _cachedView = null;
     super.dispose();
   }
 }

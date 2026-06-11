@@ -5,6 +5,7 @@ import '../services/speech_service.dart';
 import '../services/text_to_speech_service.dart';
 import '../services/voice_command_handler.dart';
 import '../../../core/di/service_locator.dart';
+import '../../../core/services/native_settings_service.dart';
 
 enum VoiceState { idle, listening, processing, speaking, error }
 
@@ -12,6 +13,8 @@ class VoiceProvider extends ChangeNotifier {
   final SpeechService _speechService = sl<SpeechService>();
   final TextToSpeechService _ttsService = sl<TextToSpeechService>();
   final VoiceCommandHandler _commandHandler = sl<VoiceCommandHandler>();
+  final NativeSettingsService _nativeSettingsService =
+      sl<NativeSettingsService>();
 
   VoiceState _state = VoiceState.idle;
   String _partialText = '';
@@ -21,6 +24,8 @@ class VoiceProvider extends ChangeNotifier {
   String _languageWarning = '';
   VoiceCommand? _lastCommand;
   String _currentLang = 'en';
+  int _listenSession = 0;
+  bool _disposed = false;
 
   // ── Getters ───────────────────────────────────────────────
   VoiceState get state => _state;
@@ -35,6 +40,8 @@ class VoiceProvider extends ChangeNotifier {
   bool get isSpeaking => _state == VoiceState.speaking;
   bool get isIdle => _state == VoiceState.idle;
   bool get isProcessing => _state == VoiceState.processing;
+  bool get canOpenOfflineSpeechSettings =>
+      _nativeSettingsService.canOpenSpeechSettings;
 
   // Callback so MapScreen can react to resolved voice commands
   void Function(VoiceCommand)? onCommandResolved;
@@ -57,19 +64,26 @@ class VoiceProvider extends ChangeNotifier {
   Future<void> startListening() async {
     if (_state != VoiceState.idle) return;
 
-    _setState(VoiceState.listening);
+    final session = ++_listenSession;
     _partialText = '';
     _recognizedText = '';
+    _responseText = '';
     _errorMessage = '';
+    await _ttsService.stop();
+    _setState(VoiceState.listening);
 
     try {
       final result = await _speechService.listen(
         langCode: _currentLang,
         onPartialResult: (partial) {
+          if (!_isActiveSession(session)) return;
+          if (partial.trim().isEmpty) return;
           _partialText = partial;
           notifyListeners();
         },
       );
+
+      if (!_isActiveSession(session)) return;
 
       if (result == null || result.trim().isEmpty) {
         _responseText = _currentLang == 'yo'
@@ -85,33 +99,42 @@ class VoiceProvider extends ChangeNotifier {
 
       _recognizedText = result;
       _setState(VoiceState.processing);
-      await _processCommand(result);
+      await _processCommand(result, session);
     } catch (e) {
+      if (!_isActiveSession(session)) return;
       _errorMessage = e.toString();
       _setState(VoiceState.error);
       await Future<void>.delayed(const Duration(seconds: 2));
-      _setState(VoiceState.idle);
+      if (_isActiveSession(session)) {
+        _setState(VoiceState.idle);
+      }
     }
   }
 
   // ── Process recognized text ───────────────────────────────
-  Future<void> _processCommand(String text) async {
+  Future<void> _processCommand(String text, int session) async {
     try {
       final command = await _commandHandler.process(text, _currentLang);
+      if (!_isActiveSession(session)) return;
       _lastCommand = command;
-      onCommandResolved?.call(command);
 
       final response = _commandHandler.buildResponse(command, _currentLang);
       _responseText = response;
       _setState(VoiceState.speaking);
 
+      onCommandResolved?.call(command);
       await _ttsService.speak(response);
-      _setState(VoiceState.idle);
+      if (_isActiveSession(session)) {
+        _setState(VoiceState.idle);
+      }
     } catch (e) {
+      if (!_isActiveSession(session)) return;
       _errorMessage = 'Processing error: $e';
       _setState(VoiceState.error);
       await Future<void>.delayed(const Duration(seconds: 2));
-      _setState(VoiceState.idle);
+      if (_isActiveSession(session)) {
+        _setState(VoiceState.idle);
+      }
     }
   }
 
@@ -136,9 +159,26 @@ class VoiceProvider extends ChangeNotifier {
 
   // ── Stop ─────────────────────────────────────────────────
   Future<void> stopListening() async {
+    _listenSession++;
     await _speechService.stop();
     await _ttsService.stop();
     _setState(VoiceState.idle);
+  }
+
+  Future<bool> openOfflineSpeechSettings() async {
+    try {
+      final opened = await _nativeSettingsService.openVoiceInputSettings();
+      if (!opened) {
+        _errorMessage =
+            'Open Android voice input settings and install offline speech recognition for your language.';
+        notifyListeners();
+      }
+      return opened;
+    } catch (e) {
+      _errorMessage = 'Could not open speech settings: $e';
+      notifyListeners();
+      return false;
+    }
   }
 
   // ── Speak directly (for nav instructions) ────────────────
@@ -153,12 +193,19 @@ class VoiceProvider extends ChangeNotifier {
   }
 
   void _setState(VoiceState newState) {
+    if (_disposed) return;
     _state = newState;
     notifyListeners();
   }
 
+  bool _isActiveSession(int session) {
+    return !_disposed && session == _listenSession;
+  }
+
   @override
   void dispose() {
+    _disposed = true;
+    _listenSession++;
     _speechService.dispose();
     _ttsService.dispose();
     super.dispose();
