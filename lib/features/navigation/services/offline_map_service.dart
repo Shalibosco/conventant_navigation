@@ -68,7 +68,8 @@ class OfflineMapService {
     } catch (_) {}
   }
 
-  /// Pre-caches OSM tiles for the campus bounding box at zoom levels 14–18.
+  /// Pre-caches OSM tiles for the campus bounding box at the configured
+  /// map zoom range.
   Future<void> preCacheCampusTiles({
     void Function(double progress)? onProgress,
     bool includeDarkTiles = true,
@@ -78,8 +79,8 @@ class OfflineMapService {
       south: AppConstants.campusBoundSouth,
       east: AppConstants.campusBoundEast,
       west: AppConstants.campusBoundWest,
-      minZoom: 14,
-      maxZoom: 18,
+      minZoom: AppConstants.minZoom.floor(),
+      maxZoom: AppConstants.maxZoom.floor(),
     );
 
     int completed = 0;

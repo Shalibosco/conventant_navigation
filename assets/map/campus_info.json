@@ -1,5 +1,288 @@
 [
     {
+        "id":  "rule_001",
+        "title":  "Mandatory Chapel Attendance",
+        "content":  "Participation in all chapel services and religious events is compulsory for all students.",
+        "category":  "rule",
+        "iconName":  "church",
+        "tags":  [
+                     "rules",
+                     "chapel",
+                     "attendance",
+                     "religious events"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_002",
+        "title":  "Dress Code Compliance",
+        "content":  "Students are expected to dress modestly and professionally. Jeans, leggings, and other forms of indecent dressing are generally prohibited on campus.",
+        "category":  "rule",
+        "iconName":  "rule",
+        "tags":  [
+                     "rules",
+                     "dress code",
+                     "modesty",
+                     "campus conduct"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_003",
+        "title":  "Identification Cards",
+        "content":  "Students must wear their student ID cards at all times to gain access to academic buildings and campus facilities.",
+        "category":  "rule",
+        "iconName":  "rule",
+        "tags":  [
+                     "rules",
+                     "id card",
+                     "access",
+                     "security"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_004",
+        "title":  "Device Restrictions",
+        "content":  "Tablets and laptops are permitted for academic use, but specific restrictions apply. For example, SIM cards may need to be removed from tablets.",
+        "category":  "rule",
+        "iconName":  "academic",
+        "tags":  [
+                     "rules",
+                     "devices",
+                     "tablet",
+                     "laptop",
+                     "academic use"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_005",
+        "title":  "Prohibition of Hard Drugs and Contraband",
+        "content":  "Possession, use, or distribution of illicit drugs and other banned substances is strictly prohibited.",
+        "category":  "rule",
+        "iconName":  "rule",
+        "tags":  [
+                     "rules",
+                     "drugs",
+                     "contraband",
+                     "discipline"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_006",
+        "title":  "Curfew and Hostel Regulations",
+        "content":  "Students must adhere to designated hostel arrival and departure times. Unauthorized movement after hours is a punishable offense.",
+        "category":  "rule",
+        "iconName":  "rule",
+        "tags":  [
+                     "rules",
+                     "curfew",
+                     "hostel",
+                     "movement"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_007",
+        "title":  "Class Attendance",
+        "content":  "Punctuality and regular attendance at lectures are required. Chronic absenteeism can lead to academic sanctions.",
+        "category":  "rule",
+        "iconName":  "academic",
+        "tags":  [
+                     "rules",
+                     "class",
+                     "attendance",
+                     "punctuality"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_008",
+        "title":  "Respect for Authority",
+        "content":  "Students are expected to show courtesy and deference to faculty, staff, and campus security. Disagreement is allowed, but disrespect is not.",
+        "category":  "rule",
+        "iconName":  "admin",
+        "tags":  [
+                     "rules",
+                     "respect",
+                     "authority",
+                     "conduct"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_009",
+        "title":  "Prohibition of Worldly Music",
+        "content":  "Playing loud or offensive music and secular media deemed contrary to the university mission is restricted.",
+        "category":  "rule",
+        "iconName":  "rule",
+        "tags":  [
+                     "rules",
+                     "music",
+                     "media",
+                     "conduct"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_010",
+        "title":  "Entrepreneurial Studies (EDS)",
+        "content":  "Participation in the university entrepreneurship development program is a mandatory graduation requirement for all students.",
+        "category":  "rule",
+        "iconName":  "academic",
+        "tags":  [
+                     "rules",
+                     "EDS",
+                     "entrepreneurship",
+                     "graduation"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_011",
+        "title":  "Total Man Concept (TMC)",
+        "content":  "All students must participate in Total Man Concept courses, which focus on holistic development of spirit, mind, and body.",
+        "category":  "rule",
+        "iconName":  "academic",
+        "tags":  [
+                     "rules",
+                     "TMC",
+                     "total man concept",
+                     "holistic development"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_012",
+        "title":  "Academic Integrity",
+        "content":  "Plagiarism, fabrication of data, and any form of deceit in academic work are considered serious violations.",
+        "category":  "rule",
+        "iconName":  "academic",
+        "tags":  [
+                     "rules",
+                     "academic integrity",
+                     "plagiarism",
+                     "misconduct"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_013",
+        "title":  "Campus Environment and Maintenance",
+        "content":  "Students are responsible for maintaining campus cleanliness and protecting university property as an act of stewardship.",
+        "category":  "rule",
+        "iconName":  "rule",
+        "tags":  [
+                     "rules",
+                     "cleanliness",
+                     "maintenance",
+                     "stewardship"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_014",
+        "title":  "Communication and Behavior",
+        "content":  "Student conduct, including online behavior and social media usage, should reflect the core values of the institution at all times.",
+        "category":  "rule",
+        "iconName":  "rule",
+        "tags":  [
+                     "rules",
+                     "communication",
+                     "behavior",
+                     "social media"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_015",
+        "title":  "Sexual Purity",
+        "content":  "The university upholds strict standards regarding sexual conduct and relationships. Behaviors outside these standards are subject to disciplinary action.",
+        "category":  "rule",
+        "iconName":  "rule",
+        "tags":  [
+                     "rules",
+                     "sexual purity",
+                     "relationships",
+                     "discipline"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_016",
+        "title":  "Prohibited Meetings",
+        "content":  "Unauthorized or clandestine student meetings and gatherings that are not sanctioned by university authorities are prohibited.",
+        "category":  "rule",
+        "iconName":  "rule",
+        "tags":  [
+                     "rules",
+                     "meetings",
+                     "gatherings",
+                     "authorization"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_017",
+        "title":  "Use of University Facilities",
+        "content":  "Misuse of library resources, laboratories, or communal facilities can lead to heavy fines and disciplinary hearings.",
+        "category":  "rule",
+        "iconName":  "academic",
+        "tags":  [
+                     "rules",
+                     "facilities",
+                     "library",
+                     "laboratory",
+                     "discipline"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_018",
+        "title":  "Compliance with Security Personnel",
+        "content":  "Students must cooperate with the university internal security team and follow all safety protocols.",
+        "category":  "rule",
+        "iconName":  "admin",
+        "tags":  [
+                     "rules",
+                     "security",
+                     "safety",
+                     "compliance"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_019",
+        "title":  "Adherence to Policies",
+        "content":  "Students are expected to be familiar with the Student Handbook and follow all amendments issued by the administration during their course of study.",
+        "category":  "rule",
+        "iconName":  "rule",
+        "tags":  [
+                     "rules",
+                     "student handbook",
+                     "policies",
+                     "administration"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
+        "id":  "rule_020",
+        "title":  "Zero-Tolerance for Examination Malpractice",
+        "content":  "Covenant University treats examination malpractice as a capital offense. Engaging in any form of cheating during exams or continuous assessments leads to automatic dismissal from the institution.",
+        "category":  "rule",
+        "iconName":  "academic",
+        "tags":  [
+                     "rules",
+                     "exams",
+                     "malpractice",
+                     "cheating",
+                     "dismissal"
+                 ],
+        "lastUpdated":  "2026-06-14"
+    },
+    {
         "id":  "loc_001",
         "name":  "Chapel of Light",
         "description":  "The main chapel at Covenant University. Mandatory chapel service holds every Monday, Wednesday, and Friday at 6:45 AM.",
