@@ -39,6 +39,7 @@ class _MapScreenState extends State<MapScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
 
+  VoiceProvider? _voiceProvider;
   bool _searchExpanded = false;
 
   @override
@@ -52,6 +53,7 @@ class _MapScreenState extends State<MapScreen> {
     final voice = context.read<VoiceProvider>();
     final lang = context.read<LanguageProvider>();
     final offlineMapService = sl<OfflineMapService>();
+    _voiceProvider = voice;
 
     await offlineMapService.getTileCacheDirectory();
     await nav.initialize();
@@ -133,6 +135,7 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void dispose() {
+    _voiceProvider?.onCommandResolved = null;
     _mapController.dispose();
     _searchController.dispose();
     _searchFocus.dispose();
@@ -666,7 +669,11 @@ class _NavigationPanel extends StatelessWidget {
                 _Stat(
                   icon: Icons.route_rounded,
                   label: context.t('nav_route'),
-                  value: nav.hasRoute ? context.t('nav_route_ready') : '...',
+                  value: nav.isRerouting
+                      ? 'Rerouting...'
+                      : nav.hasRoute
+                      ? context.t('nav_route_ready')
+                      : '...',
                   color: AppTheme.cuGold,
                 ),
               ],

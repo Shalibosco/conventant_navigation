@@ -5,6 +5,7 @@ analyzer:
     - '**/*.g.dart'
     - '**/*.freezed.dart'
     - '**/*.gr.dart'
+    - 'NATIVE_FEATURES_GUIDE.dart'
 
   language:
     strict-casts: true

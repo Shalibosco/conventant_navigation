@@ -20,7 +20,8 @@ class VoiceScreen extends StatelessWidget {
     final langProvider = context.watch<LanguageProvider>();
 
     // ✅ Re-evaluated fallback language name logic safely
-    final languageName = AppConstants.languageNames[langProvider.langCode] ?? 'English';
+    final languageName =
+        AppConstants.languageNames[langProvider.langCode] ?? 'English';
 
     return Scaffold(
       appBar: AppBar(title: Text(context.t('voice_title'))),
@@ -37,7 +38,9 @@ class VoiceScreen extends StatelessWidget {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppTheme.cuNavy.withValues(alpha: 0.1), // ✅ Fixed withValues & cuNavy
+                  color: AppTheme.cuNavy.withValues(
+                    alpha: 0.1,
+                  ), // ✅ Fixed withValues & cuNavy
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -59,9 +62,16 @@ class VoiceScreen extends StatelessWidget {
               Text(
                 context.tArgs('voice_speak_in', {'language': languageName}),
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.55), // ✅ Fixed withValues
+                  color: theme.colorScheme.onSurface.withValues(
+                    alpha: 0.55,
+                  ), // ✅ Fixed withValues
                 ),
               ).animate().fadeIn(delay: 300.ms),
+
+              if (voiceProvider.languageWarning.isNotEmpty) ...[
+                const SizedBox(height: 18),
+                _OfflineSpeechPackCard(voiceProvider: voiceProvider),
+              ],
 
               const SizedBox(height: 40),
 
@@ -120,7 +130,9 @@ class _TextBubble extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08), // ✅ Fixed withValues
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)), // ✅ Fixed withValues
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+        ), // ✅ Fixed withValues
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,6 +149,65 @@ class _TextBubble extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _OfflineSpeechPackCard extends StatelessWidget {
+  final VoiceProvider voiceProvider;
+
+  const _OfflineSpeechPackCard({required this.voiceProvider});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.cuGold.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.cuGold.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.download_for_offline_rounded,
+                color: AppTheme.cuNavy,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  context.t('voice_offline_pack_title'),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.cuNavy,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            context.t('voice_offline_pack_body'),
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton.icon(
+              onPressed: voiceProvider.canOpenOfflineSpeechSettings
+                  ? () => voiceProvider.openOfflineSpeechSettings()
+                  : null,
+              icon: const Icon(Icons.settings_voice_rounded, size: 18),
+              label: Text(context.t('voice_open_speech_settings')),
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 250.ms).slideY(begin: -0.05);
   }
 }
 
@@ -183,7 +254,9 @@ class _ExampleCommands extends StatelessWidget {
         Text(
           context.t('voice_try_saying'),
           style: theme.textTheme.labelMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.55), // ✅ Fixed withValues
+            color: theme.colorScheme.onSurface.withValues(
+              alpha: 0.55,
+            ), // ✅ Fixed withValues
           ),
         ),
         const SizedBox(height: 10),

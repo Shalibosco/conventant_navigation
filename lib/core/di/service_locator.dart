@@ -3,15 +3,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/storage_service.dart';
 import '../services/network_service.dart';
+import '../services/native_settings_service.dart';
 import '../services/permissions_service.dart';
 
 // ── Models
 import '../../data/models/location_model.dart';
-import '../../data/models/info_model.dart';
 
 // ── Data Sources
 import '../../data/datasources/local_location_data_source.dart';
@@ -37,6 +38,7 @@ Future<void> initServiceLocator() async {
   // ── External ──────────────────────────────────────────────
   final prefs = await SharedPreferences.getInstance();
   sl.registerSingleton<SharedPreferences>(prefs);
+  sl.registerLazySingleton<http.Client>(() => http.Client());
 
   // ── Hive Boxes ────────────────────────────────────────────
   // Auto-recover from corrupted box (can happen if the previous process was
@@ -52,31 +54,34 @@ Future<void> initServiceLocator() async {
 
   // ── Core Services ─────────────────────────────────────────
   sl.registerLazySingleton<StorageService>(
-        () => StorageService(sl<SharedPreferences>()),
+    () => StorageService(sl<SharedPreferences>()),
   );
   sl.registerLazySingleton<NetworkService>(() => NetworkService());
+  sl.registerLazySingleton<NativeSettingsService>(
+    () => NativeSettingsService(),
+  );
   sl.registerLazySingleton<PermissionsService>(() => PermissionsService());
 
   // ── Data Sources ──────────────────────────────────────────
   sl.registerLazySingleton<LocalLocationDataSource>(
-        () => LocalLocationDataSourceImpl(locationBox),
+    () => LocalLocationDataSourceImpl(locationBox),
   );
 
-  sl.registerLazySingleton<LocalInfoDataSource>(
-        () => LocalInfoDataSource(),
-  );
+  sl.registerLazySingleton<LocalInfoDataSource>(() => LocalInfoDataSource());
 
   // ── Repositories ──────────────────────────────────────────
   sl.registerLazySingleton<LocationRepository>(
-        () => LocationRepositoryImpl(sl<LocalLocationDataSource>()),
+    () => LocationRepositoryImpl(sl<LocalLocationDataSource>()),
   );
   sl.registerLazySingleton<InfoRepository>(
-        () => InfoRepositoryImpl(sl<LocalInfoDataSource>()), // ✅ Now it will recognize it!
+    () => InfoRepositoryImpl(
+      sl<LocalInfoDataSource>(),
+    ), // ✅ Now it will recognize it!
   );
 
   // ── Feature Services ──────────────────────────────────────
   sl.registerLazySingleton<LocationService>(
-        () => LocationService(sl<PermissionsService>()),
+    () => LocationService(sl<PermissionsService>()),
   );
   sl.registerLazySingleton<RouteService>(() => RouteService());
   sl.registerLazySingleton<OfflineMapService>(() => OfflineMapService());
@@ -84,6 +89,6 @@ Future<void> initServiceLocator() async {
   sl.registerLazySingleton<SpeechService>(() => SpeechService());
   sl.registerLazySingleton<TextToSpeechService>(() => TextToSpeechService());
   sl.registerLazySingleton<VoiceCommandHandler>(
-        () => VoiceCommandHandler(sl<LocationRepository>()),
+    () => VoiceCommandHandler(sl<LocationRepository>()),
   );
 }
