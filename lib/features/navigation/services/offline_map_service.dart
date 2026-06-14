@@ -6,10 +6,27 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import '../../../core/constants/app_constants.dart';
 
+/// Result of a pre-caching run — how many tiles were saved successfully,
+/// how many failed, and whether the run was cancelled early.
+class PreCacheResult {
+  final int downloaded;
+  final int failed;
+  final bool cancelled;
+
+  const PreCacheResult({
+    required this.downloaded,
+    required this.failed,
+    this.cancelled = false,
+  });
+}
+
 class OfflineMapService {
   static Directory? _cacheDir;
   static const String _lightStyle = 'light';
   static const String _darkStyle = 'dark';
+
+  // Set to true by cancelPreCache() to stop an in-progress download loop.
+  bool _cancelRequested = false;
 
   Future<Directory> getTileCacheDirectory() async {
     if (_cacheDir != null) return _cacheDir!;
@@ -43,7 +60,7 @@ class OfflineMapService {
     await _downloadTile(style: style, z: z, x: x, y: y);
   }
 
-  Future<int> getCacheSizeInMB() async {
+  Future<double> getCacheSizeInMB() async {
     try {
       final dir = await getTileCacheDirectory();
       int totalBytes = 0;
@@ -52,9 +69,9 @@ class OfflineMapService {
           totalBytes += await entity.length();
         }
       }
-      return (totalBytes / (1024 * 1024)).round();
+      return totalBytes / (1024 * 1024);
     } catch (_) {
-      return 0;
+      return 0.0;
     }
   }
 
@@ -68,11 +85,33 @@ class OfflineMapService {
     } catch (_) {}
   }
 
+  /// Signals an in-progress preCacheCampusTiles() run to stop after the
+  /// tile it's currently processing.
+  void cancelPreCache() {
+    _cancelRequested = true;
+  }
+
+  /// Returns the number of tiles that preCacheCampusTiles() would attempt
+  /// to download for the campus bounding box at zoom levels 14–18.
+  int estimateTileCount({bool includeDarkTiles = true}) {
+    final tiles = _getTileCoordinates(
+      north: AppConstants.campusBoundNorth,
+      south: AppConstants.campusBoundSouth,
+      east: AppConstants.campusBoundEast,
+      west: AppConstants.campusBoundWest,
+      minZoom: 14,
+      maxZoom: 18,
+    );
+    return tiles.length * (includeDarkTiles ? 2 : 1);
+  }
+
   /// Pre-caches OSM tiles for the campus bounding box at zoom levels 14–18.
-  Future<void> preCacheCampusTiles({
+  Future<PreCacheResult> preCacheCampusTiles({
     void Function(double progress)? onProgress,
     bool includeDarkTiles = true,
   }) async {
+    _cancelRequested = false;
+
     final tiles = _getTileCoordinates(
       north: AppConstants.campusBoundNorth,
       south: AppConstants.campusBoundSouth,
@@ -83,31 +122,53 @@ class OfflineMapService {
     );
 
     int completed = 0;
+    int downloaded = 0;
+    int failed = 0;
     final total = tiles.length * (includeDarkTiles ? 2 : 1);
 
     for (final tile in tiles) {
-      await _downloadTile(
+      if (_cancelRequested) {
+        return PreCacheResult(
+          downloaded: downloaded,
+          failed: failed,
+          cancelled: true,
+        );
+      }
+
+      final success = await _downloadTile(
         style: _lightStyle,
         z: tile[0],
         x: tile[1],
         y: tile[2],
       );
+      success ? downloaded++ : failed++;
       completed++;
       onProgress?.call(completed / total);
     }
 
     if (includeDarkTiles) {
       for (final tile in tiles) {
-        await _downloadTile(
+        if (_cancelRequested) {
+          return PreCacheResult(
+            downloaded: downloaded,
+            failed: failed,
+            cancelled: true,
+          );
+        }
+
+        final success = await _downloadTile(
           style: _darkStyle,
           z: tile[0],
           x: tile[1],
           y: tile[2],
         );
+        success ? downloaded++ : failed++;
         completed++;
         onProgress?.call(completed / total);
       }
     }
+
+    return PreCacheResult(downloaded: downloaded, failed: failed);
   }
 
   List<List<int>> _getTileCoordinates({
@@ -140,8 +201,8 @@ class OfflineMapService {
   int _latToTile(double lat, int zoom) {
     final latRad = lat * math.pi / 180;
     return ((1 - math.log(math.tan(latRad) + 1 / math.cos(latRad)) / math.pi) /
-            2 *
-            (1 << zoom))
+        2 *
+        (1 << zoom))
         .floor();
   }
 
@@ -165,7 +226,10 @@ class OfflineMapService {
     return 'https://tile.openstreetmap.org/$z/$x/$y.png';
   }
 
-  Future<void> _downloadTile({
+  /// Downloads a single tile, returning true if it ended up cached
+  /// successfully (already present counts as success) and false if the
+  /// download failed.
+  Future<bool> _downloadTile({
     required String style,
     required int z,
     required int x,
@@ -174,23 +238,27 @@ class OfflineMapService {
     try {
       final dir = await getTileCacheDirectory();
       final file = File('${dir.path}/${_sanitizeStyle(style)}/$z/$x/$y.png');
-      if (file.existsSync()) return;
+      if (file.existsSync()) return true;
       file.parent.createSync(recursive: true);
 
       final url = _getTileUrl(style: style, z: z, x: x, y: y);
       final response = await http
           .get(
-            Uri.parse(url),
-            headers: {
-              'User-Agent':
-                  'CUNavigate/1.0 (Covenant University campus navigation)',
-            },
-          )
+        Uri.parse(url),
+        headers: {
+          'User-Agent':
+          'CUNavigate/1.0 (Covenant University campus navigation)',
+        },
+      )
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         await file.writeAsBytes(response.bodyBytes);
+        return true;
       }
-    } catch (_) {}
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 }
