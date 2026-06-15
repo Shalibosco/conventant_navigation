@@ -64,6 +64,7 @@ flutter:
   generate: true
 
   assets:
+    - assets/Student-handbook-Feb-2020.pdf
     - assets/images/
     - assets/icons/
     - assets/map/

@@ -123,9 +123,12 @@ class VoiceProvider extends ChangeNotifier {
       _setState(VoiceState.speaking);
 
       onCommandResolved?.call(command);
-      await _ttsService.speak(response);
-      if (_isActiveSession(session)) {
-        _setState(VoiceState.idle);
+      try {
+        await _ttsService.speak(response);
+      } finally {
+        if (_isActiveSession(session)) {
+          _setState(VoiceState.idle);
+        }
       }
     } catch (e) {
       if (!_isActiveSession(session)) return;
@@ -188,8 +191,11 @@ class VoiceProvider extends ChangeNotifier {
       return;
     }
     _setState(VoiceState.speaking);
-    await _ttsService.speak(text);
-    _setState(VoiceState.idle);
+    try {
+      await _ttsService.speak(text);
+    } finally {
+      _setState(VoiceState.idle);
+    }
   }
 
   void _setState(VoiceState newState) {

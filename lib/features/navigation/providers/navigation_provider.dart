@@ -29,8 +29,11 @@ class NavigationProvider extends ChangeNotifier {
   bool _isNavigating = false;
   bool _isRerouting = false;
   bool _isUpdatingRoute = false;
+  bool _isFetchingLocation = false;
   String _activeFilter = 'all';
   String _searchQuery = '';
+  String? _navigationError;
+  RouteResult? _activeRoute;
 
   List<LocationModel> _allLocations = [];
   List<LocationModel> _filteredLocations = [];
@@ -96,10 +99,20 @@ class NavigationProvider extends ChangeNotifier {
   LocationModel? get selectedDestination => _selectedDestination;
   bool get isNavigating => _isNavigating;
   bool get isRerouting => _isRerouting;
+  bool get isFetchingLocation => _isFetchingLocation;
   String get activeFilter => _activeFilter;
   List<LocationModel> get searchResults => _filteredLocations;
   bool get hasRoute => _routePoints.isNotEmpty;
+  String? get navigationError => _navigationError;
+  bool get hasNavigationError => _navigationError != null;
+  bool get isOnlineRoute => _activeRoute?.isOnlineRoute ?? false;
   MapTrailService get trailService => _trailService;
+
+  void clearNavigationError() {
+    if (_navigationError == null) return;
+    _navigationError = null;
+    notifyListeners();
+  }
 
   void updateVoiceProvider(VoiceProvider voice) {
     _voiceProvider = voice;
@@ -193,11 +206,26 @@ class NavigationProvider extends ChangeNotifier {
     );
   }
 
+  double get routeDistanceMeters =>
+      _activeRoute?.distanceMeters ?? distanceToDestination;
+
   String get estimatedTime {
+    final seconds = _activeRoute?.durationSeconds;
+    if (seconds != null && seconds > 0) {
+      final minutes = (seconds / 60).ceil();
+      return '$minutes mins';
+    }
+
     final meters = distanceToDestination;
-    if (meters == 0) return '0 mins';
-    final minutes = (meters / 80).ceil();
+    if (meters <= 0) return '0 mins';
+    final minutes = (meters / 75).ceil();
     return '$minutes mins';
+  }
+
+  String get routeSourceLabel {
+    if (_isUpdatingRoute) return 'Calculating...';
+    if (_routePoints.isEmpty) return '...';
+    return isOnlineRoute ? 'Live route' : 'Offline estimate';
   }
 
   // 🚀 Logic Methods
@@ -211,9 +239,20 @@ class NavigationProvider extends ChangeNotifier {
   }
 
   Future<void> fetchUserLocation() async {
-    final position = await _locationService.getCurrentLocation();
-    if (position != null) {
-      _userLocation = position;
+    _isFetchingLocation = true;
+    _navigationError = null;
+    notifyListeners();
+
+    try {
+      final position = await _locationService.getCurrentLocation();
+      if (position != null) {
+        _userLocation = position;
+      }
+    } catch (e) {
+      _navigationError = _friendlyLocationError(e);
+      debugPrint('NavigationProvider: fetchUserLocation failed - $e');
+    } finally {
+      _isFetchingLocation = false;
       notifyListeners();
     }
   }
@@ -223,8 +262,15 @@ class NavigationProvider extends ChangeNotifier {
   }
 
   Future<void> _startLocationTracking() async {
-    await _locationSubscription?.cancel();
-    await _locationService.startTracking();
+    try {
+      await _locationSubscription?.cancel();
+      await _locationService.startTracking();
+    } catch (e) {
+      _navigationError = _friendlyLocationError(e);
+      debugPrint('NavigationProvider: start tracking failed - $e');
+      notifyListeners();
+      return;
+    }
 
     _locationSubscription = _locationService.locationStream.listen(
       (LatLng position) {
@@ -243,7 +289,9 @@ class NavigationProvider extends ChangeNotifier {
         notifyListeners();
       },
       onError: (Object error) {
-        debugPrint('NavigationProvider: location stream error — $error');
+        _navigationError = _friendlyLocationError(error);
+        debugPrint('NavigationProvider: location stream error - $error');
+        notifyListeners();
       },
     );
   }
@@ -525,6 +573,8 @@ class NavigationProvider extends ChangeNotifier {
     _selectedDestination = destination;
     _isNavigating = true;
     _isRerouting = false;
+    _navigationError = null;
+    _activeRoute = null;
     _lastRouteFrom = null;
     _lastRerouteTime = null;
     _lastGuidanceTime = null;
@@ -553,6 +603,8 @@ class NavigationProvider extends ChangeNotifier {
     _isNavigating = false;
     _isRerouting = false;
     _selectedDestination = null;
+    _navigationError = null;
+    _activeRoute = null;
     _lastRouteFrom = null;
     _lastRerouteTime = null;
     _lastGuidanceTime = null;
@@ -591,7 +643,12 @@ class NavigationProvider extends ChangeNotifier {
     try {
       final route = await _routeService.getRoute(routeStart, destLatLng);
       _lastRouteFrom = routeStart;
+      _activeRoute = route;
       _routePoints = route.points;
+      _navigationError = null;
+    } catch (e) {
+      _navigationError = 'Route could not be calculated. Try again.';
+      debugPrint('NavigationProvider: route update failed - $e');
     } finally {
       _isUpdatingRoute = false;
       if (isRerouting) {
@@ -603,6 +660,20 @@ class NavigationProvider extends ChangeNotifier {
 
   // 🛣️ Get trail distance in kilometers
   double get trailDistance => _trailService.totalDistanceKm;
+
+  String _friendlyLocationError(Object error) {
+    final message = error.toString().toLowerCase();
+    if (message.contains('disabled') || message.contains('gps')) {
+      return 'Location services are disabled. Enable GPS to show your position.';
+    }
+    if (message.contains('permanently denied')) {
+      return 'Location permission is permanently denied. Enable it in app settings.';
+    }
+    if (message.contains('denied')) {
+      return 'Location permission is required for live campus navigation.';
+    }
+    return 'Could not get your location. Check GPS and try again.';
+  }
 
   @override
   void dispose() {

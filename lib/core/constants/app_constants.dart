@@ -51,6 +51,9 @@ class AppConstants {
   // ── Assets ────────────────────────────────────────────────
   static const String locationsJsonPath = 'assets/map/covenant_locations.json';
   static const String langBasePath      = 'assets/lang/';
+  static const String studentHandbookAssetPath =
+      'assets/Student-handbook-Feb-2020.pdf';
+  static const String studentHandbookFileName = 'Student-handbook-Feb-2020.pdf';
 
   // ── Categories ────────────────────────────────────────────
   static const String catAcademic   = 'academic';
@@ -89,5 +92,4 @@ class AppConstants {
 ]
 ''';
 }
-
 

@@ -36,6 +36,8 @@ class RouteResult {
 // ── Service ───────────────────────────────────────────────────────────────────
 
 class RouteService {
+  static const double _walkingMetersPerSecond = 1.25;
+
   // ── Config ────────────────────────────────────────────────
   final String osrmBaseUrl;
   final bool preferOnlineRoutes;
@@ -71,8 +73,8 @@ class RouteService {
     try {
       final uri = Uri.parse(
         '$osrmBaseUrl/${start.longitude},${start.latitude};'
-            '${end.longitude},${end.latitude}'
-            '?overview=full&geometries=geojson',
+        '${end.longitude},${end.latitude}'
+        '?overview=full&geometries=geojson',
       );
 
       final response = await _httpClient
@@ -131,7 +133,10 @@ class RouteService {
     // Search a bounded window around the last known position.
     // Looking back 5 segments handles slight GPS jitter; forward 30 covers
     // a sprinting user between GPS ticks.
-    final windowStart = (_lastNearestIndex - 5).clamp(0, routePoints.length - 2);
+    final windowStart = (_lastNearestIndex - 5).clamp(
+      0,
+      routePoints.length - 2,
+    );
     final windowEnd = (_lastNearestIndex + 30).clamp(0, routePoints.length - 2);
 
     var shortest = double.infinity;
@@ -201,7 +206,7 @@ class RouteService {
     return RouteResult(
       points: [start, end],
       distanceMeters: dist,
-      durationSeconds: 0,
+      durationSeconds: dist / _walkingMetersPerSecond,
       isOnlineRoute: false,
     );
   }
@@ -239,9 +244,7 @@ class RouteService {
     final closestX = sx + clamped * dx;
     final closestY = sy + clamped * dy;
 
-    return math.sqrt(
-      math.pow(px - closestX, 2) + math.pow(py - closestY, 2),
-    );
+    return math.sqrt(math.pow(px - closestX, 2) + math.pow(py - closestY, 2));
   }
 
   /// Returns the next waypoint along the route ahead of [currentLocation].

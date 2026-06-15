@@ -30,6 +30,8 @@ class VoiceUI extends StatelessWidget {
           onTap: () {
             if (voiceProvider.isListening) {
               voiceProvider.stopListening();
+            } else if (voiceProvider.isSpeaking) {
+              voiceProvider.stopListening();
             } else if (voiceProvider.isIdle) {
               voiceProvider.startListening();
             }

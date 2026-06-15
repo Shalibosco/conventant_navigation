@@ -17,6 +17,7 @@ import '../../multilingual/localization/app_localization.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../core/routes/app_router.dart';
+import '../../../core/services/native_settings_service.dart';
 import '../../../data/models/location_model.dart';
 import '../../information/screens/info_screen.dart';
 import '../../settings/screens/settings_screen.dart';
@@ -133,6 +134,18 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+  Future<void> _openLocationSettings() async {
+    final opened = await sl<NativeSettingsService>().openLocationSettings();
+    if (!mounted) return;
+    if (!opened) {
+      Helpers.showSnackBar(
+        context,
+        'Open device settings and enable location services.',
+        isError: true,
+      );
+    }
+  }
+
   @override
   void dispose() {
     _voiceProvider?.onCommandResolved = null;
@@ -146,6 +159,10 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     final nav = context.watch<NavigationProvider>();
     final theme = Theme.of(context);
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final navigationPanelHeight = nav.isNavigating
+        ? (screenHeight * 0.38).clamp(280.0, 360.0).toDouble()
+        : 0.0;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -153,8 +170,8 @@ class _MapScreenState extends State<MapScreen> {
       drawer: const AppDrawer(),
       body: SlidingUpPanel(
         controller: _panelController,
-        minHeight: nav.isNavigating ? 160 : 0,
-        maxHeight: 340,
+        minHeight: navigationPanelHeight,
+        maxHeight: navigationPanelHeight,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         color: theme.colorScheme.surface,
         boxShadow: [
@@ -241,6 +258,15 @@ class _MapScreenState extends State<MapScreen> {
                         const SizedBox(height: 10),
                         const _CategoryChips(),
                       ],
+                      if (nav.hasNavigationError) ...[
+                        const SizedBox(height: 10),
+                        _NavigationIssueBanner(
+                          message: nav.navigationError!,
+                          onRetry: nav.fetchUserLocation,
+                          onSettings: _openLocationSettings,
+                          onDismiss: nav.clearNavigationError,
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -249,7 +275,7 @@ class _MapScreenState extends State<MapScreen> {
 
             Positioned(
               right: 16,
-              bottom: nav.isNavigating ? 200 : 120,
+              bottom: nav.isNavigating ? navigationPanelHeight + 32 : 120,
               child: Column(
                 children: [
                   _MapFab(icon: Icons.my_location_rounded, onTap: _recenter),
@@ -266,7 +292,7 @@ class _MapScreenState extends State<MapScreen> {
             ),
 
             Positioned(
-              bottom: nav.isNavigating ? 180 : 40,
+              bottom: nav.isNavigating ? navigationPanelHeight + 16 : 40,
               left: 0,
               right: 0,
               child: const Center(child: VoiceFab()),
@@ -579,124 +605,135 @@ class _NavigationPanel extends StatelessWidget {
     if (dest == null) return const SizedBox.shrink();
     final color = Helpers.getCategoryColor(dest.category);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-      child: Column(
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppTheme.lightBorder,
-              borderRadius: BorderRadius.circular(2),
+    return SafeArea(
+      top: false,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppTheme.lightBorder,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  Helpers.getCategoryIcon(dest.category),
-                  color: color,
-                  size: 26,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      dest.getLocalizedName(langCode),
-                      style: theme.textTheme.titleLarge,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      _categoryLabel(context, dest.category),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppTheme.lightSubText,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: onClose,
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: const BoxDecoration(
-                    color: AppTheme.lightBorder,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.close_rounded, size: 18),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.cuNavy.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.cuNavy.withValues(alpha: 0.1)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            const SizedBox(height: 16),
+            Row(
               children: [
-                _Stat(
-                  icon: Icons.straighten_rounded,
-                  label: context.t('nav_distance'),
-                  value: Helpers.formatDistance(nav.distanceToDestination),
-                  color: AppTheme.cuNavy,
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    Helpers.getCategoryIcon(dest.category),
+                    color: color,
+                    size: 26,
+                  ),
                 ),
-                Container(width: 1, height: 36, color: AppTheme.lightBorder),
-                _Stat(
-                  icon: Icons.directions_walk_rounded,
-                  label: context.t('nav_walk_time'),
-                  value: nav.estimatedTime,
-                  color: AppTheme.navGreen,
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        dest.getLocalizedName(langCode),
+                        style: theme.textTheme.titleLarge,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        _categoryLabel(context, dest.category),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.lightSubText,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Container(width: 1, height: 36, color: AppTheme.lightBorder),
-                _Stat(
-                  icon: Icons.route_rounded,
-                  label: context.t('nav_route'),
-                  value: nav.isRerouting
-                      ? 'Rerouting...'
-                      : nav.hasRoute
-                      ? context.t('nav_route_ready')
-                      : '...',
-                  color: AppTheme.cuGold,
+                GestureDetector(
+                  onTap: onClose,
+                  child: Container(
+                    width: 34,
+                    height: 34,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.lightBorder,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.close_rounded, size: 18),
+                  ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: onClose,
-              icon: const Icon(Icons.close_rounded, size: 18),
-              label: Text(context.t('btn_cancel')),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.errorRed,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.cuNavy.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppTheme.cuNavy.withValues(alpha: 0.1),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _Stat(
+                      icon: Icons.straighten_rounded,
+                      label: context.t('nav_distance'),
+                      value: Helpers.formatDistance(nav.routeDistanceMeters),
+                      color: AppTheme.cuNavy,
+                    ),
+                  ),
+                  Container(width: 1, height: 36, color: AppTheme.lightBorder),
+                  Expanded(
+                    child: _Stat(
+                      icon: Icons.directions_walk_rounded,
+                      label: context.t('nav_walk_time'),
+                      value: nav.estimatedTime,
+                      color: AppTheme.navGreen,
+                    ),
+                  ),
+                  Container(width: 1, height: 36, color: AppTheme.lightBorder),
+                  Expanded(
+                    child: _Stat(
+                      icon: Icons.route_rounded,
+                      label: context.t('nav_route'),
+                      value: nav.isRerouting
+                          ? 'Rerouting...'
+                          : nav.hasRoute
+                          ? nav.routeSourceLabel
+                          : '...',
+                      color: AppTheme.cuGold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: onClose,
+                icon: const Icon(Icons.close_rounded, size: 18),
+                label: Text(context.t('btn_cancel')),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.errorRed,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -723,6 +760,87 @@ class _NavigationPanel extends StatelessWidget {
   }
 }
 
+class _NavigationIssueBanner extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  final VoidCallback onSettings;
+  final VoidCallback onDismiss;
+
+  const _NavigationIssueBanner({
+    required this.message,
+    required this.onRetry,
+    required this.onSettings,
+    required this.onDismiss,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.errorContainer,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.10),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.location_disabled_rounded,
+                  color: theme.colorScheme.onErrorContainer,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onErrorContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  onPressed: onDismiss,
+                  icon: Icon(
+                    Icons.close_rounded,
+                    color: theme.colorScheme.onErrorContainer,
+                    size: 18,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                TextButton(onPressed: onRetry, child: const Text('Retry')),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: onSettings,
+                  child: const Text('Open settings'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(duration: 180.ms).slideY(begin: -0.05);
+  }
+}
+
 class _Stat extends StatelessWidget {
   final IconData icon;
   final String label, value;
@@ -745,8 +863,17 @@ class _Stat extends StatelessWidget {
         Text(
           value,
           style: t.textTheme.titleMedium?.copyWith(color: color, fontSize: 13),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
         ),
-        Text(label, style: t.textTheme.labelSmall?.copyWith(fontSize: 10)),
+        Text(
+          label,
+          style: t.textTheme.labelSmall?.copyWith(fontSize: 10),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
       ],
     );
   }

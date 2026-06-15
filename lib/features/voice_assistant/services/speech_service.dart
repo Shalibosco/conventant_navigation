@@ -35,6 +35,18 @@ class SpeechService {
   final StreamController<String> _wordStreamController =
   StreamController<String>.broadcast();
 
+  // ── On-device locale negotiation state ────────────────────
+  /// Locales that have returned `error_language_unavailable` (or
+  /// `error_language_not_supported`) when used with `onDevice: true`.
+  /// Once a locale lands here we stop retrying it on-device for the
+  /// lifetime of this service instance — the offline pack simply isn't
+  /// installed for it, so retrying just produces more noise/errors.
+  final Set<String> _onDeviceUnavailableLocales = {};
+
+  /// The most recent locale that produced usable on-device results.
+  /// We try this locale first for future on-device fallback attempts.
+  String? _verifiedOnDeviceLocale;
+
   // ── Public getters ────────────────────────────────────────
   bool get isListening => _isListening;
   bool get isInitialized => _isInitialized;
@@ -83,10 +95,17 @@ class SpeechService {
   }
 
   /// Returns a de-duplicated, priority-ordered list of locales to try.
-  List<String> _candidateLocales(
-      String preferred,
-      List<LocaleName> available,
-      ) {
+  ///
+  /// Order of priority:
+  ///   1. A locale already verified to work for on-device recognition.
+  ///   2. The resolved "preferred" locale.
+  ///   3. en-NG / en-US / en-GB / en-AU, if present on the device.
+  ///   4. *Every* other English-family locale the device reports (not just
+  ///      the first one) — this matters because the first English locale
+  ///      reported by the platform is often the system locale (e.g.
+  ///      en-GB), which may not have an offline pack installed even though
+  ///      it's "available" for cloud recognition.
+  List<String> _candidateLocales(String preferred, List<LocaleName> available) {
     final out = <String>[];
 
     void addIfExists(String pattern) {
@@ -97,12 +116,21 @@ class SpeechService {
       }
     }
 
-    void addFirstByPrefix(String prefix) {
+    void addAllByPrefix(String prefix) {
       for (final locale in available) {
         final normalized = _normalizeLocale(locale.localeId);
         if (normalized == prefix || normalized.startsWith('$prefix-')) {
           if (!out.contains(locale.localeId)) out.add(locale.localeId);
-          break;
+        }
+      }
+    }
+
+    // A locale that has already proven to work on-device is the safest bet,
+    // so it goes first if it's still in the available list.
+    if (_verifiedOnDeviceLocale != null) {
+      for (final l in available) {
+        if (l.localeId == _verifiedOnDeviceLocale) {
+          if (!out.contains(l.localeId)) out.add(l.localeId);
         }
       }
     }
@@ -112,8 +140,36 @@ class SpeechService {
     addIfExists('en-US');
     addIfExists('en-GB');
     addIfExists('en-AU');
-    addFirstByPrefix('en');
+    addAllByPrefix('en');
     return out.toSet().toList();
+  }
+
+  /// True once every English-family locale the device reports has already
+  /// failed on-device recognition with `error_language_unavailable`. When
+  /// this is the case, there's no point attempting on-device recognition
+  /// again this session — every attempt would just fail the same way.
+  bool _onDeviceLikelyUnsupported(List<LocaleName> available) {
+    final englishLocales = available
+        .map((l) => l.localeId)
+        .where((id) => _normalizeLocale(id).startsWith('en'))
+        .toSet();
+
+    if (englishLocales.isEmpty) return false;
+    return englishLocales.every(_onDeviceUnavailableLocales.contains);
+  }
+
+  /// Records the outcome of an on-device attempt so future calls can pick
+  /// better candidates and avoid known-bad locales.
+  void _recordOnDeviceOutcome(String localeId, {required bool usable}) {
+    if (usable) {
+      _verifiedOnDeviceLocale = localeId;
+      _onDeviceUnavailableLocales.remove(localeId);
+    } else if (_hasLanguageUnavailableError) {
+      _onDeviceUnavailableLocales.add(localeId);
+      if (_verifiedOnDeviceLocale == localeId) {
+        _verifiedOnDeviceLocale = null;
+      }
+    }
   }
 
   // ── Error classifiers ─────────────────────────────────────
@@ -214,7 +270,7 @@ class SpeechService {
     void Function(String partial)? onPartialResult,
     void Function()? onListeningStarted,
   }) async {
-    final listenDuration = Duration(
+    const listenDuration = Duration(
       seconds: AppConstants.voiceListenSeconds < 8
           ? 8
           : AppConstants.voiceListenSeconds,
@@ -294,11 +350,12 @@ class SpeechService {
   /// Listens for speech and returns the recognized text.
   ///
   /// Strategy:
-  ///   1. Try the preferred locale with on-device recognition.
-  ///   2. If that fails, retry the same locale with cloud recognition.
-  ///   3. Fall back to at most [_maxFallbackLocales] alternative locales.
+  ///   1. Try the preferred locale with cloud recognition first.
+  ///   2. Retry the same locale with on-device recognition when useful —
+  ///      unless that locale is already known to lack an offline pack.
+  ///   3. Fall back across available English locales before giving up.
   ///   4. Return the best partial if no final result was produced.
-  static const int _maxFallbackLocales = 2;
+  static const int _maxFallbackLocales = 5;
 
   Future<String?> listen({
     required String langCode,
@@ -320,45 +377,17 @@ class SpeechService {
     _lastErrorCode = '';
     _lastEmittedPartial = null;
 
-    int fallbacksUsed = 0;
-
     try {
-      for (final candidate in candidates) {
-        if (fallbacksUsed >= _maxFallbackLocales) break;
-        if (candidate != candidates.first) fallbacksUsed++;
-
+      for (final candidate in candidates.take(_maxFallbackLocales)) {
         _lastErrorCode = '';
 
-        // ── Pass 1: on-device ─────────────────────────────
-        final localResult = await _listenOnce(
-          localeId: candidate,
-          onDevice: true,
-          onPartialResult: onPartialResult,
-          onListeningStarted: onListeningStarted,
-        );
-
-        if (_hasUsableText(localResult.finalText)) {
-          return localResult.finalText;
-        }
-
-        bestPartial ??= localResult.partialText;
-
-        final shouldTryCloud = _hasLanguageUnavailableError ||
-            _hasNetworkError ||
-            !_hasUsableText(localResult.partialText);
-
-        if (!shouldTryCloud) {
-          // On-device engine worked but heard nothing — no point trying more
-          // locales; the user simply didn't speak.
-          break;
-        }
-
-        // ── Pass 2: cloud / network recognition ──────────
-        _lastErrorCode = '';
+        // Cloud recognition is more reliable across Android devices when
+        // Nigerian English or offline packs are unavailable.
         final cloudResult = await _listenOnce(
           localeId: candidate,
           onDevice: false,
           onPartialResult: onPartialResult,
+          onListeningStarted: onListeningStarted,
         );
 
         if (_hasUsableText(cloudResult.finalText)) {
@@ -367,9 +396,43 @@ class SpeechService {
 
         bestPartial ??= cloudResult.partialText;
 
-        // If cloud also failed with a network error there is no point
-        // retrying further locales; they will face the same issue.
-        if (_hasNetworkError) break;
+        if (_hasUsableText(bestPartial)) {
+          break;
+        }
+
+        // If cloud cannot hear anything, try on-device for this locale
+        // before moving to the next candidate — but only if we haven't
+        // already proven this locale lacks an offline pack, and only if
+        // on-device recognition isn't already known to be a dead end for
+        // every English locale on this device.
+        final shouldTryOnDevice =
+            !_onDeviceUnavailableLocales.contains(candidate) &&
+                !_onDeviceLikelyUnsupported(available) &&
+                (_hasLanguageUnavailableError ||
+                    _hasNetworkError ||
+                    !_hasUsableText(cloudResult.partialText));
+
+        if (!shouldTryOnDevice) continue;
+
+        _lastErrorCode = '';
+        final localResult = await _listenOnce(
+          localeId: candidate,
+          onDevice: true,
+          onPartialResult: onPartialResult,
+        );
+
+        _recordOnDeviceOutcome(
+          candidate,
+          usable: _hasUsableText(localResult.finalText) ||
+              _hasUsableText(localResult.partialText),
+        );
+
+        if (_hasUsableText(localResult.finalText)) {
+          return localResult.finalText;
+        }
+
+        bestPartial ??= localResult.partialText;
+        if (_hasUsableText(bestPartial)) break;
       }
 
       if (_hasUsableText(bestPartial)) return bestPartial;

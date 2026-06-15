@@ -29,6 +29,8 @@ class VoiceFab extends StatelessWidget {
           onTap: () {
             if (voice.isListening) {
               voice.stopListening();
+            } else if (voice.isSpeaking) {
+              voice.stopListening();
             } else if (voice.isIdle) {
               voice.startListening();
             }

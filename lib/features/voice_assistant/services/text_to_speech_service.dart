@@ -41,8 +41,8 @@ class TextToSpeechService {
     try {
       await _tts.awaitSpeakCompletion(true);
       await _tts.setSpeechRate(0.48); // natural pace
-      await _tts.setVolume(1.0);      // full volume
-      await _tts.setPitch(1.05);      // slightly warm pitch
+      await _tts.setVolume(1.0); // full volume
+      await _tts.setPitch(1.05); // slightly warm pitch
 
       // Register callbacks once — not on every initialize() call.
       _tts.setStartHandler(() => _isSpeaking = true);
@@ -96,7 +96,9 @@ class TextToSpeechService {
     final normalized = code.toLowerCase();
     // Match both exact (en-NG) and prefix (en) forms.
     return langs.any(
-          (l) => l.toLowerCase() == normalized || l.toLowerCase().startsWith('${normalized.split('-').first}-'),
+      (l) =>
+          l.toLowerCase() == normalized ||
+          l.toLowerCase().startsWith('${normalized.split('-').first}-'),
     );
   }
 
@@ -113,10 +115,27 @@ class TextToSpeechService {
 
     try {
       if (_isSpeaking) await stop();
-      await _tts.speak(trimmed);
+      _isSpeaking = true;
+      await _tts
+          .speak(trimmed)
+          .timeout(
+            _speakTimeoutFor(trimmed),
+            onTimeout: () async {
+              debugPrint('TTS speak timed out; resetting voice state.');
+              await stop();
+              return 0;
+            },
+          );
     } catch (e) {
       throw VoiceException('TTS speak failed: $e');
+    } finally {
+      _isSpeaking = false;
     }
+  }
+
+  Duration _speakTimeoutFor(String text) {
+    final seconds = (text.length / 12).ceil().clamp(4, 20).toInt();
+    return Duration(seconds: seconds);
   }
 
   // ── Playback control ──────────────────────────────────────
@@ -147,9 +166,7 @@ class TextToSpeechService {
     final raw = await _tts.getLanguages;
 
     // flutter_tts returns dynamic — safely cast each item individually.
-    _cachedLanguages = (raw as List<dynamic>)
-        .whereType<String>()
-        .toList();
+    _cachedLanguages = (raw as List<dynamic>).whereType<String>().toList();
 
     return _cachedLanguages!;
   }

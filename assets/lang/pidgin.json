@@ -5,6 +5,7 @@
   "nav_map": "Map",
   "nav_voice": "Voice",
   "nav_info": "Info",
+  "nav_student_handbook": "Student Handbook",
   "nav_settings": "Settings",
 
   "map_search_hint": "Search for building, hostel, office...",
@@ -50,6 +51,9 @@
   "info_tab_contacts": "Contacts",
   "info_tab_events": "Events",
   "info_last_updated": "Last updated: {date}",
+  "handbook_download_starting": "Student handbook dey download...",
+  "handbook_download_success": "Student handbook don save for {location}",
+  "handbook_download_failed": "Student handbook no fit download.",
 
   "settings_title": "Settings",
   "settings_language": "Language",

@@ -5,7 +5,14 @@ import '../../../data/repositories/location_repository.dart';
 
 // ── Command types ─────────────────────────────────────────────────────────────
 
-enum VoiceCommandType { navigate, whereAmI, listCategory, search, help, unknown }
+enum VoiceCommandType {
+  navigate,
+  whereAmI,
+  listCategory,
+  search,
+  help,
+  unknown,
+}
 
 class VoiceCommand {
   final VoiceCommandType type;
@@ -31,14 +38,31 @@ class VoiceCommand {
 class _Keywords {
   static const Map<String, List<String>> nav = {
     'en': [
-      'go to', 'take me to', 'take me', 'navigate to', 'navigate me to',
-      'show me', 'where is', 'find', 'route to', 'route me to',
-      'direct me to', 'directions to', 'directions for',
-      'how do i get to', 'lead me to',
+      'go to',
+      'take me to',
+      'take me',
+      'navigate to',
+      'navigate me to',
+      'show me',
+      'where is',
+      'find',
+      'route to',
+      'route me to',
+      'direct me to',
+      'directions to',
+      'directions for',
+      'how do i get to',
+      'lead me to',
     ],
     'yo': ['mu mi lo', 'fi han mi', 'wa', 'lo si'],
     'ig': ['were m gaa', 'chota', 'gaa', 'gosi m'],
-    'pidgin': ['take me go', 'wia dey', 'how i go reach', 'find', 'carry me go'],
+    'pidgin': [
+      'take me go',
+      'wia dey',
+      'how i go reach',
+      'find',
+      'carry me go',
+    ],
   };
 
   static const Map<String, List<String>> whereAmI = {
@@ -65,50 +89,104 @@ class _Keywords {
 
 /// Maps surface words → canonical category slugs.
 const Map<String, String> _catMap = {
-  'hostel': 'hostel', 'hall': 'hostel', 'dormitory': 'hostel',
-  'accommodation': 'hostel', 'class': 'academic', 'lecture': 'academic',
-  'building': 'academic', 'faculty': 'academic', 'department': 'academic',
-  'lab': 'academic', 'library': 'academic', 'cst': 'academic',
-  'food': 'food', 'eat': 'food', 'cafeteria': 'food',
-  'restaurant': 'food', 'canteen': 'food',
-  'chapel': 'worship', 'church': 'worship', 'worship': 'worship',
+  'hostel': 'hostel',
+  'hall': 'hostel',
+  'dormitory': 'hostel',
+  'accommodation': 'hostel',
+  'class': 'academic',
+  'lecture': 'academic',
+  'building': 'academic',
+  'faculty': 'academic',
+  'department': 'academic',
+  'lab': 'academic',
+  'library': 'academic',
+  'cst': 'academic',
+  'food': 'food',
+  'eat': 'food',
+  'cafeteria': 'food',
+  'restaurant': 'food',
+  'canteen': 'food',
+  'chapel': 'worship',
+  'church': 'worship',
+  'worship': 'worship',
   'pray': 'worship',
-  'sport': 'sports', 'gym': 'sports', 'field': 'sports', 'stadium': 'sports',
-  'hospital': 'medical', 'clinic': 'medical', 'medical': 'medical',
+  'sport': 'sports',
+  'gym': 'sports',
+  'field': 'sports',
+  'stadium': 'sports',
+  'hospital': 'medical',
+  'clinic': 'medical',
+  'medical': 'medical',
   'health': 'medical',
-  'admin': 'admin', 'office': 'admin', 'senate': 'admin', 'gate': 'admin',
-  'park': 'recreation', 'square': 'recreation', 'relax': 'recreation',
+  'admin': 'admin',
+  'office': 'admin',
+  'senate': 'admin',
+  'gate': 'admin',
+  'park': 'recreation',
+  'square': 'recreation',
+  'relax': 'recreation',
   'eagle': 'recreation',
 };
 
 /// Common phrasings → canonical query strings.
 const Map<String, String> _queryAliases = {
-  'chapel of light': 'chapel', 'university chapel': 'chapel',
-  'church auditorium': 'chapel', 'main library': 'library',
-  'school library': 'library', 'learning resource centre': 'library',
+  'chapel of light': 'chapel',
+  'university chapel': 'chapel',
+  'church auditorium': 'chapel',
+  'main library': 'library',
+  'school library': 'library',
+  'learning resource centre': 'library',
   'learning resource center': 'library',
   'centre for learning resources': 'library',
   'center for learning resources': 'library',
-  'medical center': 'medical centre', 'health center': 'medical centre',
-  'health centre': 'medical centre', 'clinic': 'medical centre',
-  'main gate': 'gate', 'school gate': 'gate',
-  'sports complex': 'stadium', 'football field': 'stadium',
-  'lecture hall': 'lecture theatre', 'lecture theater': 'lecture theatre',
+  'medical center': 'medical centre',
+  'health center': 'medical centre',
+  'health centre': 'medical centre',
+  'clinic': 'medical centre',
+  'main gate': 'gate',
+  'school gate': 'gate',
+  'sports complex': 'stadium',
+  'football field': 'stadium',
+  'lecture hall': 'lecture theatre',
+  'lecture theater': 'lecture theatre',
   'entrepreneurship building': 'ceds',
   'post graduate hall': 'postgraduate hall',
-  'pg hall': 'postgraduate hall', 'pg hostel': 'postgraduate hall',
+  'pg hall': 'postgraduate hall',
+  'pg hostel': 'postgraduate hall',
 };
 
 /// Words stripped from a query before searching.
 const Set<String> _queryStopWords = {
-  'a', 'an', 'at', 'building', 'center', 'centre', 'for',
-  'hall', 'house', 'main', 'of', 'the', 'to', 'university',
+  'a',
+  'an',
+  'at',
+  'building',
+  'center',
+  'centre',
+  'for',
+  'hall',
+  'house',
+  'main',
+  'of',
+  'the',
+  'to',
+  'university',
 };
 
 /// Words stripped from raw transcript before intent detection.
 const Set<String> _fillerWords = {
-  'a', 'an', 'can', 'could', 'kindly', 'me', 'now',
-  'please', 'the', 'to', 'would', 'you',
+  'a',
+  'an',
+  'can',
+  'could',
+  'kindly',
+  'me',
+  'now',
+  'please',
+  'the',
+  'to',
+  'would',
+  'you',
 };
 
 /// Safety cap: transcripts longer than this are truncated before processing.
@@ -157,7 +235,10 @@ class VoiceCommandHandler {
   // ── Intent resolvers ────────────────────────────────────────────────────────
 
   VoiceCommand? _tryWhereAmI(String t, String lang) {
-    if (!_matchesAny(t, _Keywords.whereAmI[lang] ?? _Keywords.whereAmI['en']!)) {
+    if (!_matchesAny(
+      t,
+      _Keywords.whereAmI[lang] ?? _Keywords.whereAmI['en']!,
+    )) {
       return null;
     }
     return const VoiceCommand(type: VoiceCommandType.whereAmI);
@@ -171,7 +252,10 @@ class VoiceCommandHandler {
   }
 
   VoiceCommand? _tryCategory(String t, String lang) {
-    if (!_matchesAny(t, _Keywords.category[lang] ?? _Keywords.category['en']!)) {
+    if (!_matchesAny(
+      t,
+      _Keywords.category[lang] ?? _Keywords.category['en']!,
+    )) {
       return null;
     }
     final cat = _extractCategory(t);
@@ -185,7 +269,9 @@ class VoiceCommandHandler {
     // Strip navigation keyword from the front, noting whether one was present.
     String query = t;
     bool hasNavKeyword = false;
-    for (final kw in navKeys) {
+    final orderedNavKeys = [...navKeys]
+      ..sort((a, b) => _normalize(b).length.compareTo(_normalize(a).length));
+    for (final kw in orderedNavKeys) {
       final normalized = _normalize(kw);
       if (t.contains(normalized)) {
         query = t.replaceFirst(normalized, '').trim();
@@ -216,16 +302,14 @@ class VoiceCommandHandler {
     }
 
     // ── Fallback: full-corpus scan (result cached) ───────────────────────────
-    if (hasNavKeyword) {
-      final fallback = await _fallbackLocationSearch(query);
-      if (fallback != null) {
-        return VoiceCommand(
-          type: VoiceCommandType.navigate,
-          query: query,
-          resolvedLocation: fallback,
-          matchCount: 1,
-        );
-      }
+    final fallback = await _fallbackLocationSearch(query);
+    if (fallback != null) {
+      return VoiceCommand(
+        type: VoiceCommandType.navigate,
+        query: query,
+        resolvedLocation: fallback,
+        matchCount: 1,
+      );
     }
 
     // ── Category as last resort ──────────────────────────────────────────────
@@ -251,13 +335,25 @@ class VoiceCommandHandler {
     required bool hasNavKeyword,
   }) {
     // Single exact match → navigate directly.
-    final exactMatches =
-    locs.where((loc) => _isExactMatch(loc, query)).toList();
+    final exactMatches = locs
+        .where((loc) => _isExactMatch(loc, query))
+        .toList();
     if (exactMatches.length == 1) {
       return VoiceCommand(
         type: VoiceCommandType.navigate,
         query: query,
         resolvedLocation: exactMatches.first,
+        matchCount: 1,
+      );
+    }
+
+    // Voice navigation should act when the repository resolves one clear
+    // destination, even if the spoken query was a single word like "chapel".
+    if (hasNavKeyword && locs.length == 1) {
+      return VoiceCommand(
+        type: VoiceCommandType.navigate,
+        query: query,
+        resolvedLocation: locs.first,
         matchCount: 1,
       );
     }
@@ -298,7 +394,8 @@ class VoiceCommandHandler {
 
     // Reject ambiguous matches where a competitor scores equally well.
     final hasCompetitor = all.any(
-          (loc) => loc.id != best.id && _scoreLocation(loc, query) >= _minFallbackScore,
+      (loc) =>
+          loc.id != best.id && _scoreLocation(loc, query) >= _minFallbackScore,
     );
     return hasCompetitor ? null : best;
   }
@@ -307,9 +404,9 @@ class VoiceCommandHandler {
 
   /// Returns the best-scored location and its score from [locs].
   (LocationModel?, int) _bestScoredMatch(
-      String query,
-      List<LocationModel> locs,
-      ) {
+    String query,
+    List<LocationModel> locs,
+  ) {
     LocationModel? best;
     var bestScore = -1;
 
@@ -338,6 +435,13 @@ class VoiceCommandHandler {
         score += 120;
         continue; // exact match; skip token scan for this field
       }
+      final fieldSimilarity = _similarity(normalized, query);
+      if (fieldSimilarity >= 0.85) {
+        score += 90;
+      } else if (fieldSimilarity >= 0.72) {
+        score += 50;
+      }
+
       if (normalized.startsWith(query)) {
         score += 80;
       } else if (normalized.contains(query)) {
@@ -350,6 +454,8 @@ class VoiceCommandHandler {
           score += 30;
         } else if (normalized.contains(token)) {
           score += 12;
+        } else if (_isNearTokenMatch(token, fieldWords)) {
+          score += 22;
         }
       }
     }
@@ -382,6 +488,44 @@ class VoiceCommandHandler {
 
   int _wordCount(String text) =>
       _normalize(text).split(' ').where((p) => p.isNotEmpty).length;
+
+  bool _isNearTokenMatch(String token, List<String> fieldWords) {
+    if (token.length < 3) return false;
+    return fieldWords.any((word) {
+      if (word.length < 3) return false;
+      return _similarity(token, word) >= 0.72;
+    });
+  }
+
+  double _similarity(String a, String b) {
+    if (a.isEmpty && b.isEmpty) return 1;
+    if (a.isEmpty || b.isEmpty) return 0;
+    final maxLength = a.length > b.length ? a.length : b.length;
+    return 1 - (_levenshteinDistance(a, b) / maxLength);
+  }
+
+  int _levenshteinDistance(String a, String b) {
+    final previous = List<int>.generate(b.length + 1, (i) => i);
+    final current = List<int>.filled(b.length + 1, 0);
+
+    for (var i = 0; i < a.length; i++) {
+      current[0] = i + 1;
+      for (var j = 0; j < b.length; j++) {
+        final insertCost = current[j] + 1;
+        final deleteCost = previous[j + 1] + 1;
+        final replaceCost = previous[j] + (a[i] == b[j] ? 0 : 1);
+        current[j + 1] = _min3(insertCost, deleteCost, replaceCost);
+      }
+      previous.setAll(0, current);
+    }
+
+    return previous[b.length];
+  }
+
+  int _min3(int a, int b, int c) {
+    final min = a < b ? a : b;
+    return min < c ? min : c;
+  }
 
   List<String> _meaningfulTokens(String query) => _normalize(query)
       .split(' ')
@@ -485,17 +629,21 @@ class VoiceCommandHandler {
 
   /// Selects the right language string; defaults to English for unknown codes.
   String _localize(
-      String lang, {
-        required String en,
-        required String yo,
-        required String ig,
-        required String pid,
-      }) {
+    String lang, {
+    required String en,
+    required String yo,
+    required String ig,
+    required String pid,
+  }) {
     switch (lang) {
-      case 'yo': return yo;
-      case 'ig': return ig;
-      case 'pidgin': return pid;
-      default: return en;
+      case 'yo':
+        return yo;
+      case 'ig':
+        return ig;
+      case 'pidgin':
+        return pid;
+      default:
+        return en;
     }
   }
 

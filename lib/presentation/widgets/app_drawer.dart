@@ -8,6 +8,7 @@ import '../../features/multilingual/localization/app_localization.dart';
 import '../../features/voice_assistant/providers/voice_provider.dart';
 import '../../presentation/providers/app_state_provider.dart';
 import '../../core/routes/app_router.dart';
+import '../../core/services/student_handbook_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_constants.dart';
 
@@ -67,13 +68,19 @@ class AppDrawer extends StatelessWidget {
                   ).animate(delay: 150.ms).fadeIn().slideX(begin: -0.1),
 
                   _DrawerItem(
+                    icon: Icons.picture_as_pdf_rounded,
+                    label: context.t('nav_student_handbook'),
+                    onTap: () => _downloadStudentHandbook(context),
+                  ).animate(delay: 200.ms).fadeIn().slideX(begin: -0.1),
+
+                  _DrawerItem(
                     icon: Icons.settings_rounded,
                     label: context.t('nav_settings'),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.pushNamed(context, AppRoutes.settings);
                     },
-                  ).animate(delay: 200.ms).fadeIn().slideX(begin: -0.1),
+                  ).animate(delay: 250.ms).fadeIn().slideX(begin: -0.1),
 
                   const Divider(height: 24),
 
@@ -201,6 +208,49 @@ class AppDrawer extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _downloadStudentHandbook(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final startingMessage = context.t('handbook_download_starting');
+    final successTemplate = context.t('handbook_download_success');
+    final errorMessage = context.t('handbook_download_failed');
+
+    Navigator.pop(context);
+    messenger
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(startingMessage),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+    try {
+      final result = await StudentHandbookService().downloadHandbook();
+      messenger
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              successTemplate.replaceAll('{location}', result.location),
+            ),
+            backgroundColor: const Color(0xFF2ECC71),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+    } catch (_) {
+      messenger
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: const Color(0xFFE74C3C),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    }
   }
 }
 
